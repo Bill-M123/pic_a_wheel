@@ -1,5 +1,7 @@
 import os
 class Player():
+    '''The player class holds player information including the players hand and
+    bankroll.'''
 
     def __init__(self,player_dir='',name='',nickname='',email='place_holder@place_holder.com',
         password='password'):
