@@ -6,6 +6,7 @@ import pandas as pd
 from poker_classes.player import Player
 from poker_classes.dealer import Dealer
 from poker_classes.game import Game
+from poker_classes.cards import Cards
 
 working_dir=os.getcwd()
 app_dir=working_dir+'/poker_classes/'
@@ -31,3 +32,14 @@ for p in players:
 
 print(f"Common Cards: {dealer.common_cards}")
 print(f"Cards remaining in deck {len(shuffled)}")
+
+cards=Cards()
+for h in dealer.common_cards:
+    for c in h:
+        this_card=cards.get_simple_u_card_p(c)
+        print(c,this_card[0],this_card[1])
+
+for h in alba.hands:
+    for c in h:
+        this_card=cards.get_simple_u_card_p(c)
+        print(c,this_card[0],this_card[1])
