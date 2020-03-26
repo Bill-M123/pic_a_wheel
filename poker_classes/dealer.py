@@ -1,4 +1,5 @@
 import random as random
+from collections import Counter
 
 class Dealer():
     '''The dealer class is responsible for moving the cards, and holding the
@@ -47,3 +48,25 @@ class Dealer():
                 self.common_cards[i].append(card)
 
         return shuffled
+
+    def rank_hands(self,hand_list):
+        '''accept list of hands, return hand rank'''
+        #Count Cards
+        cnt=Counter(hand_list)
+        #print(cnt.most_common()[0],cnt.most_common()[1])
+        mc_1=cnt.most_common()[0]
+        mc_2=cnt.most_common()[1]
+
+        if (mc_1[1]==2) & (mc_2[1]==1):
+            return 'Pair'
+        elif (mc_1[1]==2) & (mc_2[1]==2):
+            return 'Two Pair'
+        elif (mc_1[1]==3) & (mc_2[1]==1):
+            return 'Three of a Kind'
+        elif (max(hand_list)-min(hand_list)==4)&(len(set(hand_list))==5):
+            return 'Straight'
+        elif (mc_1[1]==3) & (mc_2[1]==2):
+            return 'Full House'
+        elif (mc_1[1]==4) & (mc_2[1]==1):
+            return 'Four of a Kind'
+        return 'Unknown'
