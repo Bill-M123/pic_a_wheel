@@ -50,7 +50,7 @@ class Dealer():
         return shuffled
 
     def rank_hands(self,hand_list):
-        '''accept list of hands, return hand rank'''
+        '''accept list of 5 cards, return hand rank'''
         #Count Cards
         cnt=Counter(hand_list)
         #print(cnt.most_common()[0],cnt.most_common()[1])
