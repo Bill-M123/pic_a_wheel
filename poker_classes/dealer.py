@@ -1,6 +1,8 @@
 import random as random
 from collections import Counter
 
+import json
+
 class Dealer():
     '''The dealer class is responsible for moving the cards, and holding the
     common cards.'''
@@ -50,6 +52,102 @@ class Dealer():
         return shuffled
 
     def rank_hands(self,hand_list):
+        '''accept list of 5 cards, return hand rank
+        If Ace, run calculations twice, returns a list of best hand(s).'''
+
+        # Separate cards into ranks and suits
+        rank_list=[x[0] for x in hand_list]
+        suits_list=[x[1] for x in hand_list]
+
+        # Find two most common combinations, allows id of all hands including fh
+        cnt_rnk=Counter(rank_list)
+        mc_1=cnt_rnk.most_common()[0]
+        mc_2=cnt_rnk.most_common()[1]
+
+        # Set flush flag
+        flush_flag=False
+        if len(list(set(suits_list)))==1:
+            flush_flag=True
+
+        #set ace_flag and hand combinations to try
+
+        hand_options=[rank_list.copy()]
+        ace_flag=False
+        if 1 in rank_list:
+            ace_flag=True
+            a_h_list=[x if x!=1 else 14 for x in rank_list]
+            a_l_list=rank_list
+            hand_options=[a_h_list,a_l_list]
+
+        best_hands=[]
+
+        for tmp in hand_options:
+
+            hand_decision=False
+
+            if not flush_flag:
+
+                if (mc_1[1]==2) & (mc_2[1]==1)&(hand_decision==False):
+
+                    show=[x for x in tmp if x == mc_1[0]]+\
+                        sorted([x for x in tmp if x != mc_1[0]],reverse=True)
+                    best_hands.append(f"Pair {show}")
+
+                elif (mc_1[1]==2) & (mc_2[1]==2)&(hand_decision==False):
+
+                    if mc_1[0]>mc_2[0]:
+                        a=mc_1[0]
+                        b=mc_2[0]
+                    else:
+                        a=mc_2[0]
+                        b=mc_1[0]
+                    show=[x for x in tmp if x == a]+\
+                        [x for x in tmp if x == b]+\
+                        sorted([x for x in tmp if (x != mc_1[0])&(x != mc_2[0])],
+                            reverse=True)
+                    best_hands.append(f"Two Pair {show}")
+
+                elif (mc_1[1]==3) & (mc_2[1]==1)&(hand_decision==False):
+
+                    show=[x for x in tmp if x == mc_1[0]]+\
+                        sorted([x for x in tmp if x != mc_1[0]],reverse=True)
+                    best_hands.append(f"Three of a Kind {show}")
+
+
+                elif (max(rank_list)-min(rank_list)==4)&\
+                    (len(set(rank_list))==5)&(hand_decision==False):
+                    best_hands.append('Straight '+str(sorted(rank_list,reverse=True)))
+
+                elif (mc_1[1]==3) & (mc_2[1]==2)&(hand_decision==False):
+
+                    show=[x for x in tmp if x == mc_1[0]]+\
+                        sorted([x for x in tmp if x != mc_1[0]],reverse=True)
+
+                    best_hands.append(f"Full House {show}")
+
+                elif (mc_1[1]==4) & (mc_2[1]==1)&(hand_decision==False):
+                    show=[x for x in tmp if x == mc_1[0]]+\
+                        sorted([x for x in tmp if x != mc_1[0]],reverse=True)
+                    best_hands.append(f'Four of a Kind {show}')
+
+                else:
+                    best_hands.append('High_card '+str(sorted(tmp,reverse=True)))
+
+            elif flush_flag:
+                if (max(rank_list)-min(rank_list)==4)&(len(set(rank_list))==5)&\
+                    (hand_decision==False):
+                    best_hands.append(f"Straight Flush {sorted(tmp,reverse=True)}")
+                else:
+                    best_hands.append(f"Flush {sorted(tmp,reverse=True)}")
+            else:
+                best_hands.append('Unknown: '+str(hand_list))
+        return best_hands
+
+
+#############################################################
+# Code below currently not used.  To be removed if a need doesn't arise
+#############################################################
+    def copy_of_rank_hands(self,hand_list):
         '''accept list of 5 cards, return hand rank'''
         #Count Similar Card Combinations
         rank_list=[x[0] for x in hand_list]
@@ -69,20 +167,21 @@ class Dealer():
         ace_flag=False
         if 1 in rank_list:
             ace_flag=True
-            a_h_list=[x if x!=1 else 13 for x in rank_list]
+            a_h_list=[x if x!=1 else 14 for x in rank_list]
             a_l_list=rank_list
 
+        tmp=rank_list.copy()
+        if ace_flag:
+            tmp=a_h_list
+
         if not flush_flag:
+
             if (mc_1[1]==2) & (mc_2[1]==1):
-                tmp=rank_list.copy()
-                if ace_flag:
-                    tmp=a_h_list
-                show=[x for x in tmp if x == mc_1[0]]+sorted([x for x in tmp if x != mc_1[0]],reverse=True)
+
+                show=[x for x in tmp if x == mc_1[0]]+\
+                    sorted([x for x in tmp if x != mc_1[0]],reverse=True)
                 return f"Pair {show}"
             elif (mc_1[1]==2) & (mc_2[1]==2):
-                tmp=rank_list.copy()
-                if ace_flag:
-                    tmp=a_h_list
 
                 if mc_1[0]>mc_2[0]:
                     a=mc_1[0]
@@ -92,32 +191,43 @@ class Dealer():
                     b=mc_1[0]
                 show=[x for x in tmp if x == a]+\
                     [x for x in tmp if x == b]+\
-                    sorted([x for x in tmp if (x != mc_1[0])&(x != mc_2[0])],reverse=True)
+                    sorted([x for x in tmp if (x != mc_1[0])&(x != mc_2[0])],
+                        reverse=True)
                 return f"Two Pair {show}"
 
             elif (mc_1[1]==3) & (mc_2[1]==1):
-                return 'Three of a Kind'
+
+                show=[x for x in tmp if x == mc_1[0]]+\
+                    sorted([x for x in tmp if x != mc_1[0]],reverse=True)
+                return f"Three of a Kind {show}"
+
 
             elif (max(rank_list)-min(rank_list)==4)&(len(set(rank_list))==5):
-                return 'Straight'
+                return 'Straight '+str(sorted(rank_list,reverse=True))
+
             elif (mc_1[1]==3) & (mc_2[1]==2):
-                return 'Full House'
+
+                show=[x for x in tmp if x == mc_1[0]]+\
+                    sorted([x for x in tmp if x != mc_1[0]],reverse=True)
+
+                return f"Full House {show}"
+
             elif (mc_1[1]==4) & (mc_2[1]==1):
-                return 'Four of a Kind'
+                show=[x for x in tmp if x == mc_1[0]]+\
+                    sorted([x for x in tmp if x != mc_1[0]],reverse=True)
+                return f'Four of a Kind {show}'
+
             else:
-                sorted(rank_list,reverse=True)
-                return 'High_Card '+str(sorted(rank_list,reverse=True))
+                if ace_flag:
+                    return 'High_card '+str(sorted(tmp,reverse=True))
+                else:
+                    #sorted(rank_list,reverse=True)
+                    return 'High_card '+str(sorted(rank_list,reverse=True))
 
         elif flush_flag:
             if (max(rank_list)-min(rank_list)==4)&(len(set(rank_list))==5):
-                tmp=rank_list.copy()
-                if ace_flag:
-                    tmp=a_h_list
                 return f"Straight Flush {sorted(tmp,reverse=True)}"
             else:
-                tmp=rank_list.copy()
-                if ace_flag:
-                    tmp=a_h_list
                 return f"Flush {sorted(tmp,reverse=True)}"
         else:
             return 'Unknown: '+str(hand_list)

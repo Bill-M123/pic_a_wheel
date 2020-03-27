@@ -1,4 +1,6 @@
 import os
+import json
+
 class Player():
     '''The player class holds player information including the players hand and
     bankroll.'''
@@ -17,6 +19,7 @@ class Player():
         self.hands=[[],[]]
         self.status='out'
         self.in_pot=0
+        self.in_hand=True
         self.check_player_existence()
 
     def split_cards(self,cards):
@@ -55,10 +58,31 @@ class Player():
 
     def check_player_existence(self):
         existing_players=os.listdir(self.player_dir)
-        player_file=self.p_nickname+'.txt'
+        player_file=self.p_nickname+'.json'
 
         if player_file in existing_players:
             print(f'Found {self.p_nickname}')
+            with open(self.player_dir+player_file) as f:
+                data = json.load(f)
+
+            self.p_name=data['p_name']
+            self.p_nickname=data['p_nickname']
+            self.email=data['email']
+            self.password=data['password']
+            self.bankroll=data['bankroll']
+
         else:
             print(f"{self.p_nickname} not found.")
+            data={}
+
+            data['p_name']=self.p_name
+            data['p_nickname']=self.p_nickname
+            data['email']=self.email
+            data['password']=self.password
+            data['bankroll']=self.bankroll
+            json_data=json.dumps(data)
+
+            with open(self.player_dir+player_file, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
+
         return

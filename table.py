@@ -20,8 +20,9 @@ clyde=Player(player_dir,name='Bob Vincent',nickname='Clyde')
 
 players=[alba,bornstein,clyde]
 
+alba.add_funds(500)
 bornstein.add_funds(500)
-clyde.add_funds(1000)
+clyde.add_funds(500)
 
 this_game=Game()
 this_game.set_pic_a_wheel()
@@ -47,22 +48,6 @@ for h in alba.hands:
         this_card=cards.get_simple_u_card_p(c)
         print(c,this_card[0],this_card[1])
 
-start=dt.datetime.now()
-a=[[3,2,5,4,2],[3,3,5,4,5],[3,3,4,3,5],[3,5,4,7,6],[3,3,5,3,5],[3,3,5,3,3],]
-b=[[(3,'H'),(2,'C'),(5,'C'),(4,'D'),(2,'H')],[(3,'H'),(3,'C'),(5,'C'),(4,'D'),(5,'H')],
-    [(3,'H'),(4,'H'),(3,'C'),(7,'H'),(3,'D')],
-    [(3,'H'),(2,'H'),(8,'H'),(4,'H'),(9,'H')],[(3,'H'),(6,'C'),(5,'C'),(4,'D'),(7,'H')],
-    [(3,'H'),(2,'H'),(3,'C'),(3,'D'),(2,'S')],[(3,'H'),(3,'C'),(5,'C'),(3,'D'),(3,'S')],
-    [(3,'H'),(5,'H'),(4,'H'),(6,'H'),(2,'H')],[(3,'H'),(1,'H'),(4,'H'),(6,'S'),(2,'H')],
-]
-#for k in range(2000):
-for c in b:
-        rank=dealer.rank_hands(c)
-        print(c,rank)
-end=dt.datetime.now()
-
-time_elapsed=end-start
-print('time in seconds: ',time_elapsed.total_seconds())
 
 c=[1,2,3,4,5,6,7,8,9,10,11]
 
