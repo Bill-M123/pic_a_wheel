@@ -31,7 +31,7 @@ dealer=Dealer()
 
 shuffled=dealer.deal_cards(players,this_game)
 for p in players:
-    print(p.p_nickname,p.bankroll,p.hands)
+    print(p.p_nickname,p.bankroll,p.hands,p.common_cards)
 
 print(f"Common Cards: {dealer.common_cards}")
 print(f"Cards remaining in deck {len(shuffled)}")
@@ -46,7 +46,11 @@ for h in dealer.common_cards:
 for h in alba.hands:
     for c in h:
         this_card=cards.get_simple_u_card_p(c)
-        print(c,this_card[0],this_card[1])
+        print('Alba hand: ',c,this_card[0],this_card[1])
+
+for c in alba.common_cards:
+    this_card=cards.get_simple_u_card_p(c)
+    print('Alba common: ',c,this_card[0],this_card[1])
 
 
 c=[1,2,3,4,5,6,7,8,9,10,11]
@@ -55,3 +59,9 @@ print(len(list(combinations(c,4))))
 print(len(list(combinations(c,3))))
 print(len(list(combinations(c,2))))
 print(len(list(combinations(c,1))))
+alba.add_funds(50)
+bornstein.add_funds(75)
+clyde.add_funds(100)
+alba.save_player_data()
+bornstein.save_player_data()
+clyde.save_player_data()

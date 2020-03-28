@@ -3,5 +3,9 @@
     "p_nickname": "JohnAlba",
     "email": "place_holder@place_holder.com",
     "password": "password",
-    "bankroll": 0
+    "bankroll": 550,
+    "deposits": [
+        "03/28/20 14:04:04 500",
+        "03/28/20 14:04:04 50"
+    ]
 }

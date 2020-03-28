@@ -10,6 +10,7 @@ class Dealer():
     def __init__(self):
         self.new_deck=[(rank, suit) for rank in range(1,14) for suit in ['S','H','C','D']]
         self.dealer_position=0
+        self.pot=0
         self.common_cards=[]
 
     def shuffle_deck(self,deck):
@@ -42,6 +43,12 @@ class Dealer():
                     else:
                         pass
             card_count+=1
+
+            p.common_cards=[]
+            for c in range(game.p_common):
+                card,shuffled=self.deal_card(shuffled)
+                p.common_cards.append(card)
+
 
         self.common_cards=[[] for x in range(len(game.common_cards))]
         for i,flip in enumerate(game.common_cards):
