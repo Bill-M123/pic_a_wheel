@@ -19,6 +19,12 @@ def user(name):
 def raw_table():
     return render_template('test3.html')
 
+@app.route('/da_var')
+def some_func():
+    my_var={'name':'Barry Bornstein',
+            'favorite_bet':'20 cents'}
+    return render_template('test_var.html',my_variable=my_var)
+
 
 if __name__=='__main__':
     app.run(debug=True)
