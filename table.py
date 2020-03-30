@@ -14,6 +14,11 @@ working_dir=os.getcwd()
 app_dir=working_dir+'/poker_classes/'
 player_dir=working_dir+'/existing_players/'
 
+this_game=Game()
+this_game.set_pic_a_wheel()
+
+dealer=Dealer()
+
 alba=Player(player_dir,name='John Alba',nickname='JohnAlba')
 bornstein=Player(player_dir,name='Bill Murphy',nickname='Bornstein')
 clyde=Player(player_dir,name='Bob Vincent',nickname='Clyde')
@@ -24,10 +29,7 @@ alba.add_funds(500)
 bornstein.add_funds(500)
 clyde.add_funds(500)
 
-this_game=Game()
-this_game.set_pic_a_wheel()
-print(f'This game hands: {this_game.hands} ')
-dealer=Dealer()
+
 
 shuffled=dealer.deal_cards(players,this_game)
 for p in players:
@@ -53,12 +55,33 @@ for c in alba.common_cards:
     print('Alba common: ',c,this_card[0],this_card[1])
 
 
-c=[1,2,3,4,5,6,7,8,9,10,11]
+# Deal Round:
+for bet_rnd in range(this_game.betting_rounds):
+    print(f'Round{bet_rnd}: Betting on:')
+    for com_flip in range(len(dealer.common_cards)):
+        if dealer.common_cards_flipped[com_flip]:
+            print(dealer.common_cards[com_flip])
+        else:
+            print(['X' for x in dealer.common_cards[com_flip]])
+    if bet_rnd<this_game.betting_rounds-1:
+        dealer.common_cards_flipped[bet_rnd]=True
 
-print(len(list(combinations(c,4))))
-print(len(list(combinations(c,3))))
-print(len(list(combinations(c,2))))
-print(len(list(combinations(c,1))))
+
+    for p in players:
+        print(p.p_nickname,p.hands,p.common_cards)
+
+        # Fold decisions for player
+        p.fold_decisions()
+        p.open_bet_decisions(dealer,this_game)
+
+    print(f"After round {bet_rnd} of betting, the following hands remain:")
+    for p in players:
+        for h in p.hands:
+            if h!='folded':
+                print(p.p_nickname,h,p.common_cards)
+
+
+
 alba.add_funds(50)
 bornstein.add_funds(75)
 clyde.add_funds(100)

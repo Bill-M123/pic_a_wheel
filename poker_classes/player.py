@@ -19,9 +19,11 @@ class Player():
         self.total_deals_tonight=0
         self.seconds_thinking=0
         self.hands=[[],[]]
+        self.folded_hands=['folded' for x in self.hands]
         self.common_cards=[]
         self.status='out'
         self.in_pot=0
+        self.this_round_per_side=0
         self.last_bet=0
         self.in_hand=True
         self.check_player_existence()
@@ -33,6 +35,126 @@ class Player():
     def get_hands(self):
         return self.hands
 
+    def fold_decisions(self):
+        # Fold decisions for player
+        print(self.p_nickname,self.hands,self.common_cards)
+        for h in range(len(self.hands)):
+            if self.hands[h]=='folded':
+                pass
+
+            else:
+                fold_action=input(f'Fold hand {self.hands[h]}, common {self.common_cards}? fold=fold ')
+                if fold_action=='fold':
+                    self.hands[h]='folded'
+
+        if self.hands==self.folded_hands:
+            self.common_cards='folded'
+        print('\n')
+        return
+
+    def open_bet_decisions(self,dealer,game):
+
+        print('Betting Options:')
+
+        if self.hands==self.folded_hands:
+            print('You folded previously.  No decisions to make.')
+            return
+
+        elif dealer.who_opened=='No one':
+            print('You may BET, CHECK, or FOLD')
+            options=['bet','check','fold']
+
+        else:
+            if dealer.num_raises<=game.max_raises:
+                remaining_raises=game.max_raises-dealer.num_raises
+                print(f"The bet is {dealer.bet_per_side}")
+                print(f'There are {remaining_raises} raises left.')
+                print('You may CALL, RAISE or FOLD')
+                options=['call','raise','fold']
+
+            else:
+                print(f'There are no raises left.')
+                print('You may CALL or FOLD')
+                options=['call','fold']
+
+        invalid_action=True
+        while invalid_action:
+            action=input('Enter choice: ')
+            if action in options:
+                invalid_action=False
+            else:
+                print(f"That is an invalid choice.  Valid choices are: {options} Try again.")
+
+
+        bet_options=[5,10,15,20]
+
+        if action=='check':
+            pass
+
+        elif action=='bet':
+            invalid_action=True
+            while invalid_action:
+                amount=int(input('Enter bet amount (5,10,15,20): '))
+                if action in options:
+                    invalid_action=False
+                else:
+                    print(f"That is an invalid choice.  Valid choices are: {bet_options} Try again.")
+
+
+            dealer.bet_per_side+=amount
+            dealer.who_opened=self.p_nickname
+
+            self.bankroll-= amount*len([x for x in self.hands if x!='folded'])
+            self.in_pot+= amount*len([x for x in self.hands if x!='folded'])
+            self.last_bet= amount
+            self.this_round_per_side += amount
+
+            print(f"{self.p_nickname} now has {self.in_pot} in pot, has bet {self.this_round_per_side} per side and has a bankroll of {self.bankroll}")
+            return
+
+        elif action=='call':
+            to_add=dealer.bet_per_side-self.last_bet
+
+            self.bankroll-= to_add*len([x for x in self.hands if x!='folded'])
+            self.in_pot+= to_add*len([x for x in self.hands if x!='folded'])
+            self.last_bet += to_add
+            self.this_round_per_side += to_add
+
+            print(f"{self.p_nickname} now has {self.in_pot} in pot, has bet {self.this_round_per_side} per side and has a bankroll of {self.bankroll}")
+            return
+
+        elif action=='raise':
+            to_add=dealer.bet_per_side-self.last_bet
+
+            invalid_action=True
+            raise_options=[5,10,15,20]
+
+            while invalid_action:
+                da_raise=int(input('Enter raise amount (5,10,15,20): '))
+
+                if da_raise in raise_options:
+                    invalid_action=False
+                else:
+                    print(f"That is an invalid choice.  Valid choices are: {bet_options} Try again.")
+
+            to_add += da_raise
+
+
+            self.bankroll-= to_add*len([x for x in self.hands if x!='folded'])
+            self.in_pot+= to_add*len([x for x in self.hands if x!='folded'])
+            self.last_bet += to_add
+            self.this_round_per_side += to_add
+
+            dealer.num_raises +=1
+            dealer.bet_per_side += da_raise
+            dealer.last_raise=self.p_nickname
+
+            print(f"{self.p_nickname} now has {self.in_pot} in pot, has bet {self.this_round_per_side} per side and has a bankroll of {self.bankroll}")
+            print(f"Raises left: {game.max_raises-dealer.num_raises}")
+            return
+
+
+    # Remove  Need separate actions
     def action(self,action='check',amount=0):
         '''There are 3 possible player actions at for each hand for each round:
         check:  No impact, player remains in hand.

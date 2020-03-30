@@ -11,7 +11,14 @@ class Dealer():
         self.new_deck=[(rank, suit) for rank in range(1,14) for suit in ['S','H','C','D']]
         self.dealer_position=0
         self.pot=0
-        self.common_cards=[]
+        self.common_cards=[] # Will have separate lists for each flip
+        self.common_cards_flipped=[] #True/False for each flip
+        self.bet_per_side=0
+        self.round_open=False
+        self.num_raises=0
+        self.who_opened='No one'
+        self.last_raise='No one'
+
 
     def shuffle_deck(self,deck):
         random.shuffle(deck)
@@ -55,6 +62,10 @@ class Dealer():
             for f in range(flip):
                 card,shuffled=self.deal_card(shuffled)
                 self.common_cards[i].append(card)
+
+        self.common_cards_flipped=[]
+        for flip in self.common_cards:
+            self.common_cards_flipped.append(False)
 
         return shuffled
 
