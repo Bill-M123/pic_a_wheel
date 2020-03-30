@@ -14,7 +14,7 @@ class Dealer():
         self.common_cards=[] # Will have separate lists for each flip
         self.common_cards_flipped=[] #True/False for each flip
         self.bet_per_side=0
-        self.round_open=False
+        self.round_complete=False
         self.num_raises=0
         self.who_opened='No one'
         self.last_raise='No one'
@@ -68,6 +68,18 @@ class Dealer():
             self.common_cards_flipped.append(False)
 
         return shuffled
+
+    def check_which_players_are_folded(self,players):
+        '''Accepts a list of player objects, compares remaining hands
+        to a completely folded hand and sets p.in_hand'''
+        for p in players:
+            f_check=sorted(list(set([str(x) for x in p.hands])))[0]
+
+            if f_check=='folded':
+                p.in_hand=False
+            else:
+                p.in_hand=True
+        return
 
     def rank_hands(self,hand_list):
         '''accept list of 5 cards, return hand rank

@@ -21,11 +21,11 @@ class Player():
         self.hands=[[],[]]
         self.folded_hands=['folded' for x in self.hands]
         self.common_cards=[]
-        self.status='out'
         self.in_pot=0
         self.this_round_per_side=0
         self.last_bet=0
-        self.in_hand=True
+        self.in_hand=True  #Flag for in hand
+        self.at_table=True #Flag for at table
         self.check_player_existence()
 
     def split_cards(self,cards):
@@ -52,26 +52,43 @@ class Player():
         print('\n')
         return
 
-    def open_bet_decisions(self,dealer,game):
+    def open_bet_decisions(self,p,dealer,game):
+        '''Takes place of previous actions method.  Accepts dealer and game,
+        uses attributes from those classes to determine action options for
+        the player.'''
 
         print('Betting Options:')
 
+        #Previously folded
         if self.hands==self.folded_hands:
             print('You folded previously.  No decisions to make.')
             return
 
-        elif dealer.who_opened=='No one':
+        # No action yet
+        elif (dealer.who_opened=='No one'):
             print('You may BET, CHECK, or FOLD')
             options=['bet','check','fold']
 
+        #Bet on table
         else:
-            if dealer.num_raises<=game.max_raises:
+            # Raises left
+            if (dealer.num_raises<=game.max_raises)&\
+            (dealer.bet_per_side>0):
                 remaining_raises=game.max_raises-dealer.num_raises
                 print(f"The bet is {dealer.bet_per_side}")
                 print(f'There are {remaining_raises} raises left.')
                 print('You may CALL, RAISE or FOLD')
                 options=['call','raise','fold']
 
+            elif(dealer.num_raises<=game.max_raises)&\
+            (dealer.bet_per_side==0):
+                remaining_raises=game.max_raises-dealer.num_raises
+                print(f"The bet is {dealer.bet_per_side}")
+                print(f'There are {remaining_raises} raises left.')
+                print('You may CHECK, CALL, RAISE or FOLD')
+                options=['check','call','raise','fold']
+
+            #No raises left
             else:
                 print(f'There are no raises left.')
                 print('You may CALL or FOLD')
@@ -86,20 +103,12 @@ class Player():
                 print(f"That is an invalid choice.  Valid choices are: {options} Try again.")
 
 
-        bet_options=[5,10,15,20]
-
         if action=='check':
             pass
 
         elif action=='bet':
-            invalid_action=True
-            while invalid_action:
-                amount=int(input('Enter bet amount (5,10,15,20): '))
-                if action in options:
-                    invalid_action=False
-                else:
-                    print(f"That is an invalid choice.  Valid choices are: {bet_options} Try again.")
-
+            bet_options=[5,10,15,20]
+            amount=self.get_amount(bet_options)
 
             dealer.bet_per_side+=amount
             dealer.who_opened=self.p_nickname
@@ -126,19 +135,10 @@ class Player():
         elif action=='raise':
             to_add=dealer.bet_per_side-self.last_bet
 
-            invalid_action=True
             raise_options=[5,10,15,20]
-
-            while invalid_action:
-                da_raise=int(input('Enter raise amount (5,10,15,20): '))
-
-                if da_raise in raise_options:
-                    invalid_action=False
-                else:
-                    print(f"That is an invalid choice.  Valid choices are: {bet_options} Try again.")
+            da_raise=self.get_amount(raise_options)
 
             to_add += da_raise
-
 
             self.bankroll-= to_add*len([x for x in self.hands if x!='folded'])
             self.in_pot+= to_add*len([x for x in self.hands if x!='folded'])
@@ -153,6 +153,16 @@ class Player():
             print(f"Raises left: {game.max_raises-dealer.num_raises}")
             return
 
+    def get_amount(self, choices):
+        '''Enter bet/increase, trap for errors.'''
+        invalid_action=True
+        while invalid_action:
+            amount=int(input(f'Enter bet amount {choices}: '))
+            if amount in choices:
+                invalid_action=False
+            else:
+                print(f"That is an invalid choice.  Valid choices are: {choices} Try again.")
+        return amount
 
     # Remove  Need separate actions
     def action(self,action='check',amount=0):
