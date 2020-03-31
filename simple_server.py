@@ -23,6 +23,7 @@ def raw_table():
 def some_func():
     my_var={'name':'Barry Bornstein',
             'favorite_bet':'20 cents'}
+    print(my_var['name'])
     return render_template('test_var.html',my_variable=my_var)
 
 

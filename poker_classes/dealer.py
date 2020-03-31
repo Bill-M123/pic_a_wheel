@@ -73,12 +73,14 @@ class Dealer():
         '''Accepts a list of player objects, compares remaining hands
         to a completely folded hand and sets p.in_hand'''
         for p in players:
-            f_check=sorted(list(set([str(x) for x in p.hands])))[0]
+            p.in_hand=not all(x=='folded' for x in p.hands)
+            print(p.p_nickname,p.hands,'in hand: ',p.in_hand)
+            #f_check=sorted(list(set([str(x) for x in p.hands])))[0]
 
-            if f_check=='folded':
-                p.in_hand=False
-            else:
-                p.in_hand=True
+            #if f_check=='folded':
+                #p.in_hand=False
+            #else:
+                #p.in_hand=True
         return
 
     def rank_hands(self,hand_list):
