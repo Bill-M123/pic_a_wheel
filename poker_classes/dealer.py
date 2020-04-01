@@ -1,6 +1,7 @@
 import random as random
 from collections import Counter
 
+
 import json
 
 class Dealer():
@@ -18,6 +19,8 @@ class Dealer():
         self.num_raises=0
         self.who_opened='No one'
         self.last_raise='No one'
+        self.display_dict={1:'A',11:'J',12:'Q',13:'K',2:2,3:3,4:4,5:5,6:6,
+                7:7,8:8,9:9,10:10}
 
 
     def shuffle_deck(self,deck):
@@ -174,6 +177,50 @@ class Dealer():
             else:
                 best_hands.append('Unknown: '+str(hand_list))
         return best_hands
+
+
+    def add_to_display_dict(self,player_dict,i,p,Cards):
+
+        player_dict[i]={'name':p.p_nickname,
+
+            'hand_1':[(self.display_dict[Cards.get_simple_u_card_p(p.hands[0][0])[0]],
+                        Cards.get_simple_u_card_p(p.hands[0][0])[1]),
+                    (self.display_dict[Cards.get_simple_u_card_p(p.hands[0][1])[0]],
+                                Cards.get_simple_u_card_p(p.hands[0][1])[1])],
+
+            'common':[(self.display_dict[Cards.get_simple_u_card_p(p.common_cards[0])[0]],
+                        Cards.get_simple_u_card_p(p.common_cards[0])[1])],
+            'hand_2':[(self.display_dict[Cards.get_simple_u_card_p(p.hands[1][0])[0]],
+                        Cards.get_simple_u_card_p(p.hands[1][0])[1]),
+                    (self.display_dict[Cards.get_simple_u_card_p(p.hands[1][1])[0]],
+                                Cards.get_simple_u_card_p(p.hands[1][1])[1])]}
+
+        return player_dict
+
+    def make_common_display_dict(self,common,Cards):
+        print(common)
+        common_dict={}
+        max_rows=max([len(x) for x in common])
+
+        print('common',common)
+        for i,flip in enumerate(common):
+            tmp=[]
+            print('flip',flip)
+            for crd in flip:
+                ranker=self.display_dict[Cards.get_simple_u_card_p(crd)[0]]
+                suit=Cards.get_simple_u_card_p(crd)[1]
+                #tmp.append(Cards.get_simple_u_card_p(crd))
+                tmp.append((ranker,suit))
+            print('tmp',tmp)
+
+            short_cards=max_rows-len(flip)
+            for k in range(short_cards):
+                tmp.append(' ')
+
+            common_dict[i]=tmp
+        print(common_dict)
+        return common_dict
+
 
 
 #############################################################

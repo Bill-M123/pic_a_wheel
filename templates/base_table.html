@@ -7,10 +7,10 @@
 </head>
 
 <body>
-<table>
+<table style="display: inline-block">
   <tr><th>Player</th><th>Hand1</th><th>Comon</th><th>Hand2</th></tr>
   {% for player in players.keys() %}
-  <tr style='font-size:40px;'>
+  <tr style='font-size:32px;'>
     <td style="border: 1px solid black;"> {{players[player]['name']}}</td>
 
       <td style="border: 1px solid black">
@@ -30,7 +30,7 @@
 
 
         <td style="border: 1px solid black">
-        {% if players[player]['hand_1'][0][1] in ['\u2665','\u2666'] %}
+        {% if players[player]['common'][0][1] in ['\u2665','\u2666'] %}
         <span style='color:#bb0000'>{{players[player]['common'][0][0]}}{{players[player]['common'][0][1]}}</span>
         {% else %}
         {{players[player]['common'][0][0]}}{{players[player]['common'][0][1]}}
@@ -55,8 +55,70 @@
   {% endfor %}
 </table>
 
+<div style="display: inline-block; width:20%">
+<table >
+
+  <tr><th>1st Flip</th><th>2nd Flip</th><th>Last Flip</th></tr>
+  <tr style='font-size:40px;'>
+    <td style="border: 1px solid black">{% if common[0][0][1] in ['\u2665','\u2666'] %}
+    <span style='color:#bb0000'>{{common[0][0][0]}}{{common[0][0][1]}}</span>
+    {% else %}
+    {{common[0][0][0]}}{{common[0][0][1]}}
+    {% endif %}
+
+    {% if common[0][1][1] in ['\u2665','\u2666'] %}
+    <span style='color:#bb0000'>{{common[0][1][0]}}{{common[0][1][1]}}</span>
+    {% else %}
+    {{common[0][1][0]}}{{common[0][1][1]}}
+    {% endif %}
+
+    {% if common[0][2][1] in ['\u2665','\u2666'] %}
+    <span style='color:#bb0000'>{{common[0][2][0]}}{{common[0][2][1]}}</span>
+    {% else %}
+    {{common[0][2][0]}}{{common[0][2][1]}}
+    {% endif %}</td>
+
+    <td style="border: 1px solid black">{% if common[1][0][1] in ['\u2665','\u2666'] %}
+    <span style='color:#bb0000'>{{common[1][0][0]}}{{common[1][0][1]}}</span>
+    {% else %}
+    {{common[1][0][0]}}{{common[1][0][1]}}
+    {% endif %}
+
+    {% if common[1][1][1] in ['\u2665','\u2666'] %}
+    <span style='color:#bb0000'>{{common[1][1][0]}}{{common[1][1][1]}}</span>
+    {% else %}
+    {{common[1][1][0]}}{{common[1][1][1]}}
+    {% endif %}
+
+    {% if common[1][2][1] in ['\u2665','\u2666'] %}
+    <span style='color:#bb0000'>{{common[1][2][0]}}{{common[1][2][1]}}</span>
+    {% else %}
+    {{common[1][2][0]}}{{common[1][2][1]}}
+    {% endif %}</td>
+
+    <td style="border: 1px solid black">{% if common[2][0][1] in ['\u2665','\u2666'] %}
+    <span style='color:#bb0000'>{{common[2][0][0]}}{{common[2][0][1]}}</span>
+    {% else %}
+    {{common[2][0][0]}}{{common[2][0][1]}}
+    {% endif %}
+
+    {% if common[2][1][1] in ['\u2665','\u2666'] %}
+    <span style='color:#bb0000'>{{common[2][1][0]}}{{common[2][1][1]}}</span>
+    {% else %}
+    {{common[2][1][0]}}{{common[2][1][1]}}
+    {% endif %}
+
+    {% if common[2][2][1] in ['\u2665','\u2666'] %}
+    <span style='color:#bb0000'>{{common[2][2][0]}}{{common[2][2][1]}}</span>
+    {% else %}
+    {{common[2][2][0]}}{{common[2][2][1]}}
+    {% endif %}</td>
+
+  </tr>
 
 
+</table>
+</div>
 
 </body>
 </html>
