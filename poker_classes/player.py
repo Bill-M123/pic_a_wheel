@@ -24,6 +24,8 @@ class Player():
         self.in_pot=0
         self.this_round_per_side=0
         self.last_bet=0
+        self.high_hands=[]
+        self.low_hands=[]
         self.in_hand=True  #Flag for in hand
         self.at_table=True #Flag for at table
         self.check_player_existence()

@@ -45,7 +45,7 @@ app=Flask(__name__)
 
 @app.route('/')
 def index():
-    return '<h1>Home page for first deal</h1>'
+    return '<h1>Home page for second deal</h1>'
 
 @app.route('/base_table')
 def raw_table():
@@ -56,8 +56,37 @@ def new_deal():
     display_dict={}
     shuffled=dealer.deal_cards(players,this_game)
     for i,p in enumerate(players):
+        #high_hand_ranks=[]
+        #low_hand_ranks=[]
+        p.high_hands=[]
+        p.low_hands=[]
+        for hand in p.hands:
+            high_hand_ranks=[]
+            low_hand_ranks=[]
+            tmp_hand=hand+p.common_cards
+            flat_list = [item for sublist in dealer.common_cards for item in sublist]
+            combos=dealer.get_possible_hands(tmp_hand,flat_list)
+            for c in combos:
+                tmp_high,tmp_low=dealer.rank_hands((c))
+                high_hand_ranks.append(tmp_high)
+                low_hand_ranks.append(tmp_low)
+            #print('High/Low',high_hand_ranks[0],low_hand_ranks[0])
+            high_hand_ranks.sort(key=lambda tup: tup[0])
+
+            low_hand_ranks.sort(key=lambda tup: (tup[0],tup[2]),reverse=True)
+            #print(low_hand_ranks[0],low_hand_ranks[-1])
+            high_hand=high_hand_ranks[0]
+            low_hand=low_hand_ranks[-1]
+            p.high_hands.append(high_hand)
+            p.low_hands.append(high_hand)
+
+            print(f"{p.p_nickname} \nhigh: {high_hand[1]} {high_hand[2]} \nlow: {low_hand[1]} {low_hand[2]}")
+            #print('Low_hands','\n',low_hand_ranks[:3],'\n',low_hand_ranks[-3:],'\n')
+
+
+        
         display_dict=dealer.add_to_display_dict(display_dict,i,p,cards)
-    print(dealer.common_cards)
+    #print(dealer.common_cards)
     common_dict=dealer.make_common_display_dict(dealer.common_cards,cards)
 
     return render_template('base_table.html',players=display_dict,

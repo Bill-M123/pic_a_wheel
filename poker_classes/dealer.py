@@ -1,5 +1,6 @@
 import random as random
 from collections import Counter
+from itertools import combinations
 
 
 import json
@@ -86,13 +87,28 @@ class Dealer():
                 #p.in_hand=True
         return
 
-    def rank_hands(self,hand_list):
+    def get_possible_hands(self,this_hand,common,omaha=False):
+        '''return a list of all possible hands based on hand and common cards.
+        Sets omaha flag which drives to two cards from hand'''
+
+        cards_from_hand=list(range(1,len(this_hand)+1))
+
+        if omaha:
+            cards_from_hand=[2]
+        possibles=[]
+        for hand_cards in cards_from_hand:
+            for h in combinations(this_hand,hand_cards):
+                for com in combinations(common,5-hand_cards):
+                    possibles+=[list(h)+list(com)]
+        return possibles
+
+    def rank_hands(self,hand):
         '''accept list of 5 cards, return hand rank
         If Ace, run calculations twice, returns a list of best hand(s).'''
 
         # Separate cards into ranks and suits
-        rank_list=[x[0] for x in hand_list]
-        suits_list=[x[1] for x in hand_list]
+        rank_list=[x[0] for x in hand]
+        suits_list=[x[1] for x in hand]
 
         # Find two most common combinations, allows id of all hands including fh
         cnt_rnk=Counter(rank_list)
@@ -114,7 +130,8 @@ class Dealer():
             a_l_list=rank_list
             hand_options=[a_h_list,a_l_list]
 
-        best_hands=[]
+        high_hands=[]
+        low_hands=[]
 
         for tmp in hand_options:
 
@@ -126,7 +143,12 @@ class Dealer():
 
                     show=[x for x in tmp if x == mc_1[0]]+\
                         sorted([x for x in tmp if x != mc_1[0]],reverse=True)
-                    best_hands.append(f"Pair {show}")
+
+                    show_low=[x for x in tmp if x == mc_1[0]]+\
+                        sorted([x for x in tmp if x != mc_1[0]])
+
+                    high_hands.append((8,f"Pair",show,hand))
+                    low_hands.append((2,f"Pair",show_low,hand))
 
                 elif (mc_1[1]==2) & (mc_2[1]==2)&(hand_decision==False):
 
@@ -140,43 +162,62 @@ class Dealer():
                         [x for x in tmp if x == b]+\
                         sorted([x for x in tmp if (x != mc_1[0])&(x != mc_2[0])],
                             reverse=True)
-                    best_hands.append(f"Two Pair {show}")
+
+                    show_low=[x for x in tmp if x == a]+\
+                        [x for x in tmp if x == b]+\
+                        sorted([x for x in tmp if (x != mc_1[0])&(x != mc_2[0])])
+
+                    high_hands.append((7,f"Two Pair",show,hand))
+                    low_hands.append((3,f"Two Pair",show_low,hand))
 
                 elif (mc_1[1]==3) & (mc_2[1]==1)&(hand_decision==False):
 
                     show=[x for x in tmp if x == mc_1[0]]+\
                         sorted([x for x in tmp if x != mc_1[0]],reverse=True)
-                    best_hands.append(f"Three of a Kind {show}")
+                    show_low=[x for x in tmp if x == mc_1[0]]+\
+                        sorted([x for x in tmp if x != mc_1[0]])
 
+                    high_hands.append((6,f"Three of a Kind",show,hand))
+                    low_hands.append((4,f"Three of a Kind",show_low,hand))
 
                 elif (max(rank_list)-min(rank_list)==4)&\
                     (len(set(rank_list))==5)&(hand_decision==False):
-                    best_hands.append('Straight '+str(sorted(rank_list,reverse=True)))
+                    #best_hands.append((5,'Straight '+str(sorted(rank_list,reverse=True))))
+                    high_hands.append((5,'Straight',sorted(rank_list,reverse=True),hand))
+                    low_hands.append((5,'Straight',sorted(rank_list,reverse=True),hand))
 
                 elif (mc_1[1]==3) & (mc_2[1]==2)&(hand_decision==False):
 
                     show=[x for x in tmp if x == mc_1[0]]+\
                         sorted([x for x in tmp if x != mc_1[0]],reverse=True)
 
-                    best_hands.append(f"Full House {show}")
+                    high_hands.append((3,f"Full House",show,hand))
+                    low_hands.append((7,f"Full House",show,hand))
 
                 elif (mc_1[1]==4) & (mc_2[1]==1)&(hand_decision==False):
                     show=[x for x in tmp if x == mc_1[0]]+\
                         sorted([x for x in tmp if x != mc_1[0]],reverse=True)
-                    best_hands.append(f'Four of a Kind {show}')
+                    high_hands.append((2,f'Four of a Kind',show,hand))
+                    low_hands.append((8,f'Four of a Kind',show,hand))
 
                 else:
-                    best_hands.append('High_card '+str(sorted(tmp,reverse=True)))
+                    high_hands.append((9,'High card',sorted(tmp,reverse=True),hand))
+                    low_hands.append((1,'High card',sorted(tmp,reverse=True),hand))
 
             elif flush_flag:
                 if (max(rank_list)-min(rank_list)==4)&(len(set(rank_list))==5)&\
                     (hand_decision==False):
-                    best_hands.append(f"Straight Flush {sorted(tmp,reverse=True)}")
+                    high_hands.append((1,f"Straight Flush",sorted(tmp,reverse=True),hand))
+                    low_hands.append((9,f"Straight Flush",sorted(tmp),hand))
                 else:
-                    best_hands.append(f"Flush {sorted(tmp,reverse=True)}")
+                    high_hands.append((4,f"Flush",sorted(tmp,reverse=True),hand))
+                    low_hands.append((6,f"Flush",sorted(tmp,reverse=True),hand))
             else:
-                best_hands.append('Unknown: '+str(hand_list))
-        return best_hands
+                high_hands.append('Unknown: '+str(hand))
+                low_hands.append('Unknown: '+str(hand))
+        return max(high_hands),min(low_hands)
+
+
 
 
     def add_to_display_dict(self,player_dict,i,p,Cards):
@@ -198,27 +239,27 @@ class Dealer():
         return player_dict
 
     def make_common_display_dict(self,common,Cards):
-        print(common)
+        #print(common)
         common_dict={}
         max_rows=max([len(x) for x in common])
 
-        print('common',common)
+        #print('common',common)
         for i,flip in enumerate(common):
             tmp=[]
-            print('flip',flip)
+            #print('flip',flip)
             for crd in flip:
                 ranker=self.display_dict[Cards.get_simple_u_card_p(crd)[0]]
                 suit=Cards.get_simple_u_card_p(crd)[1]
                 #tmp.append(Cards.get_simple_u_card_p(crd))
                 tmp.append((ranker,suit))
-            print('tmp',tmp)
+            #print('tmp',tmp)
 
             short_cards=max_rows-len(flip)
             for k in range(short_cards):
                 tmp.append(' ')
 
             common_dict[i]=tmp
-        print(common_dict)
+        #print(common_dict)
         return common_dict
 
 
