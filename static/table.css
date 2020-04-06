@@ -1,0 +1,67 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+.the_whole_window{
+  min-height:100vh;
+  min-width:100vw;
+  background-color:red;
+}
+.common_table_view{
+  border: 2px solid black;
+  min-width:100%;
+}
+
+
+.player_div{
+  display: inline-block;
+  border: 2px solid black;
+  margin-right: 30px;
+  margin-left: 10px;
+  margin-top: 5px;
+  width=300px;
+}
+
+.player_name_box{
+  width=100px;
+  border: 2px solid black;
+  text-align: left;
+  font-size:35px;
+  color: black;
+  padding: 0px 0px 0px 0px;
+
+}
+
+
+.hand_play_box_r{
+  border: 2px solid black;
+  margin: 0px;
+  text-align: center;
+  font-size:40px;
+  color: #cc0000;
+  padding: 0px 3px 0px 3px;
+
+}
+
+.common_card_div{
+
+  display: inline-block;
+  border: 2px solid black;
+  align-content: center;
+
+}
+
+.common_card_table{
+}
+
+.common_card_back_r{
+  color: #cc0000;
+  font-size:110px;
+}
+
+.summary_table{
+  display: inline-block;
+  border: 2px solid black;
+  align-content: center;
+}

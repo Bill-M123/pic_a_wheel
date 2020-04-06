@@ -17,7 +17,8 @@ def user(name):
 
 @app.route('/raw_table')
 def raw_table():
-    return render_template('test3.html')
+    players=['Alba','Clyde','Bornstein','Scumbo','Brian','Ed','Beauv','Judogi']
+    return render_template('test4.html',players=players)
 
 @app.route('/da_var')
 def some_func():
