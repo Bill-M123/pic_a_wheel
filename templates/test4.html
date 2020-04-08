@@ -21,17 +21,38 @@
 <div class='common_table_view'>
 <div class='player_div'>
 <table class='jumbotron'>
-  {% for p in players%}
+
   <tr>
+  <th style='width: 10px'> </th>
+  <th>Name</th>
+  <th style='width: 10px'> </th>
+  <th>Hand 1</th>
+  <th style='width:10px'> </th>
+  <th>Comm.</th>
+  <th style='width:10px'> </th>
+  <th>Hand 2</th>
+  <th style='width:10px'> </th>
+  <th>/Side</th>
+  <th style='width:10px'> </th>
+  <th>Bet</th>
+  </tr>
+
+  {% for p in players%}
+
     <tr>
+      <td style='width: 10px'> </td>
       <td class='player_name_box'>{{p}}</td>
-      <td style='width: 5px'> </td>
+      <td style='width: 10px'> </td>
       <td class='hand_play_box_r'>&#127136 &#127136;</td>
       <td style='width:10px'> </td>
       <td class='hand_play_box_r'>&#127136;</td>
       <td style='width:10px'> </td>
       <td class='hand_play_box_r'>&#127136 &#127136;</td>
-      <td>0.19 </td>
+      <td style='width:10px'> </td>
+      <td class='hand_play_box_b'>20 </td>
+      <td style='width:10px'> </td>
+      <td class='hand_play_box_b'>{% if p=='Bornstein'%}X{%endif%}</td>
+
   </tr>
   {% endfor %}
 
@@ -39,10 +60,12 @@
 </div>
 
 <div class='common_card_div'>
-<table class='jumbotron common_card_table'>
-  <th>Common</th>
-  <th>Cards</th>
-  <th></th>
+<table class='common_card_table'>
+<tr>
+  <th style="text-align:center">Flip 1</th>
+  <th style="text-align:center">Flip 2</th>
+  <th style="text-align:center">Flip 3</th>
+</tr>
   <tr class='common_card_back_r'>
     <td>&#127136;</td>
     <td>&#127136;</td>
@@ -91,60 +114,87 @@
 </div>
 
 
+<div class='container your_cards'>
 
-
-
-
-<div>
   <p><b>Your Cards:</b></p>
+    <form class="form-inline" method="POST" >
+    <div>
+      <table >
+        <tr>
+
+          <td class='your_cards_hand'>
+            <span style='color: #000000;font-size:40px;'>10</span>
+            <span style='font-size:50px;'>&#9824;</span>
+            <span style='color: #cc0000;font-size:40px;'>10</span>
+            <span style='color: #cc0000;font-size:50px;'>&#9830; </span>
 
 
-<div>
-  <table style='width:35%'>
-    <tr>
+            <div class="dropup" >
+            <select  name="Hand_1">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Keep/Fold
+            <span class="caret"></span></button>
 
-      <td style="border: 1px solid black ;">
-        <span style='color: #000000;font-size:40px;'>10</span>
-        <span style='font-size:50px;'>&#9824;</span>
-        <span style='color: #cc0000;font-size:40px;'>10</span>
-        <span style='color: #cc0000;font-size:50px;'>&#9830; </span>
-
-        <div class="input-group">
-
-          <!-- Default unchecked -->
-
-          <div class="custom-control custom-radio">
-          <input type="radio" class="custom-control-input" id="defaultUnchecked" name="defaultExampleRadios">
-          <label class="custom-control-label" for="defaultUnchecked">Keep</label>
-          </div>
-
-          <!-- Default checked -->
-          <div class="custom-control custom-radio">
-          <input type="radio" class="custom-control-input" id="defaultChecked" name="defaultExampleRadios" checked>
-          <label class="custom-control-label" for="defaultChecked">Fold</label>
-          </div>
+            <ul class="dropdown-menu">
+            <li ><a href="#"><option value='keep'>Keep</a></li>
+            <li ><a href="#"><option value='fold'>Fold</a></li>
+            </ul>
+          </select>
         </div>
-      </td>
+          </td>
 
-      <td style='width:10px'> </td>
-      <td style="border: 1px solid black ;" ><span style='color: #000000;font-size:40px;'>4</span>
-        <span style='font-size:50px;'>&#9824;</span>
-      </td>
+          <td style='width:10px'> </td>
+          <td style="border: 1px solid black ;" ><span style='color: #000000;font-size:40px;'>4</span>
+            <span style='font-size:50px;'>&#9824;</span>
+          </td>
 
-      <td style='width:10px'> </td>
-      <td style="border: 1px solid black ;"><span style='color: #000000;font-size:40px;'>3</span>
-        <span style='font-size:50px;'>&#9824;</span>
-      <span style='color: #cc0000;font-size:40px;'>5</span>
-      <span style='color: #cc0000;font-size:50px;'>&#9830; </span>
-      </td>
-      <td> </td>
+          <td style='width:10px'> </td>
+          <td style="border: 1px solid black ;"><span style='color: #000000;font-size:40px;'>3</span>
+            <span style='font-size:50px;'>&#9824;</span>
+          <span style='color: #cc0000;font-size:40px;'>5</span>
+          <span style='color: #cc0000;font-size:50px;'>&#9830; </span>
+
+          <div class="dropup">
+            <select  name="Hand_2">
+          <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Keep/Fold
+          <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+          <li><a href="#"><option value='keep'>Keep</a></li>
+          <li><a href="#"><option value='fold'>Fold</a></li>
+          </ul>
+          </select>
+          </div>
+
+          </td>
 
 
-    </tr>
-</table>
-</div>
-</div>
+          <td>
+            <div class="dropup" >
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Actions
+              <select name='bet_actions'>
+            <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+            <li><a href="#"><option value='check'>Check</a></li>
+            <li><a href="#"><option value='call'>Call</a></li>
+            <li><a href="#"><option value='bet_5'>Bet 5</a></li>
+            <li><a href="#"><option value='bet_10'>Bet 10</a></li>
+            <li><a href="#"><option value='bet_15'>Bet 15</a></li>
+            <li><a href="#"><option value='bet_20'>Bet 20</a></li>
+            </ul>
+          </select>
+            </div>
+          </td>
+          <td>  <button type="submit" class="btn btn-default">Take Action</button></td>
 
-</div>
+        </tr>
+    </table>
+
+
+
+    </div>
+    </form>
+    </div>
+
+
+    </div>
 </body>
 </html>

@@ -1,7 +1,10 @@
-from flask import Flask
-from flask import render_template
+from flask import Flask,render_template,session,redirect,request,url_for
+from flask_wtf import FlaskForm
+from wtforms import StringField,SubmitField
+from wtforms.validators import DataRequired
 
 app=Flask(__name__)
+app.config['SECRET_KEY']='my_secret_key'
 
 @app.route('/')
 def index():
@@ -15,8 +18,13 @@ def info():
 def user(name):
     return f"<h1>This is {name}'s page</h1><p style='font-size:30px;'>10 &#9824;</p>"
 
-@app.route('/raw_table')
+@app.route('/raw_table',methods=['GET','POST'])
 def raw_table():
+    hand1_kf = request.form.get('Hand_1')
+    hand2_kf = request.form.get('Hand_2')
+    bet_action = request.form.get('bet_actions')
+    print(f"{hand1_kf}ing Hand 1, {hand2_kf}ing Hand 2, Bet is: {bet_action}")
+    #return(str(hand1_kf))
     players=['Alba','Clyde','Bornstein','Scumbo','Brian','Ed','Beauv','Judogi']
     return render_template('test4.html',players=players)
 
