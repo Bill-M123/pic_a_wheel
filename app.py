@@ -15,10 +15,11 @@ def home():
 def do_admin_login():
     if request.form['password'] == 'password' and request.form['username'] == 'admin':
         session['logged_in'] = True
+        print(session.items())
     else:
         flash('wrong password!')
     return home()
 
 if __name__ == "__main__":
     app.secret_key = os.urandom(12)
-    app.run(debug=True,host='0.0.0.0', port=4000)
+    app.run()
