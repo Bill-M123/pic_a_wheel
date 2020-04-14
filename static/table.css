@@ -28,6 +28,7 @@ td{
   margin-left: 10px;
   margin-top: 5px;
   min-width:35vw;
+  vertical-align: top;
 }
 
 .player_name_box{
@@ -96,5 +97,24 @@ td{
 
 .your_cards_hand{
   border: 1px solid black ;
+}
 
+.your_cards_card_r_rnk{
+  color: #bb0000;
+  font-size:40px;
+}
+
+.your_cards_card_b_rnk{
+  color: #000000;
+  font-size:40px;
+}
+
+.your_cards_card_r_st{
+  color: #bb0000;
+  font-size:50px;
+}
+
+.your_cards_card_b_st{
+  color: #000000;
+  font-size:50px;
 }

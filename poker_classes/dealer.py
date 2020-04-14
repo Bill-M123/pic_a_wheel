@@ -1,4 +1,5 @@
 import random as random
+import pandas as pd
 from collections import Counter
 from itertools import combinations
 
@@ -10,12 +11,20 @@ class Dealer():
     common cards.'''
 
     def __init__(self):
+        self.perform_reset=False
         self.new_deck=[(rank, suit) for rank in range(1,14) for suit in ['S','H','C','D']]
+        self.first_deal=True
+        self.deal_complete=False
+
         self.dealer_position=0
+        self.active_player='Bornstein'
+        self.deal_complete=False
         self.pot=0
         self.common_cards=[] # Will have separate lists for each flip
-        self.common_cards_flipped=[] #True/False for each flip
+        self.common_cards_pr=[]
+        self.common_cards_flipped=[False,False,False] #True/False for each flip
         self.bet_per_side=0
+        self.declare_done=False
         self.round_complete=False
         self.num_raises=0
         self.who_opened='No one'
@@ -24,11 +33,41 @@ class Dealer():
                 7:7,8:8,9:9,10:10}
 
 
+
+    def reset_table(self,players,this_game):
+        '''Resets all table related values for players and dealer.'''
+        self.__init__()
+
+        return
+
+    def assign_new_dealer(self,players):
+        '''Get next dealer position'''
+        print(f'Old dealer position: {self.dealer_position}',end=' ')
+        num_players=len(players)
+        if self.first_deal==True:
+            self.first_deal=False
+            print(f'New dealer position: {self.dealer_position}, first deal.')
+            return
+        else:
+            self.dealer_position+=1
+            if self.dealer_position==num_players:
+                self.dealer_position=0
+            print(f'New dealer position: {self.dealer_position}')
+            return
+
+    def take_ante(self,dealing_player,ante=50):
+        '''Takes ante from player, deposits in live pot'''
+        dealing_player.bankroll-=ante
+        self.pot+=ante
+        return
+
     def shuffle_deck(self,deck):
+        '''Shuffles card in deck, returns decl'''
         random.shuffle(deck)
         return deck
 
     def deal_card(self,deck):
+        '''Return single card, and adjusted deck'''
         card=deck.pop(0)
         return card,deck
 
@@ -79,12 +118,6 @@ class Dealer():
         for p in players:
             p.in_hand=not all(x=='folded' for x in p.hands)
             print(p.p_nickname,p.hands,'in hand: ',p.in_hand)
-            #f_check=sorted(list(set([str(x) for x in p.hands])))[0]
-
-            #if f_check=='folded':
-                #p.in_hand=False
-            #else:
-                #p.in_hand=True
         return
 
     def get_possible_hands(self,this_hand,common,omaha=False):
@@ -102,7 +135,7 @@ class Dealer():
                     possibles+=[list(h)+list(com)]
         return possibles
 
-    def rank_hands(self,hand):
+    def rank_single_hand(self,hand):
         '''accept list of 5 cards, return hand rank
         If Ace, run calculations twice, returns a list of best hand(s).'''
 
@@ -217,7 +250,69 @@ class Dealer():
                 low_hands.append('Unknown: '+str(hand))
         return max(high_hands),min(low_hands)
 
+    def evaluate_all_hands(self,players):
+        '''Evaluate winning hands from remaining players'''
+        high_hand_list=[]
+        low_hand_list=[]
 
+        for i,p in enumerate(players):
+
+            p.high_hands=[]
+            p.low_hands=[]
+
+            for hand in p.hands:
+                high_hand_ranks=[]
+                low_hand_ranks=[]
+
+                tmp_hand=hand+p.common_cards
+                flat_list = [item for sublist in self.common_cards for item in sublist]
+                combos=self.get_possible_hands(tmp_hand,flat_list)
+                for c in combos:
+                    tmp_high,tmp_low=self.rank_single_hand((c))
+
+                    sorting_dict={1:'01',2:'02',3:'03',4:'04',5:'05',
+                                6:'06',7:'07',8:'08',9:'09',10:'10',
+                                11:'11',12:'12',13:'13',14:'14',15:'15'}
+
+
+                    tmp_high_c=[sorting_dict[x] for x in tmp_high[2]]
+                    tmp_low_c=[sorting_dict[x] for x in tmp_low[2]]
+                    tmp_high=[tmp_high[0],tmp_high[1],tmp_high_c,tmp_high[3]]
+                    tmp_low=[tmp_low[0],tmp_low[1],tmp_low_c,tmp_low[3]]
+
+                    high_hand_ranks.append(tmp_high)
+                    low_hand_ranks.append(tmp_low)
+
+                df_data_h=high_hand_ranks
+                df_data_l=low_hand_ranks
+
+                high_df=pd.DataFrame(columns=['Rank','Hand','Card_Values','Cards'],data=df_data_h)
+                high_df.drop('Cards',axis=1,inplace=True)
+
+                low_df=pd.DataFrame(columns=['Rank','Hand','Card_Values','Cards'],data=df_data_l)
+                low_df.drop('Cards',axis=1,inplace=True)
+
+                high_df['Card_Values']=high_df.Card_Values.apply(lambda x: '-'.join([str(y) for y in x]))
+                high_df=high_df.drop_duplicates(keep="first")
+                high_df=high_df.sort_values(['Rank','Card_Values'],ascending=[True,False]).reset_index(drop=True)
+
+                low_df['Card_Values']=low_df.Card_Values.apply(lambda x: '-'.join([str(y) for y in x]))
+                low_df=low_df.drop_duplicates(keep="first")
+                low_df=low_df.sort_values(['Rank','Card_Values'],ascending=[False,False]).reset_index(drop=True)
+
+                print(f"{p.p_nickname} rank: {high_df['Rank'][0]} high_new: {high_df['Hand'][0]} {high_df['Card_Values'][0]}")
+                print(f"{p.p_nickname} rank: {high_df['Rank'][len(low_df)-1]} low_new: {low_df['Hand'][len(low_df)-1]} {low_df['Card_Values'][len(low_df)-1]}\n")
+
+                high_hand_list.append([p.p_nickname,high_df['Rank'][0],high_df['Hand'][0],high_df['Card_Values'][0]])
+                low_hand_list.append([p.p_nickname,low_df['Rank'][len(low_df)-1],low_df['Hand'][len(low_df)-1],low_df['Card_Values'][len(low_df)-1]])
+
+        high_hand_df=pd.DataFrame(columns=['Name','Rank','Hand','Card_Values'],data=high_hand_list)
+        low_hand_df=pd.DataFrame(columns=['Name','Rank','Hand','Card_Values'],data=low_hand_list)
+
+        high_hand_df=high_hand_df.sort_values(['Rank','Card_Values'],ascending=[True,False])
+        low_hand_df=low_hand_df.sort_values(['Rank','Card_Values'],ascending=[False,True])
+
+        return high_hand_df, low_hand_df
 
 
     def add_to_display_dict(self,player_dict,i,p,Cards):
@@ -239,20 +334,15 @@ class Dealer():
         return player_dict
 
     def make_common_display_dict(self,common,Cards):
-        #print(common)
         common_dict={}
         max_rows=max([len(x) for x in common])
 
-        #print('common',common)
         for i,flip in enumerate(common):
             tmp=[]
-            #print('flip',flip)
             for crd in flip:
                 ranker=self.display_dict[Cards.get_simple_u_card_p(crd)[0]]
                 suit=Cards.get_simple_u_card_p(crd)[1]
-                #tmp.append(Cards.get_simple_u_card_p(crd))
                 tmp.append((ranker,suit))
-            #print('tmp',tmp)
 
             short_cards=max_rows-len(flip)
             for k in range(short_cards):
@@ -262,12 +352,68 @@ class Dealer():
         #print(common_dict)
         return common_dict
 
+    def make_player_cards_no_options(self,players,session_name,cards):
+        '''Organize cards visible to player'''
+
+        this_player=False
+        for p in players:
+            print(p.p_nickname,p.hands_pr)
+            if session_name==p.p_nickname:
+                this_player=p
+                print(f'Working on {this_player.p_nickname},hands: {p.hands}, common: {p.common_cards}')
+                print(f'Working on {this_player.p_nickname},hands: {p.hands_pr}, common: {p.common_cards_pr}')
+
+        try:
+            tmp=[]
+            for i,h in enumerate(this_player.hands):
+                print
+                print('Hands: ',this_player.hands[0],this_player.hands[1],i,h)
+                tmp_hand=[]
+                if h!="folded":
+                    tmp_hand.append([cards.get_simple_u_card_p(h[0]),cards.get_simple_u_card_p(h[1])])
+                    tmp.append(tmp_hand[0])
+                else:
+                    tmp.append(['folded'])
+            this_player.hands_pr=tmp
+
+            print('Initial Common: ',this_player.common_cards)
+
+            if this_player.common_cards==[]:
+                this_player.common_cards=[]
+                this_player.common_cards_pr=[]
+            else:
+                this_player.common_cards_pr=[cards.get_simple_u_card_p(this_player.common_cards[0])]
+
+            print('Hands: ',this_player.hands_pr)
+            print('Common: ',this_player.common_cards_pr)
+            print('Passed card string to hex')
+
+        except:
+            print('Failed card string to hex')
+            pass
+        return this_player
+
+    def convert_value_card_to_display(self,c):
+        print(f"Card: {c}")
+        if c=='backs':
+            return c
+        return (self.display_dict[c[0]],c[1])
+
+    def convert_value_hand_to_display(self,hand):
+        print(f"Convert_hand_input: {hand}")
+        if hand==['folded']:
+            return hand
+        new_hand=[]
+        for c in hand:
+            new_hand.append(self.convert_value_card_to_display(c))
+        return new_hand
+
 
 
 #############################################################
 # Code below currently not used.  To be removed if a need doesn't arise
 #############################################################
-    def copy_of_rank_hands(self,hand_list):
+    def copy_of_rank_single_hand(self,hand_list):
         '''accept list of 5 cards, return hand rank'''
         #Count Similar Card Combinations
         rank_list=[x[0] for x in hand_list]

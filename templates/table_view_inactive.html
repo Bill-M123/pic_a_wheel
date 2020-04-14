@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="1" />
+    <title></title>
+
+    <link rel='stylesheet' href="static/table.css">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </head>
+
+
+
+
+<body>
+<div class='the_whole_window'>
+
+<div class='common_table_view'>
+<div class='player_div'>
+<table class='jumbotron'>
+
+  <tr>
+  <th style='width: 10px'> </th>
+  <th>Name</th>
+  <th style='width: 10px'> </th>
+  <th>Hand 1</th>
+  <th style='width:10px'> </th>
+  <th>Comm.</th>
+  <th style='width:10px'> </th>
+  <th>Hand 2</th>
+  <th style='width:10px'> </th>
+  <th>/Side</th>
+  <th style='width:10px'> </th>
+  <th>Bet</th>
+  </tr>
+
+  {% for p in players%}
+
+    <tr>
+      <td style='width: 10px'> </td>
+      <td class='player_name_box'>{{p.p_nickname}}</td>
+      <td style='width: 10px'> </td>
+        <td class='hand_play_box_r'>
+          {% if p.hands[0]!='folded' %}
+            &#127136 &#127136;
+          {% endif %}
+        </td>
+      <td style='width:10px'> </td>
+        <td class='hand_play_box_r'>
+          {% if p.common_cards[0]!='folded' %}
+            &#127136;
+          {% endif %}
+        </td>
+      <td style='width:10px'> </td>
+        <td class='hand_play_box_r'>
+          {% if p.hands[1]!='folded' %}
+            &#127136 &#127136;
+          {% endif %}
+        </td>
+      <td style='width:10px'> </td>
+      <td class='hand_play_box_b'>{{p.this_round_per_side}}</td>
+      <td style='width:10px'> </td>
+      <td class='hand_play_box_b'>{% if p.p_nickname == dealer.active_player%}X{%endif%}</td>
+
+  </tr>
+  {% endfor %}
+
+</table>
+</div>
+
+<div class='common_card_div'>
+<table class='common_card_table'>
+<tr>
+  <th style="text-align:center">Flip 1</th>
+  <th style="text-align:center">Flip 2</th>
+  <th style="text-align:center">Flip 3</th>
+</tr>
+  <tr class='common_card_back_r'>
+    <td>&#127136;</td>
+    <td>&#127136;</td>
+    <td>&#127136;</td>
+  </tr >
+  <tr class='common_card_back_r'>
+    <td>&#127136;</td>
+    <td>&#127136;</td>
+    <td>&#127136;</td>
+  </tr>
+  <tr class='common_card_back_r'>
+    <td>&#127136;</td>
+    <td>&#127136;</td>
+    <td></td>
+  </tr>
+</table>
+</div>
+
+<div class="summary_table">
+<table >
+  <th><b>Table Status</b></th>
+  <tr><td>Dealer:</td><td>Beauv</td><td style="width:50px"></td></tr>
+  <tr><td>In Pot:</td><td>$0.75</td><td></td></tr>
+  <tr><td>Opened:</td><td>Ed</td><td>Nickle</td></tr>
+
+  <tr><td>Last Bet/Raise:</td><td>Scumbo</td><td></td></tr>
+  <tr><td>Bet to:</td><td>Alba</td><td></td></tr>
+  <tr><td>Current Bet:</td><td>Dime a Side</td><td></td></tr>
+  <tr><td>Raises remaining:</td><td>2</td><td></td></tr>
+  <tr style="height: 10px"><td></td></tr>
+  <tr><th><b>Bet Status</b></th></tr>
+  <tr><td>Player</td><td>Rnd/Side</td><td>Hand</td></tr>
+  <tr><td>Alba</td><td>0</td><td>0</td></tr>
+  <tr><td>Clyde</td><td>10</td><td>20</td></tr>
+  <tr><td>Bornstein</td><td>10</td><td>20</td></tr>
+  <tr><td>Scumbo</td><td>10</td><td>20</td></tr>
+  <tr><td>Dr. Dirty</td><td>5</td><td>10</td></tr>
+  <tr><td>Judogi</td><td>0</td><td>0</td></tr>
+  <tr><td>Ed</td><td>5</td><td>5</td></tr>
+  <tr><td>Beauv</td><td>0</td><td>0</td></tr>
+
+
+</table>
+
+</div>
+</div>
+
+
+<div class='container your_cards'>
+
+  <p><b>{{this_player.p_nickname}} your cards are:</b></p>
+    <form class="form-inline" method="POST" >
+    <div>
+      <table >
+        <tr>
+
+          <td class='your_cards_hand'>
+            {% if this_player['hands_pr'][0][0][1] in ['\u2665','\u2666'] %}
+              <span class='your_cards_card_r_rnk'>{{this_player['hands_pr'][0][0][0]}}</span>
+              <span class='your_cards_card_r_st'>{{this_player['hands_pr'][0][0][1]}}</span>
+            {% else %}
+              <span class='your_cards_card_b_rnk'>{{this_player['hands_pr'][0][0][0]}}</span>
+              <span class='your_cards_card_b_st'>{{this_player['hands_pr'][0][0][1]}}</span>
+            {% endif %},
+            {% if this_player['hands_pr'][0][1][1] in ['\u2665','\u2666'] %}
+              <span class='your_cards_card_r_rnk'>{{this_player['hands_pr'][0][1][0]}}</span>
+              <span class='your_cards_card_r_st'>{{this_player['hands_pr'][0][1][1]}}</span>
+            {% else %}
+              <span class='your_cards_card_b_rnk'>{{this_player['hands_pr'][0][1][0]}}</span>
+              <span class='your_cards_card_b_st'>{{this_player['hands_pr'][0][1][1]}}</span>
+            {% endif %}
+
+          </td>
+
+          <td style='width:10px'> </td>
+
+          <td class='your_cards_hand'>
+            {% if this_player['common_cards_pr'][0][1] in ['\u2665','\u2666'] %}
+              <span class='your_cards_card_r_rnk'>{{this_player['common_cards_pr'][0][0]}}</span>
+              <span class='your_cards_card_r_st'>{{this_player['common_cards_pr'][0][1]}}</span>
+            {% else %}
+              <span class='your_cards_card_b_rnk'>{{this_player['common_cards_pr'][0][0]}}</span>
+              <span class='your_cards_card_b_st'>{{this_player['common_cards_pr'][0][1]}}</span>
+            {% endif %}
+
+          </td>
+
+          <td style='width:10px'> </td>
+
+          <td class='your_cards_hand'>
+            {% if this_player['hands_pr'][1][0][1] in ['\u2665','\u2666'] %}
+              <span class='your_cards_card_r_rnk'>{{this_player['hands_pr'][1][0][0]}}</span>
+              <span class='your_cards_card_r_st'>{{this_player['hands_pr'][1][0][1]}}</span>
+            {% else %}
+              <span class='your_cards_card_b_rnk'>{{this_player['hands_pr'][1][0][0]}}</span>
+              <span class='your_cards_card_b_st'>{{this_player['hands_pr'][1][0][1]}}</span>
+            {% endif %},
+            {% if this_player['hands_pr'][1][1][1] in ['\u2665','\u2666'] %}
+              <span class='your_cards_card_r_rnk'>{{this_player['hands_pr'][1][1][0]}}</span>
+              <span class='your_cards_card_r_st'>{{this_player['hands_pr'][1][1][1]}}</span>
+            {% else %}
+              <span class='your_cards_card_b_rnk'>{{this_player['hands_pr'][1][1][0]}}</span>
+              <span class='your_cards_card_b_st'>{{this_player['hands_pr'][1][1][1]}}</span>
+            {% endif %}
+
+
+          </td>
+
+          <td>
+          </td>
+          <td>
+
+        </tr>
+    </table>
+
+
+
+    </div>
+    </form>
+    </div>
+
+
+    </div>
+</body>
+</html>

@@ -72,7 +72,7 @@ def new_deal():
             flat_list = [item for sublist in dealer.common_cards for item in sublist]
             combos=dealer.get_possible_hands(tmp_hand,flat_list)
             for c in combos:
-                tmp_high,tmp_low=dealer.rank_hands((c))
+                tmp_high,tmp_low=dealer.rank_single_hand((c))
 
                 sorting_dict={1:'01',2:'02',3:'03',4:'04',5:'05',
                         6:'06',7:'07',8:'08',9:'09',10:'10',

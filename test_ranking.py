@@ -31,7 +31,7 @@ b=[[(3,'H'),(2,'C'),(5,'C'),(4,'D'),(2,'H')],[(3,'H'),(3,'C'),(5,'C'),(4,'D'),(5
 test_loops=10000
 for k in range(test_loops):
     for c in b:
-            rank=dealer.rank_hands(c)
+            rank=dealer.rank_single_hand(c)
 
 end=dt.datetime.now()
 

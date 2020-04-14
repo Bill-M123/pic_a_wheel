@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <p>
+      {% if name %}
+      Welcome to the control panel {{name}} please tread carefully.
+
+
+      {% endif %}
+    </p>
+
+    <form method="POST">
+      {{form.hidden_tag() }}
+      <table>
+        <tr><td>{{form.new_deal.label}}</td><td>{{form.new_deal}}</td></tr>
+        <tr><td>{{form.first_bet.label}}</td><td>{{form.first_bet}}</td></tr>
+        <tr><td>{{form.first_flip.label}}</td><td>{{form.first_flip}}</tr>
+        <tr><td>{{form.second_bet.label}}</td><td>{{form.second_bet}}</td></tr>
+        <tr><td>{{form.second_flip.label}}</td><td>{{form.second_flip}}</td></tr>
+        <tr><td>{{form.third_bet.label}}</td><td>{{form.third_bet}}</td></tr>
+        <tr><td>{{form.third_flip.label}}</td><td>{{form.third_flip}}</td></tr>
+        <tr><td>{{form.fourth_bet.label}}</td><td>{{form.fourth_bet}}</td></tr>
+        <tr><td>{{form.declare.label}}</td><td>{{form.declare}}</td></tr>
+        <tr><td>{{form.fifth_bet.label}}</td><td>{{form.fifth_bet}}</td></tr>
+        <tr><td>{{form.evaluate_now.label}}</td><td>{{form.evaluate_now}}</td></tr>
+        <tr><td>{{form.reset_table.label}}</td><td>{{form.reset_table}}</td></tr>
+      </table>
+
+      {{form.submit}}
+
+    </form>
+  </body>
+</html>

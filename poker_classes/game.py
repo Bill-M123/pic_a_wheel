@@ -11,7 +11,7 @@ class Game():
 
     def set_pic_a_wheel(self):
         self.game='pick_a_wheel'
-        self.common_cards=[3,2,2]
+        self.common_cards=[3,3,2]
         self.hands=[[],[]]
         self.hands_count=[2,2]
         self.p_common=1

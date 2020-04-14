@@ -25,7 +25,32 @@ from flask_socketio import SocketIO, emit
 #########################
 from flask_login import login_required,current_user
 
+#########################
+from flask_wtf import Form,FlaskForm
+from wtforms import BooleanField,SubmitField,TextField
 
+class MasterControlForm(FlaskForm):
+    reset_table = BooleanField(label="Reset Table now?",default=False)
+    new_deal = BooleanField(label="New deal now?",default=False)
+    first_bet = BooleanField(label="First Bet now?",default=False)
+    second_bet = BooleanField(label="Second Bet now?",default=False)
+    third_bet = BooleanField(label="Third Bet now?",default=False)
+    fourth_bet = BooleanField(label="Fourth Bet now?",default=False)
+    fifth_bet = BooleanField(label="Last Bet now?",default=False)
+    first_flip = BooleanField(label="First Flip now?",default=False)
+    second_flip = BooleanField(label="Second Flip now?",default=False)
+    third_flip = BooleanField(label="Third Flip now?",default=False)
+    declare = BooleanField(label="Declare now?",default=False)
+    evaluate_now = BooleanField(label="Evaluate winners now?",default=False)
+
+    submit = SubmitField("Submit")
+
+class FullTableForm(FlaskForm):
+    hand1_kf = TextField(label="Fold Hand 1?",default='Keep')
+    hand2_kf = TextField(label="Fold Hand 2?",default='Keep')
+    bet_action = TextField()
+
+#########################
 
 working_dir=os.getcwd()
 app_dir=working_dir+'/poker_classes/'
@@ -50,8 +75,10 @@ brian=Player(player_dir,name='Brian Mercer',nickname='Mercer')
 ed=Player(player_dir,name='Ed Mulhern',nickname='Ed')
 
 players=[alba,bornstein,clyde,brian,ed]
-for p in players:
-    p.add_funds(500)
+for i,p in enumerate(players):
+    p.add_funds(500) #add funds
+    p.player_position = i # set table position
+
 print('Funds added')
 player_dict={}
 
@@ -109,88 +136,218 @@ def raw_table():
     for p in players:
             if session['username']==p.p_nickname:
                 this_player=p
+    try:
+        for i,h in this_player.hands:
+            tmp_hand=[]
+            tmp_hand.append([cards.get_simple_u_card_h(h[0]),cards.get_simple_u_card_h(h[1])])
+            this_player['hands'][i]=tmp_hand
+        this_player.common_cards=[cards.get_simple_u_card_h(this_player.common_cards[0][0]),
+                    cards.get_simple_u_card_h(this_player.common_cards[0][1])]
+        print('Passed card string to hex')
+
+    except:
+        print('Failed card string to hex')
+        pass
 
     common_dict=dealer.make_common_display_dict(dealer.common_cards,cards)
 
     return render_template('base_table_w_player.html',players=display_dict,
             common=common_dict,this_player=this_player)
 
+@app.route('/full_table',methods=['GET','POST'])
+def full_table():
 
+    form=FullTableForm()
+
+    print('dealer.perform_reset',dealer.perform_reset)
+    if dealer.perform_reset:
+
+        hand1_kf='keep'
+        hand2_kf='keep'
+        bet_action='Check'
+        form.hand1_kf='keep'
+        form.hand2_kf='keep'
+        form.bet_action='Check'
+        dealer.perform_reset=False
+
+    players_l=[p.p_nickname for p in players]
+    for p in players:
+        print('AA',p.p_nickname,p.hands)
+        if p.p_nickname=='JohnAlba':
+            alba=p
+
+    if session['username']==dealer.active_player:
+        print('Player Player Player Player Player Player Player PlayerPlayer Player Player Player')
+        if form.validate_on_submit:
+            hand1_kf = request.form.get('Hand_1')
+            hand2_kf = request.form.get('Hand_2')
+            bet_action = request.form.get('bet_actions')
+
+            if dealer.perform_reset:
+
+                hand1_kf='keep'
+                hand2_kf='keep'
+                bet_action='Check'
+                form.hand1_kf='keep'
+                form.hand2_kf='keep'
+                form.bet_action='Check'
+                dealer.perform_reset=False
+                print('form.hand1_kf',form.hand1_kf,'form.hand2_kf',form.hand2_kf)
+
+
+            print(f"C {dealer.common_cards_flipped}")
+            #return(str(hand1_kf))
+            if hand1_kf == 'fold':
+                for p in players:
+                        if session['username']==p.p_nickname:
+                            p.hands[0]='folded'
+                            p.hands_pr[0]='folded'
+                            for i in range(10):
+                                print(p.p_nickname,p.hands,p.hands)
+
+                        if p.p_nickname=='JohnAlba':
+                            alba=p
+
+            if hand2_kf == 'fold':
+                for p in players:
+                        if session['username']==p.p_nickname:
+                            p.hands[1]='folded'
+                            p.hands_pr[1]='folded'
+                            for i in range(10):
+                                print(p.p_nickname,p.hands,p.hands)
+                            if (p.hands[0] =='folded')&(p.hands[1]=='folded'):
+                                p.common_cards=['folded']
+
+            this_player=dealer.make_player_cards_no_options(players,session['username'],cards)
+
+#convert for display#
+            new_hands=[]
+            for h in this_player.hands_pr:
+                new_hands.append(dealer.convert_value_hand_to_display(h))
+            this_player.hands_pr=new_hands
+            print('this_player.common_cards_pr',this_player.common_cards_pr)
+            if this_player.common_cards_pr==[]:
+                pass
+            else:
+                this_player.common_cards_pr=[(dealer.convert_value_card_to_display(this_player.common_cards_pr[0]))]
+
+            new_common=[]
+            for f in dealer.common_cards:
+                tmp_h=dealer.convert_value_hand_to_display(f)
+                new_hand=[]
+                for c in tmp_h:
+                    new_hand.append(cards.get_simple_u_card_p(c))
+                new_common.append(new_hand)
+            dealer.common_cards_pr=new_common
+            print(f'Dealer Commons: {dealer.common_cards_pr}')
+
+            if this_player:
+                return render_template('table_view_active.html',dealer=dealer,
+                    players=players,this_player=this_player,alba=alba,
+                    form=form)
+            else:
+                return f"{session['username']} is not welcome at this table, so get lost!"
+    else:
+        this_player=dealer.make_player_cards_no_options(players,session['username'],cards)
+        print(this_player.p_nickname,this_player.hands_pr,this_player.common_cards,this_player.common_cards_pr)
+        if this_player:
+            return render_template('table_view_inactive.html',dealer=dealer,
+                players=players,this_player=this_player)
+        else:
+            return f"{session['username']} is not welcome at this table, so get lost!"
 
 @app.route('/new_deal')
 def new_deal():
     display_dict={}
     shuffled=dealer.deal_cards(players,this_game)
 
-    high_hand_list=[]
-    low_hand_list=[]
-
     for i,p in enumerate(players):
-        #high_hand_ranks=[]
-        #low_hand_ranks=[]
-        p.high_hands=[]
-        p.low_hands=[]
-        #print(p.p_nickname,p.hands,p.c)
-        for hand in p.hands:
-            high_hand_ranks=[]
-            low_hand_ranks=[]
-
-            tmp_hand=hand+p.common_cards
-            flat_list = [item for sublist in dealer.common_cards for item in sublist]
-            combos=dealer.get_possible_hands(tmp_hand,flat_list)
-            for c in combos:
-                tmp_high,tmp_low=dealer.rank_hands((c))
-
-                sorting_dict={1:'01',2:'02',3:'03',4:'04',5:'05',
-                        6:'06',7:'07',8:'08',9:'09',10:'10',
-                        11:'11',12:'12',13:'13',14:'14',15:'15'}
-
-
-                tmp_high_c=[sorting_dict[x] for x in tmp_high[2]]
-                tmp_low_c=[sorting_dict[x] for x in tmp_low[2]]
-                tmp_high=[tmp_high[0],tmp_high[1],tmp_high_c,tmp_high[3]]
-                tmp_low=[tmp_low[0],tmp_low[1],tmp_low_c,tmp_low[3]]
-
-                high_hand_ranks.append(tmp_high)
-                low_hand_ranks.append(tmp_low)
-
-            df_data_h=high_hand_ranks
-            df_data_l=low_hand_ranks
-
-            high_df=pd.DataFrame(columns=['Rank','Hand','Card_Values','Cards'],data=df_data_h)
-            high_df.drop('Cards',axis=1,inplace=True)
-
-            low_df=pd.DataFrame(columns=['Rank','Hand','Card_Values','Cards'],data=df_data_l)
-            low_df.drop('Cards',axis=1,inplace=True)
-
-            high_df['Card_Values']=high_df.Card_Values.apply(lambda x: '-'.join([str(y) for y in x]))
-            high_df=high_df.drop_duplicates(keep="first")
-            high_df=high_df.sort_values(['Rank','Card_Values'],ascending=[True,False]).reset_index(drop=True)
-
-            low_df['Card_Values']=low_df.Card_Values.apply(lambda x: '-'.join([str(y) for y in x]))
-            low_df=low_df.drop_duplicates(keep="first")
-            low_df=low_df.sort_values(['Rank','Card_Values'],ascending=[False,False]).reset_index(drop=True)
-
-            print(f"{p.p_nickname} rank: {high_df['Rank'][0]} high_new: {high_df['Hand'][0]} {high_df['Card_Values'][0]}")
-            print(f"{p.p_nickname} rank: {high_df['Rank'][len(low_df)-1]} low_new: {low_df['Hand'][len(low_df)-1]} {low_df['Card_Values'][len(low_df)-1]}\n")
-
-            high_hand_list.append([p.p_nickname,high_df['Rank'][0],high_df['Hand'][0],high_df['Card_Values'][0]])
-            low_hand_list.append([p.p_nickname,low_df['Rank'][len(low_df)-1],low_df['Hand'][len(low_df)-1],low_df['Card_Values'][len(low_df)-1]])
-
         display_dict=dealer.add_to_display_dict(display_dict,i,p,cards)
 
-    high_hand_df=pd.DataFrame(columns=['Name','Rank','Hand','Card_Values'],data=high_hand_list)
-    low_hand_df=pd.DataFrame(columns=['Name','Rank','Hand','Card_Values'],data=low_hand_list)
-    print('Best High Hands:\n',high_hand_df.sort_values(['Rank','Card_Values'],ascending=[True,False]).head(3))
-    print('Best Low Hands:\n',low_hand_df.sort_values(['Rank','Card_Values'],ascending=[False,True]).head(3))
+    high_hand_df,low_hand_df=dealer.evaluate_all_hands(players)
+    print('Best High Hands:\n',high_hand_df.head(3))
+    print('Best Low Hands:\n',low_hand_df.head(3))
 
-
-    #print(dealer.common_cards)
     common_dict=dealer.make_common_display_dict(dealer.common_cards,cards)
     print('Common_Dict: ',common_dict)
 
     return render_template('base_table.html',players=display_dict,
     common=common_dict)
+
+
+@app.route('/master_control',methods=['GET','POST'])
+def master_control():
+
+    form=MasterControlForm()
+
+    if form.validate_on_submit:
+
+        reset_table=form.reset_table.data
+        new_deal = form.new_deal.data
+        first_bet = form.first_bet.data
+        second_bet = form.second_bet.data
+        third_bet = form.third_bet.data
+        fourth_bet = form.fourth_bet.data
+        fifth_bet = form.fifth_bet.data
+        flip1 = form.first_flip.data
+        flip2 = form.second_flip.data
+        flip3= form.third_flip.data
+        declare = form.declare.data
+        evaluate_now = form.evaluate_now.data
+        submit_value =form.submit.data
+        print('Reset Table:',reset_table)
+        print('New Deal:',new_deal)
+        print("first_bet",first_bet)
+        print("second_bet",second_bet)
+        print("third_bet",third_bet)
+        print("fourth_bet",fourth_bet)
+        print("fifth_bet",fifth_bet)
+        print("first_flip",flip1)
+        print("second_flip",flip2)
+        print("third_flip",flip3)
+        print("declare",declare)
+        print("submit",submit_value)
+        dealer.common_cards_flipped=[flip1,flip2,flip3]
+        print(f"1 common_cards_flipped {dealer.common_cards_flipped}")
+
+
+    if (session['username']=='Bornstein') or (session['username']=='Clyde'):
+        name=session['username']
+        print(f"Found Right Guys, common_cards_flipped {dealer.common_cards_flipped}")
+
+        if reset_table:
+            print('resetting')
+            new_players=[]
+            dealer.reset_table(players,this_game)
+            dealer.perform_reset=True
+
+            for i,p in enumerate(players):
+                players[i]=p.reset_player_from_master_control()
+                print((p.p_nickname,p.hands,p.common_cards))
+
+            for p in players:
+                if p.p_nickname=='Bornstein':
+                    print(p.p_nickname,p.hands,p.common_cards)
+            print(f"2 common_cards_flipped {dealer.common_cards_flipped}")
+            return redirect(url_for('master_control'))
+
+        if new_deal and ~dealer.deal_complete:
+            dealer.reset_table(players,this_game)
+            shuffled=dealer.deal_cards(players,this_game)
+            dealer.deal_complete=True
+            dealer.first_deal=False
+            form.new_deal.data=False
+
+            print(f"3 common_cards_flipped {dealer.common_cards_flipped}")
+            return render_template('master_control.html',form=form,name=name)
+
+        print(f"4 common_cards_flipped {dealer.common_cards_flipped}")
+        return render_template('master_control.html',form=form,name=name)
+
+    else:
+        return f"You are not Bornstein or Clyde, Fuck Off!"
+
+
 
 
 @app.route('/da_var')
