@@ -3,6 +3,8 @@ import pandas as pd
 from collections import Counter
 from itertools import combinations
 
+from poker_classes.cards import Cards
+
 
 import json
 
@@ -29,7 +31,9 @@ class Dealer():
         self.num_raises=0
         self.who_opened='No one'
         self.last_raise='No one'
-        self.display_dict={1:'A',11:'J',12:'Q',13:'K',2:2,3:3,4:4,5:5,6:6,
+        self.cards=Cards()
+        self.display_suits_dict={'S':'\u2660','C':'\u2663','H':'\u2665','D':'\u2666',}
+        self.display_rank_dict={1:'A',11:'J',12:'Q',13:'K',2:2,3:3,4:4,5:5,6:6,
                 7:7,8:8,9:9,10:10}
 
 
@@ -319,16 +323,16 @@ class Dealer():
 
         player_dict[i]={'name':p.p_nickname,
 
-            'hand_1':[(self.display_dict[Cards.get_simple_u_card_p(p.hands[0][0])[0]],
+            'hand_1':[(self.display_rank_dict[Cards.get_simple_u_card_p(p.hands[0][0])[0]],
                         Cards.get_simple_u_card_p(p.hands[0][0])[1]),
-                    (self.display_dict[Cards.get_simple_u_card_p(p.hands[0][1])[0]],
+                    (self.display_rank_dict[Cards.get_simple_u_card_p(p.hands[0][1])[0]],
                                 Cards.get_simple_u_card_p(p.hands[0][1])[1])],
 
-            'common':[(self.display_dict[Cards.get_simple_u_card_p(p.common_cards[0])[0]],
+            'common':[(self.display_rank_dict[Cards.get_simple_u_card_p(p.common_cards[0])[0]],
                         Cards.get_simple_u_card_p(p.common_cards[0])[1])],
-            'hand_2':[(self.display_dict[Cards.get_simple_u_card_p(p.hands[1][0])[0]],
+            'hand_2':[(self.display_rank_dict[Cards.get_simple_u_card_p(p.hands[1][0])[0]],
                         Cards.get_simple_u_card_p(p.hands[1][0])[1]),
-                    (self.display_dict[Cards.get_simple_u_card_p(p.hands[1][1])[0]],
+                    (self.display_rank_dict[Cards.get_simple_u_card_p(p.hands[1][1])[0]],
                                 Cards.get_simple_u_card_p(p.hands[1][1])[1])]}
 
         return player_dict
@@ -394,14 +398,19 @@ class Dealer():
         return this_player
 
     def convert_value_card_to_display(self,c):
-        print(f"Card: {c}")
-        if c=='backs':
+        #print(f"Card: {c}, len: {len(c)} type: {type(c)}")
+        if isinstance(c,str):
+            print(f"Card: {c} is a really a string.  Returning {c}")
             return c
-        return (self.display_dict[c[0]],c[1])
+        return (self.display_rank_dict[c[0]],self.display_suits_dict[c[1]])
 
     def convert_value_hand_to_display(self,hand):
-        print(f"Convert_hand_input: {hand}")
+        #print(f"Convert_hand_input: {hand} len: {len(hand)} type: {type(hand)}")
         if hand==['folded']:
+            print(f"Hand folded.  Returning: {hand}")
+            return hand
+        if hand=='folded':
+            print(f"Hand folded.  Returning: {hand}")
             return hand
         new_hand=[]
         for c in hand:

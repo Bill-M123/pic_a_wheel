@@ -2,6 +2,12 @@
 
 For now, I have changed the design a bit in order to get everything running and ease testing.  Currently, there are essentially four working pages: login, a master control, an active player, and an inactive player.  
 
+From the command line, run test program with:
+
+## python third_deal.py
+
+
+
 ## login
 
 Simple as it sounds.  access by pic-a-wheel-root/login
@@ -18,7 +24,7 @@ The active and inactive screens are essentially the same, except that the inacti
 
 Known bug:  folded hands are causing some unknown variable and illegal actions.  This is because the underlying algos expect a card datatype (or a hand) and the folded flags are strings.  An easy fix, but tedious, as calculations are done in various parts of the code.
 
-## active player:
+## inactive player:
 See above.  Was working to show inactive players the hand status on an updating basis, but a lot of changes have been made since that was true.  Current status unknow, and will need to be rewritten to reflect the changes to active players page.
 
 # Boilerplate

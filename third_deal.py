@@ -27,7 +27,7 @@ from flask_login import login_required,current_user
 
 #########################
 from flask_wtf import Form,FlaskForm
-from wtforms import BooleanField,SubmitField,TextField
+from wtforms import BooleanField,SubmitField,TextField,SelectField
 
 class MasterControlForm(FlaskForm):
     reset_table = BooleanField(label="Reset Table now?",default=False)
@@ -46,8 +46,8 @@ class MasterControlForm(FlaskForm):
     submit = SubmitField("Submit")
 
 class FullTableForm(FlaskForm):
-    hand1_kf = TextField(label="Fold Hand 1?",default='Keep')
-    hand2_kf = TextField(label="Fold Hand 2?",default='Keep')
+    hand1_kf = SelectField(label="Hand 1",default='keep')
+    hand2_kf = SelectField(label="Hand 2",default='keep')
     bet_action = TextField()
 
 #########################
@@ -156,105 +156,120 @@ def raw_table():
 
 @app.route('/full_table',methods=['GET','POST'])
 def full_table():
+    global players,this_game
 
     form=FullTableForm()
 
     print('dealer.perform_reset',dealer.perform_reset)
-    if dealer.perform_reset:
+    if form.validate_on_submit:
+        new_players=[]
+        if dealer.perform_reset:
+            for p in players:
+                new_players.append(p.reset_player_from_master_control())
+            players=new_players
+            dealer.reset_table(players,this_game)
 
-        hand1_kf='keep'
-        hand2_kf='keep'
-        bet_action='Check'
-        form.hand1_kf='keep'
-        form.hand2_kf='keep'
-        form.bet_action='Check'
-        dealer.perform_reset=False
+            hand1_kf='keep'
+            hand2_kf='keep'
+            bet_action='Check'
+            form.hand1_kf='keep'
+            form.hand2_kf='keep'
+            form.bet_action='Check'
+            dealer.perform_reset=False
+            print('Redirecting to full_table')
+            return redirect(url_for("full_table"))
 
-    players_l=[p.p_nickname for p in players]
-    for p in players:
-        print('AA',p.p_nickname,p.hands)
-        if p.p_nickname=='JohnAlba':
-            alba=p
 
-    if session['username']==dealer.active_player:
-        print('Player Player Player Player Player Player Player PlayerPlayer Player Player Player')
-        if form.validate_on_submit:
-            hand1_kf = request.form.get('Hand_1')
-            hand2_kf = request.form.get('Hand_2')
+        players_l=[p.p_nickname for p in players]
+        for p in players:
+            print('AA',p.p_nickname,p.hands)
+            if p.p_nickname=='JohnAlba':
+                alba=p
+
+        if session['username']==dealer.active_player:
+            print('Found Active Player:  Player Player PlayerPlayer Player Player Player')
+
+            hand1_kf = request.form.get('hand1_kf')
+            hand2_kf = request.form.get('hand2_kf')
             bet_action = request.form.get('bet_actions')
 
-            if dealer.perform_reset:
-
-                hand1_kf='keep'
-                hand2_kf='keep'
-                bet_action='Check'
-                form.hand1_kf='keep'
-                form.hand2_kf='keep'
-                form.bet_action='Check'
-                dealer.perform_reset=False
-                print('form.hand1_kf',form.hand1_kf,'form.hand2_kf',form.hand2_kf)
-
-
+            print(f'Active Player Form Responses h1: {hand1_kf} h2: {hand2_kf} bet: {bet_action}')
             print(f"C {dealer.common_cards_flipped}")
             #return(str(hand1_kf))
             if hand1_kf == 'fold':
-                for p in players:
-                        if session['username']==p.p_nickname:
-                            p.hands[0]='folded'
-                            p.hands_pr[0]='folded'
-                            for i in range(10):
-                                print(p.p_nickname,p.hands,p.hands)
+                    for p in players:
+                            if session['username']==p.p_nickname:
+                                p.hands[0]='folded'
+                                p.hands_pr[0]='folded'
+                                for i in range(10):
+                                    print(p.p_nickname,p.hands,p.hands)
 
-                        if p.p_nickname=='JohnAlba':
-                            alba=p
+                            if p.p_nickname=='JohnAlba':
+                                alba=p
 
             if hand2_kf == 'fold':
-                for p in players:
-                        if session['username']==p.p_nickname:
-                            p.hands[1]='folded'
-                            p.hands_pr[1]='folded'
-                            for i in range(10):
-                                print(p.p_nickname,p.hands,p.hands)
-                            if (p.hands[0] =='folded')&(p.hands[1]=='folded'):
-                                p.common_cards=['folded']
+                    for p in players:
+                            if session['username']==p.p_nickname:
+                                p.hands[1]='folded'
+                                p.hands_pr[1]='folded'
+                                for i in range(10):
+                                    print(p.p_nickname,p.hands,p.hands)
+                                if (p.hands[0] =='folded')&(p.hands[1]=='folded'):
+                                    p.common_cards=['folded']
 
             this_player=dealer.make_player_cards_no_options(players,session['username'],cards)
 
-#convert for display#
+    #convert for display#
             new_hands=[]
-            for h in this_player.hands_pr:
-                new_hands.append(dealer.convert_value_hand_to_display(h))
+            for h in this_player.hands:
+                    new_hands.append(dealer.convert_value_hand_to_display(h))
             this_player.hands_pr=new_hands
+            print('this_player.common_cards',this_player.common_cards)
             print('this_player.common_cards_pr',this_player.common_cards_pr)
+            tmp=set([str(x) for x in this_player.hands])
+            print(f"set of hands: {tmp}")
+
+
             if this_player.common_cards_pr==[]:
-                pass
+                    pass
+
+            elif set([str(x) for x in this_player.hands])=={'folded'}:
+                print('All folded')
+                this_player.common_cards_pr==[]
+
             else:
-                this_player.common_cards_pr=[(dealer.convert_value_card_to_display(this_player.common_cards_pr[0]))]
+                    this_player.common_cards_pr=[(dealer.convert_value_card_to_display(this_player.common_cards[0]))]
+            print('this_player.common_cards_pr',this_player.common_cards_pr)
 
             new_common=[]
+            #print(f"Starting dealer_common: {dealer.common_cards}")
             for f in dealer.common_cards:
-                tmp_h=dealer.convert_value_hand_to_display(f)
-                new_hand=[]
-                for c in tmp_h:
-                    new_hand.append(cards.get_simple_u_card_p(c))
-                new_common.append(new_hand)
+                    tmp_h=dealer.convert_value_hand_to_display(f)
+                    #print(f"tmp_h: {tmp_h}")
+                    #new_hand=[]
+                    #for c in tmp_h:
+                    #    new_hand.append(dealer.convert_value_card_to_display(c))
+                    #    print(f"new_hand: {new_hand}")
+                    #new_common.append(new_hand)
+                    new_common.append(tmp_h)
+                    #print(f"new_common: {new_common}")
             dealer.common_cards_pr=new_common
             print(f'Dealer Commons: {dealer.common_cards_pr}')
 
             if this_player:
-                return render_template('table_view_active.html',dealer=dealer,
-                    players=players,this_player=this_player,alba=alba,
-                    form=form)
+                    return render_template('table_view_active.html',dealer=dealer,
+                        players=players,this_player=this_player,alba=alba,
+                        form=form)
+            else:
+                    return f"{session['username']} is not welcome at this table, so get lost!"
+        else:
+            this_player=dealer.make_player_cards_no_options(players,session['username'],cards)
+            print(this_player.p_nickname,this_player.hands_pr,this_player.common_cards,this_player.common_cards_pr)
+            if this_player:
+                return render_template('table_view_inactive.html',dealer=dealer,
+                    players=players,this_player=this_player)
             else:
                 return f"{session['username']} is not welcome at this table, so get lost!"
-    else:
-        this_player=dealer.make_player_cards_no_options(players,session['username'],cards)
-        print(this_player.p_nickname,this_player.hands_pr,this_player.common_cards,this_player.common_cards_pr)
-        if this_player:
-            return render_template('table_view_inactive.html',dealer=dealer,
-                players=players,this_player=this_player)
-        else:
-            return f"{session['username']} is not welcome at this table, so get lost!"
 
 @app.route('/new_deal')
 def new_deal():

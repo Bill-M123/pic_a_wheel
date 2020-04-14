@@ -228,17 +228,14 @@
                 <span class='your_cards_card_b_st'>{{this_player['hands_pr'][0][1][1]}}</span>
               {% endif %}
 
-              <div class="dropup" >
-                <select  name="Hand_1" value='keep'>
-                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                <span class="caret">Keep/Fold</span></button>
 
-                <ul class="dropdown-menu">
-                <li ><a href="#"><option value='keep'>Keep</a></li>
-                <li ><a href="#"><option value='fold'>Fold</a></li>
-                </ul>
-              </select>
-              </div>
+              <label for="hand1_kf">Hand 1:</label>
+                  <select name='hand1_kf' id="hand1_kf" value='keep'>
+                   <option value="keep">Keep</option>
+                   <option value="fold">Fold</option>
+                  </select>
+
+
             {% endif %}
 
           </td>
@@ -278,16 +275,12 @@
                 <span class='your_cards_card_b_st'>{{this_player['hands_pr'][1][1][1]}}</span>
               {% endif %}
 
-              <div class="dropup">
-                <select  name="Hand_2" value='keep'>
-              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Keep/Fold
-              <span class="caret"></span></button>
-              <ul class="dropdown-menu">
-              <li><a href="#"><option value='keep'>Keep</a></li>
-              <li><a href="#"><option value='fold'>Fold</a></li>
-              </ul>
-              </select>
-              </div>
+              <label for="hand2_kf">Hand 2:</label>
+                  <select name='hand2_kf' id="hand2_kf" value='keep'>
+                   <option value="keep">Keep</option>
+                   <option value="fold">Fold</option>
+                  </select>
+
             {% endif %}
           </td>
 
