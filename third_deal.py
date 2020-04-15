@@ -224,10 +224,10 @@ def full_table():
             for h in this_player.hands:
                     new_hands.append(dealer.convert_value_hand_to_display(h))
             this_player.hands_pr=new_hands
-            print('this_player.common_cards',this_player.common_cards)
-            print('this_player.common_cards_pr',this_player.common_cards_pr)
+            #print('this_player.common_cards',this_player.common_cards)
+            #print('this_player.common_cards_pr',this_player.common_cards_pr)
             tmp=set([str(x) for x in this_player.hands])
-            print(f"set of hands: {tmp}")
+            #print(f"set of hands: {tmp}")
 
 
             if this_player.common_cards_pr==[]:
@@ -254,7 +254,7 @@ def full_table():
                     new_common.append(tmp_h)
                     #print(f"new_common: {new_common}")
             dealer.common_cards_pr=new_common
-            print(f'Dealer Commons: {dealer.common_cards_pr}')
+            #print(f'Dealer Commons: {dealer.common_cards_pr}')
 
             if this_player:
                     return render_template('table_view_active.html',dealer=dealer,

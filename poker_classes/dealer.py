@@ -370,8 +370,8 @@ class Dealer():
         try:
             tmp=[]
             for i,h in enumerate(this_player.hands):
-                print
-                print('Hands: ',this_player.hands[0],this_player.hands[1],i,h)
+                #print
+                #print('Hands: ',this_player.hands[0],this_player.hands[1],i,h)
                 tmp_hand=[]
                 if h!="folded":
                     tmp_hand.append([cards.get_simple_u_card_p(h[0]),cards.get_simple_u_card_p(h[1])])
@@ -380,7 +380,7 @@ class Dealer():
                     tmp.append(['folded'])
             this_player.hands_pr=tmp
 
-            print('Initial Common: ',this_player.common_cards)
+            #print('Initial Common: ',this_player.common_cards)
 
             if this_player.common_cards==[]:
                 this_player.common_cards=[]
@@ -390,7 +390,7 @@ class Dealer():
 
             print('Hands: ',this_player.hands_pr)
             print('Common: ',this_player.common_cards_pr)
-            print('Passed card string to hex')
+            #print('Passed card string to hex')
 
         except:
             print('Failed card string to hex')
