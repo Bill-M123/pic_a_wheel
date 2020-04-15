@@ -171,31 +171,18 @@
 <div class="summary_table">
 <table >
   <th><b>Table Status</b></th>
-  <tr><td>F:</td><td>Beauv</td><td style="width:50px"></td></tr>
-  <tr><td>In Pot:</td><td>$0.75</td><td></td></tr>
-  <tr><td>Opened:</td><td>Ed</td><td>Nickle</td></tr>
+  <tr><td>Dealer</td><td>Beauv</td><td style="width:50px"></td></tr>
+  <tr><td>In Pot:</td><td>{{dealer.pot}}</td><td></td></tr>
+  <tr><td>Opened:</td><td>{{dealer.who_opened}}</td><td></td></tr>
 
-  <tr><td>Last Bet/Raise:</td><td>Scumbo</td><td></td></tr>
-  <tr><td>Bet to:</td><td>Alba</td><td></td></tr>
-  <tr><td>Current Bet:</td><td>Dime a Side</td><td></td></tr>
-  <tr><td>Raises remaining:</td><td>2</td><td></td></tr>
+  <tr><td>Last Bet/Raise:</td><td>{{dealer.last_raise}}</td><td></td></tr>
+  <tr><td>Bet to:</td><td>{{dealer.active_player}}</td><td></td></tr>
+  <tr><td>Current Bet:</td><td>{{dealer.bet_per_side}}</td><td></td></tr>
+  <tr><td>Bet/Raises remaining:</td><td>{{4-dealer.num_raises}}</td><td></td></tr>
   <tr style="height: 10px"><td></td></tr>
   <tr><th><b>Table Status</b></th></tr>
   <tr><td>first_deal</td><td>{{dealer.first_deal}}</td><td>-</td></tr>
   <tr><td>deal_complete</td><td>{{dealer.deal_complete}}</td><td>0</td></tr>
-  <tr><td>This Player h1</td><td>{{this_player.hands[0]}}</td><td></td></tr>
-  <tr><td>This Player h2</td><td>{{this_player.hands[1]}}</td><td></td></tr>
-  <tr><td>This Player com</td><td>{{this_player.common_cards}}</td><td></td></tr>
-  <tr><td>Alba h1</td><td>{{alba.hands[0]}}</td><td></td></tr>
-  <tr><td>Alba h2</td><td>{{alba.hands[1]}}</td><td></td></tr>
-  <tr><td>Alba com</td><td>{{alba.common_cards}}</td><td></td></tr>
-  <tr><td>Bornstein</td><td>10</td><td>20</td></tr>
-  <tr><td>Scumbo</td><td>10</td><td>20</td></tr>
-  <tr><td>Dr. Dirty</td><td>5</td><td>10</td></tr>
-  <tr><td>Judogi</td><td>0</td><td>0</td></tr>
-  <tr><td>Ed</td><td>5</td><td>5</td></tr>
-  <tr><td>Beauv</td><td>0</td><td>0</td></tr>
-
 
 </table>
 
