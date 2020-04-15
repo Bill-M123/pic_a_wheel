@@ -20,7 +20,7 @@ from flask import render_template
 from flask import flash
 from flask import request, session, redirect, url_for
 from flask_login import LoginManager
-from flask_socketio import SocketIO, emit
+#from flask_socketio import SocketIO, emit
 
 #########################
 from flask_login import login_required,current_user
@@ -95,7 +95,7 @@ app=Flask(__name__)
 # App config from Clyde
 app.config["SECRET_KEY"] = "yousecntuch"
 app.debug = True
-socketio = SocketIO(app)
+#socketio = SocketIO(app)
 login_manager=login_manager.init_app(app)
 
 @app.route('/')
@@ -323,12 +323,12 @@ def master_control():
         print("declare",declare)
         print("submit",submit_value)
         dealer.common_cards_flipped=[flip1,flip2,flip3]
-        print(f"1 common_cards_flipped {dealer.common_cards_flipped}")
+        #print(f"1 common_cards_flipped {dealer.common_cards_flipped}")
 
 
     if (session['username']=='Bornstein') or (session['username']=='Clyde'):
         name=session['username']
-        print(f"Found Right Guys, common_cards_flipped {dealer.common_cards_flipped}")
+        #print(f"Found Right Guys, common_cards_flipped {dealer.common_cards_flipped}")
 
         if reset_table:
             print('resetting')
@@ -343,7 +343,7 @@ def master_control():
             for p in players:
                 if p.p_nickname=='Bornstein':
                     print(p.p_nickname,p.hands,p.common_cards)
-            print(f"2 common_cards_flipped {dealer.common_cards_flipped}")
+            #print(f"2 common_cards_flipped {dealer.common_cards_flipped}")
             return redirect(url_for('master_control'))
 
         if new_deal and ~dealer.deal_complete:
@@ -353,10 +353,10 @@ def master_control():
             dealer.first_deal=False
             form.new_deal.data=False
 
-            print(f"3 common_cards_flipped {dealer.common_cards_flipped}")
+            #print(f"3 common_cards_flipped {dealer.common_cards_flipped}")
             return render_template('master_control.html',form=form,name=name)
 
-        print(f"4 common_cards_flipped {dealer.common_cards_flipped}")
+        #print(f"4 common_cards_flipped {dealer.common_cards_flipped}")
         return render_template('master_control.html',form=form,name=name)
 
     else:
