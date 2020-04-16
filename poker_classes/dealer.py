@@ -114,6 +114,8 @@ class Dealer():
         for flip in self.common_cards:
             self.common_cards_flipped.append(False)
 
+
+
         return shuffled
 
     def check_which_players_are_folded(self,players):
@@ -416,6 +418,37 @@ class Dealer():
         for c in hand:
             new_hand.append(self.convert_value_card_to_display(c))
         return new_hand
+
+    def make_your_hand_display_cards(self,this_player):
+        '''Make your hands and common cards display cards'''
+        #convert for display#
+        new_hands=[]
+        for h in this_player.hands:
+                        new_hands.append(self.convert_value_hand_to_display(h))
+        this_player.hands_pr=new_hands
+
+        if this_player.common_cards_pr==[]:
+                        pass
+
+        elif set([str(x) for x in this_player.hands])=={'folded'}:
+                    print('In dealer All folded')
+                    this_player.common_cards_pr=[]
+
+        else:
+
+            this_player.common_cards_pr=[(self.convert_value_card_to_display(this_player.common_cards[0]))]
+            print(f" In dealer, hands {this_player.hands}, common {this_player.common_cards}")
+        print('this_player.common_cards_pr',this_player.common_cards_pr)
+
+        new_common=[]
+        for f in self.common_cards:
+                        tmp_h=self.convert_value_hand_to_display(f)
+                        new_common.append(tmp_h)
+
+        self.common_cards_pr=new_common
+
+        return this_player
+
 
 
 

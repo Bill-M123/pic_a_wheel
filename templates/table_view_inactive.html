@@ -80,19 +80,90 @@
   <th style="text-align:center">Flip 3</th>
 </tr>
   <tr class='common_card_back_r'>
-    <td>&#127136;</td>
-    <td>&#127136;</td>
-    <td>&#127136;</td>
+    {% if dealer.common_cards_flipped[0] %}
+              {% if dealer.common_cards_pr[0][0][1] in ['\u2665','\u2666'] %}
+                <td><span class='your_cards_card_r_rnk'>{{dealer.common_cards_pr[0][0][0]}}</span><span class='your_cards_card_r_st'>{{dealer.common_cards_pr[0][0][1]}}</span></td>
+              {% else %}
+                <td><span class='your_cards_card_b_rnk'>{{dealer.common_cards_pr[0][0][0]}}</span><span class='your_cards_card_b_st'>{{dealer.common_cards_pr[0][0][1]}}</span></td>
+              {% endif %}
+
+          {% else%}
+            <td class='common_card_back_r'>&#127136;</td>
+          {% endif %}
+    {% if dealer.common_cards_flipped[1] %}
+                    {% if dealer.common_cards_pr[1][0][1] in ['\u2665','\u2666'] %}
+                      <td><span class='your_cards_card_r_rnk'>{{dealer.common_cards_pr[1][0][0]}}</span><span class='your_cards_card_r_st'>{{dealer.common_cards_pr[1][0][1]}}</span></td>
+                    {% else %}
+                      <td><span class='your_cards_card_b_rnk'>{{dealer.common_cards_pr[1][0][0]}}</span><span class='your_cards_card_b_st'>{{dealer.common_cards_pr[1][0][1]}}</span></td>
+                    {% endif %}
+
+                {% else%}
+                  <td class='common_card_back_r'>&#127136;</td>
+                {% endif %}
+    {% if dealer.common_cards_flipped[2] %}
+                                {% if dealer.common_cards_pr[2][0][1] in ['\u2665','\u2666'] %}
+                                  <td><span class='your_cards_card_r_rnk'>{{dealer.common_cards_pr[2][0][0]}}</span><span class='your_cards_card_r_st'>{{dealer.common_cards_pr[2][0][1]}}</span></td>
+                                {% else %}
+                                  <td><span class='your_cards_card_b_rnk'>{{dealer.common_cards_pr[2][0][0]}}</span><span class='your_cards_card_b_st'>{{dealer.common_cards_pr[2][0][1]}}</span></td>
+                                {% endif %}
+
+                            {% else%}
+                              <td class='common_card_back_r'>&#127136;</td>
+                            {% endif %}
   </tr >
   <tr class='common_card_back_r'>
-    <td>&#127136;</td>
-    <td>&#127136;</td>
-    <td>&#127136;</td>
+    {% if dealer.common_cards_flipped[0] %}
+              {% if dealer.common_cards_pr[0][1][1] in ['\u2665','\u2666'] %}
+                <td><span class='your_cards_card_r_rnk'>{{dealer.common_cards_pr[0][1][0]}}</span><span class='your_cards_card_r_st'>{{dealer.common_cards_pr[0][1][1]}}</span></td>
+              {% else %}
+                <td><span class='your_cards_card_b_rnk'>{{dealer.common_cards_pr[0][1][0]}}</span><span class='your_cards_card_b_st'>{{dealer.common_cards_pr[0][1][1]}}</span></td>
+              {% endif %}
+
+          {% else%}
+            <td class='common_card_back_r'>&#127136;</td>
+          {% endif %}
+    {% if dealer.common_cards_flipped[1] %}
+                    {% if dealer.common_cards_pr[1][1][1] in ['\u2665','\u2666'] %}
+                      <td><span class='your_cards_card_r_rnk'>{{dealer.common_cards_pr[1][1][0]}}</span><span class='your_cards_card_r_st'>{{dealer.common_cards_pr[1][1][1]}}</span></td>
+                    {% else %}
+                      <td><span class='your_cards_card_b_rnk'>{{dealer.common_cards_pr[1][1][0]}}</span><span class='your_cards_card_b_st'>{{dealer.common_cards_pr[1][1][1]}}</span></td>
+                    {% endif %}
+
+                {% else%}
+                  <td class='common_card_back_r'>&#127136;</td>
+                {% endif %}
+    {% if dealer.common_cards_flipped[2] %}
+                                {% if dealer.common_cards_pr[2][1][1] in ['\u2665','\u2666'] %}
+                                  <td><span class='your_cards_card_r_rnk'>{{dealer.common_cards_pr[2][1][0]}}</span><span class='your_cards_card_r_st'>{{dealer.common_cards_pr[2][1][1]}}</span></td>
+                                {% else %}
+                                  <td><span class='your_cards_card_b_rnk'>{{dealer.common_cards_pr[2][1][0]}}</span><span class='your_cards_card_b_st'>{{dealer.common_cards_pr[2][1][1]}}</span></td>
+                                {% endif %}
+
+                            {% else%}
+                              <td class='common_card_back_r'>&#127136;</td>
+                            {% endif %}
   </tr>
   <tr class='common_card_back_r'>
-    <td>&#127136;</td>
-    <td>&#127136;</td>
-    <td></td>
+    {% if dealer.common_cards_flipped[0] %}
+              {% if dealer.common_cards_pr[0][2][1] in ['\u2665','\u2666'] %}
+                <td><span class='your_cards_card_r_rnk'>{{dealer.common_cards_pr[0][2][0]}}</span><span class='your_cards_card_r_st'>{{dealer.common_cards_pr[0][2][1]}}</span></td>
+              {% else %}
+                <td><span class='your_cards_card_b_rnk'>{{dealer.common_cards_pr[0][2][0]}}</span><span class='your_cards_card_b_st'>{{dealer.common_cards_pr[0][2][1]}}</span></td>
+              {% endif %}
+
+          {% else%}
+            <td class='common_card_back_r'>&#127136;</td>
+          {% endif %}
+          {% if dealer.common_cards_flipped[1] %}
+                    {% if dealer.common_cards_pr[1][2][1] in ['\u2665','\u2666'] %}
+                      <td><span class='your_cards_card_r_rnk'>{{dealer.common_cards_pr[1][2][0]}}</span><span class='your_cards_card_r_st'>{{dealer.common_cards_pr[1][2][1]}}</span></td>
+                    {% else %}
+                      <td><span class='your_cards_card_b_rnk'>{{dealer.common_cards_pr[1][2][0]}}</span><span class='your_cards_card_b_st'>{{dealer.common_cards_pr[1][2][1]}}</span></td>
+                    {% endif %}
+
+                {% else%}
+                  <td class='common_card_back_r'>&#127136;</td>
+                {% endif %}
   </tr>
 </table>
 </div>
@@ -100,26 +171,18 @@
 <div class="summary_table">
 <table >
   <th><b>Table Status</b></th>
-  <tr><td>Dealer:</td><td>Beauv</td><td style="width:50px"></td></tr>
-  <tr><td>In Pot:</td><td>$0.75</td><td></td></tr>
-  <tr><td>Opened:</td><td>Ed</td><td>Nickle</td></tr>
+  <tr><td>Dealer</td><td>Beauv</td><td style="width:50px"></td></tr>
+  <tr><td>In Pot:</td><td>{{dealer.pot}}</td><td></td></tr>
+  <tr><td>Opened:</td><td>{{dealer.who_opened}}</td><td></td></tr>
 
-  <tr><td>Last Bet/Raise:</td><td>Scumbo</td><td></td></tr>
-  <tr><td>Bet to:</td><td>Alba</td><td></td></tr>
-  <tr><td>Current Bet:</td><td>Dime a Side</td><td></td></tr>
-  <tr><td>Raises remaining:</td><td>2</td><td></td></tr>
+  <tr><td>Last Bet/Raise:</td><td>{{dealer.last_raise}}</td><td></td></tr>
+  <tr><td>Bet to:</td><td>{{dealer.active_player}}</td><td></td></tr>
+  <tr><td>Current Bet:</td><td>{{dealer.bet_per_side}}</td><td></td></tr>
+  <tr><td>Bet/Raises remaining:</td><td>{{4-dealer.num_raises}}</td><td></td></tr>
   <tr style="height: 10px"><td></td></tr>
-  <tr><th><b>Bet Status</b></th></tr>
-  <tr><td>Player</td><td>Rnd/Side</td><td>Hand</td></tr>
-  <tr><td>Alba</td><td>0</td><td>0</td></tr>
-  <tr><td>Clyde</td><td>10</td><td>20</td></tr>
-  <tr><td>Bornstein</td><td>10</td><td>20</td></tr>
-  <tr><td>Scumbo</td><td>10</td><td>20</td></tr>
-  <tr><td>Dr. Dirty</td><td>5</td><td>10</td></tr>
-  <tr><td>Judogi</td><td>0</td><td>0</td></tr>
-  <tr><td>Ed</td><td>5</td><td>5</td></tr>
-  <tr><td>Beauv</td><td>0</td><td>0</td></tr>
-
+  <tr><th><b>Table Status</b></th></tr>
+  <tr><td>first_deal</td><td>{{dealer.first_deal}}</td><td>-</td></tr>
+  <tr><td>deal_complete</td><td>{{dealer.deal_complete}}</td><td>0</td></tr>
 
 </table>
 
@@ -136,19 +199,26 @@
         <tr>
 
           <td class='your_cards_hand'>
-            {% if this_player['hands_pr'][0][0][1] in ['\u2665','\u2666'] %}
-              <span class='your_cards_card_r_rnk'>{{this_player['hands_pr'][0][0][0]}}</span>
-              <span class='your_cards_card_r_st'>{{this_player['hands_pr'][0][0][1]}}</span>
-            {% else %}
-              <span class='your_cards_card_b_rnk'>{{this_player['hands_pr'][0][0][0]}}</span>
-              <span class='your_cards_card_b_st'>{{this_player['hands_pr'][0][0][1]}}</span>
-            {% endif %},
-            {% if this_player['hands_pr'][0][1][1] in ['\u2665','\u2666'] %}
-              <span class='your_cards_card_r_rnk'>{{this_player['hands_pr'][0][1][0]}}</span>
-              <span class='your_cards_card_r_st'>{{this_player['hands_pr'][0][1][1]}}</span>
-            {% else %}
-              <span class='your_cards_card_b_rnk'>{{this_player['hands_pr'][0][1][0]}}</span>
-              <span class='your_cards_card_b_st'>{{this_player['hands_pr'][0][1][1]}}</span>
+            {% if (this_player['hands'][0] !='folded') and (dealer.first_deal != True) %}
+              {% if this_player['hands_pr'][0][0][1] in ['\u2665','\u2666'] %}
+                <span class='your_cards_card_r_rnk'>{{this_player['hands_pr'][0][0][0]}}</span>
+                <span class='your_cards_card_r_st'>{{this_player['hands_pr'][0][0][1]}}</span>
+              {% else %}
+                <span class='your_cards_card_b_rnk'>{{this_player['hands_pr'][0][0][0]}}</span>
+                <span class='your_cards_card_b_st'>{{this_player['hands_pr'][0][0][1]}}</span>
+              {% endif %},
+              {% if this_player['hands_pr'][0][1][1] in ['\u2665','\u2666'] %}
+                <span class='your_cards_card_r_rnk'>{{this_player['hands_pr'][0][1][0]}}</span>
+                <span class='your_cards_card_r_st'>{{this_player['hands_pr'][0][1][1]}}</span>
+              {% else %}
+                <span class='your_cards_card_b_rnk'>{{this_player['hands_pr'][0][1][0]}}</span>
+                <span class='your_cards_card_b_st'>{{this_player['hands_pr'][0][1][1]}}</span>
+              {% endif %}
+
+
+            No folding out of turn
+
+
             {% endif %}
 
           </td>
@@ -156,12 +226,14 @@
           <td style='width:10px'> </td>
 
           <td class='your_cards_hand'>
-            {% if this_player['common_cards_pr'][0][1] in ['\u2665','\u2666'] %}
-              <span class='your_cards_card_r_rnk'>{{this_player['common_cards_pr'][0][0]}}</span>
-              <span class='your_cards_card_r_st'>{{this_player['common_cards_pr'][0][1]}}</span>
-            {% else %}
-              <span class='your_cards_card_b_rnk'>{{this_player['common_cards_pr'][0][0]}}</span>
-              <span class='your_cards_card_b_st'>{{this_player['common_cards_pr'][0][1]}}</span>
+            {% if (this_player['common_cards'][0]!='folded') and (dealer.first_deal != True) %}
+              {% if this_player['common_cards_pr'][0][1] in ['\u2665','\u2666'] %}
+                <span class='your_cards_card_r_rnk'>{{this_player['common_cards_pr'][0][0]}}</span>
+                <span class='your_cards_card_r_st'>{{this_player['common_cards_pr'][0][1]}}</span>
+              {% else %}
+                <span class='your_cards_card_b_rnk'>{{this_player['common_cards_pr'][0][0]}}</span>
+                <span class='your_cards_card_b_st'>{{this_player['common_cards_pr'][0][1]}}</span>
+              {% endif %}
             {% endif %}
 
           </td>
@@ -169,28 +241,52 @@
           <td style='width:10px'> </td>
 
           <td class='your_cards_hand'>
-            {% if this_player['hands_pr'][1][0][1] in ['\u2665','\u2666'] %}
-              <span class='your_cards_card_r_rnk'>{{this_player['hands_pr'][1][0][0]}}</span>
-              <span class='your_cards_card_r_st'>{{this_player['hands_pr'][1][0][1]}}</span>
-            {% else %}
-              <span class='your_cards_card_b_rnk'>{{this_player['hands_pr'][1][0][0]}}</span>
-              <span class='your_cards_card_b_st'>{{this_player['hands_pr'][1][0][1]}}</span>
-            {% endif %},
-            {% if this_player['hands_pr'][1][1][1] in ['\u2665','\u2666'] %}
-              <span class='your_cards_card_r_rnk'>{{this_player['hands_pr'][1][1][0]}}</span>
-              <span class='your_cards_card_r_st'>{{this_player['hands_pr'][1][1][1]}}</span>
-            {% else %}
-              <span class='your_cards_card_b_rnk'>{{this_player['hands_pr'][1][1][0]}}</span>
-              <span class='your_cards_card_b_st'>{{this_player['hands_pr'][1][1][1]}}</span>
+            {% if this_player['hands'][1] !='folded' and (dealer.first_deal != True) %}
+              {% if this_player['hands_pr'][1][0][1] in ['\u2665','\u2666'] %}
+                <span class='your_cards_card_r_rnk'>{{this_player['hands_pr'][1][0][0]}}</span>
+                <span class='your_cards_card_r_st'>{{this_player['hands_pr'][1][0][1]}}</span>
+              {% else %}
+                <span class='your_cards_card_b_rnk'>{{this_player['hands_pr'][1][0][0]}}</span>
+                <span class='your_cards_card_b_st'>{{this_player['hands_pr'][1][0][1]}}</span>
+              {% endif %},
+
+              {% if this_player['hands_pr'][1][1][1] in ['\u2665','\u2666'] %}
+                <span class='your_cards_card_r_rnk'>{{this_player['hands_pr'][1][1][0]}}</span>
+                <span class='your_cards_card_r_st'>{{this_player['hands_pr'][1][1][1]}}</span>
+              {% else %}
+                <span class='your_cards_card_b_rnk'>{{this_player['hands_pr'][1][1][0]}}</span>
+                <span class='your_cards_card_b_st'>{{this_player['hands_pr'][1][1][1]}}</span>
+              {% endif %}
+
+              <label for="hand2_kf">Hand 2:</label>
+                  <select name='hand2_kf' id="hand2_kf" value='keep'>
+                   <option value="keep">Keep</option>
+                   <option value="fold">Fold</option>
+                  </select>
+
             {% endif %}
-
-
           </td>
 
           <td>
+            <div class="dropup" >
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Actions
+              <select name='bet_actions'>
+            <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+            <li><a href="#"><option value='check'>Check</a></li>
+            <li><a href="#"><option value='call'>Call</a></li>
+            <li><a href="#"><option value='bet_5'>Bet 5</a></li>
+            <li><a href="#"><option value='bet_10'>Bet 10</a></li>
+            <li><a href="#"><option value='bet_15'>Bet 15</a></li>
+            <li><a href="#"><option value='bet_20'>Bet 20</a></li>
+            </ul>
+          </select>
+            </div>
           </td>
           <td>
-
+            <div class="form-group">
+              <button type="submit" class="btn btn-default">Take Action</button></td>
+            </div>
         </tr>
     </table>
 
@@ -199,7 +295,6 @@
     </div>
     </form>
     </div>
-
 
     </div>
 </body>

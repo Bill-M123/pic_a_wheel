@@ -111,7 +111,7 @@ def login():
         valid_ids=[p.p_nickname for p in players]
 
         if session['username'] in valid_ids:
-            return f"You are logged in as {session['username']}"
+            return redirect(url_for("full_table"))
         else:
             return f"Invalid Login.  I don't know you.  I don't want to know you.  Go away."
     return '''
@@ -163,7 +163,7 @@ def full_table():
     print('dealer.perform_reset',dealer.perform_reset)
     if form.validate_on_submit:
         new_players=[]
-        if dealer.perform_reset:
+        if (dealer.perform_reset) and (session['username']==dealer.active_player):
             for p in players:
                 new_players.append(p.reset_player_from_master_control())
             players=new_players
@@ -182,7 +182,7 @@ def full_table():
 
         players_l=[p.p_nickname for p in players]
         for p in players:
-            print('AA',p.p_nickname,p.hands)
+            #print('AA',p.p_nickname,p.hands)
             if p.p_nickname=='JohnAlba':
                 alba=p
 
@@ -212,49 +212,40 @@ def full_table():
                             if session['username']==p.p_nickname:
                                 p.hands[1]='folded'
                                 p.hands_pr[1]='folded'
-                                for i in range(10):
-                                    print(p.p_nickname,p.hands,p.hands)
+
                                 if (p.hands[0] =='folded')&(p.hands[1]=='folded'):
                                     p.common_cards=['folded']
 
             this_player=dealer.make_player_cards_no_options(players,session['username'],cards)
 
     #convert for display#
-            new_hands=[]
-            for h in this_player.hands:
-                    new_hands.append(dealer.convert_value_hand_to_display(h))
-            this_player.hands_pr=new_hands
-            #print('this_player.common_cards',this_player.common_cards)
-            #print('this_player.common_cards_pr',this_player.common_cards_pr)
-            tmp=set([str(x) for x in this_player.hands])
-            #print(f"set of hands: {tmp}")
+            #new_hands=[]
+            #for h in this_player.hands:
+        #            new_hands.append(dealer.convert_value_hand_to_display(h))
+    #        this_player.hands_pr=new_hands
+#
+#            if this_player.common_cards_pr==[]:
+#                    pass
 
+#            elif set([str(x) for x in this_player.hands])=={'folded'}:
+#                print('All folded')
+#                this_player.common_cards_pr==[]
 
-            if this_player.common_cards_pr==[]:
-                    pass
+#            else:
+#                    this_player.common_cards_pr=[(dealer.convert_value_card_to_display(this_player.common_cards[0]))]
+#            print('this_player.common_cards_pr',this_player.common_cards_pr)
 
-            elif set([str(x) for x in this_player.hands])=={'folded'}:
-                print('All folded')
-                this_player.common_cards_pr==[]
+#            new_common=[]
 
-            else:
-                    this_player.common_cards_pr=[(dealer.convert_value_card_to_display(this_player.common_cards[0]))]
-            print('this_player.common_cards_pr',this_player.common_cards_pr)
+#            for f in dealer.common_cards:
+#                    tmp_h=dealer.convert_value_hand_to_display(f)
+#                    new_common.append(tmp_h)
 
-            new_common=[]
-            #print(f"Starting dealer_common: {dealer.common_cards}")
-            for f in dealer.common_cards:
-                    tmp_h=dealer.convert_value_hand_to_display(f)
-                    #print(f"tmp_h: {tmp_h}")
-                    #new_hand=[]
-                    #for c in tmp_h:
-                    #    new_hand.append(dealer.convert_value_card_to_display(c))
-                    #    print(f"new_hand: {new_hand}")
-                    #new_common.append(new_hand)
-                    new_common.append(tmp_h)
-                    #print(f"new_common: {new_common}")
-            dealer.common_cards_pr=new_common
-            #print(f'Dealer Commons: {dealer.common_cards_pr}')
+#            dealer.common_cards_pr=new_common
+            this_player=dealer.make_your_hand_display_cards(this_player)
+
+            #Check to see if player folded.
+
 
             if this_player:
                     return render_template('table_view_active.html',dealer=dealer,
@@ -266,6 +257,7 @@ def full_table():
             this_player=dealer.make_player_cards_no_options(players,session['username'],cards)
             print(this_player.p_nickname,this_player.hands_pr,this_player.common_cards,this_player.common_cards_pr)
             if this_player:
+                this_player=dealer.make_your_hand_display_cards(this_player)
                 return render_template('table_view_inactive.html',dealer=dealer,
                     players=players,this_player=this_player)
             else:
