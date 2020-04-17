@@ -1,8 +1,8 @@
 {
-    "p_name": "Ed Mulhern",
-    "p_nickname": "Ed",
-    "email": "place_holder@place_holder.com",
-    "password": "password",
-    "bankroll": 0,
-    "deposits": []
+  "p_name": "Ed Mulhern",
+  "p_nickname": "Ed",
+  "email": "place_holder@place_holder.com",
+  "password": "password",
+  "bankroll": 0,
+  "deposits": []
 }

@@ -1,202 +1,298 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
+<html dir="ltr" lang="en">
+<head>
     <meta charset="utf-8">
     <title></title>
 
-    <link rel='stylesheet' href="static/table.css">
+    <link href="static/table.css" rel='stylesheet'>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-  </head>
-
-
+    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" rel="stylesheet">
+    <script crossorigin="anonymous"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script crossorigin="anonymous"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script crossorigin="anonymous"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
 
 
 <body>
 <div class='the_whole_window'>
 
-<div class='common_table_view'>
-<div class='player_div'>
-<table class='jumbotron'>
+    <div class='common_table_view'>
+        <div class='player_div'>
+            <table class='jumbotron'>
 
-  <tr>
-  <th style='width: 10px'> </th>
-  <th>Name</th>
-  <th style='width: 10px'> </th>
-  <th>Hand 1</th>
-  <th style='width:10px'> </th>
-  <th>Comm.</th>
-  <th style='width:10px'> </th>
-  <th>Hand 2</th>
-  <th style='width:10px'> </th>
-  <th>/Side</th>
-  <th style='width:10px'> </th>
-  <th>Bet</th>
-  </tr>
+                <tr>
+                    <th style='width: 10px'></th>
+                    <th>Name</th>
+                    <th style='width: 10px'></th>
+                    <th>Hand 1</th>
+                    <th style='width:10px'></th>
+                    <th>Comm.</th>
+                    <th style='width:10px'></th>
+                    <th>Hand 2</th>
+                    <th style='width:10px'></th>
+                    <th>/Side</th>
+                    <th style='width:10px'></th>
+                    <th>Bet</th>
+                </tr>
 
-  {% for p in players%}
+                {% for p in players%}
 
-    <tr>
-      <td style='width: 10px'> </td>
-      <td class='player_name_box'>{{p}}</td>
-      <td style='width: 10px'> </td>
-      <td class='hand_play_box_r'>&#127136 &#127136;</td>
-      <td style='width:10px'> </td>
-      <td class='hand_play_box_r'>&#127136;</td>
-      <td style='width:10px'> </td>
-      <td class='hand_play_box_r'>&#127136 &#127136;</td>
-      <td style='width:10px'> </td>
-      <td class='hand_play_box_b'>20 </td>
-      <td style='width:10px'> </td>
-      <td class='hand_play_box_b'>{% if p=='Bornstein'%}X{%endif%}</td>
+                <tr>
+                    <td style='width: 10px'></td>
+                    <td class='player_name_box'>{{p}}</td>
+                    <td style='width: 10px'></td>
+                    <td class='hand_play_box_r'>&#127136 &#127136;</td>
+                    <td style='width:10px'></td>
+                    <td class='hand_play_box_r'>&#127136;</td>
+                    <td style='width:10px'></td>
+                    <td class='hand_play_box_r'>&#127136 &#127136;</td>
+                    <td style='width:10px'></td>
+                    <td class='hand_play_box_b'>20</td>
+                    <td style='width:10px'></td>
+                    <td class='hand_play_box_b'>{% if p=='Bornstein'%}X{%endif%}</td>
 
-  </tr>
-  {% endfor %}
+                </tr>
+                {% endfor %}
 
-</table>
-</div>
-
-<div class='common_card_div'>
-<table class='common_card_table'>
-<tr>
-  <th style="text-align:center">Flip 1</th>
-  <th style="text-align:center">Flip 2</th>
-  <th style="text-align:center">Flip 3</th>
-</tr>
-  <tr class='common_card_back_r'>
-    <td>&#127136;</td>
-    <td>&#127136;</td>
-    <td>&#127136;</td>
-  </tr >
-  <tr class='common_card_back_r'>
-    <td>&#127136;</td>
-    <td>&#127136;</td>
-    <td>&#127136;</td>
-  </tr>
-  <tr class='common_card_back_r'>
-    <td>&#127136;</td>
-    <td>&#127136;</td>
-    <td></td>
-  </tr>
-</table>
-</div>
-
-<div class="summary_table">
-<table >
-  <th><b>Table Status</b></th>
-  <tr><td>Dealer:</td><td>Beauv</td><td style="width:50px"></td></tr>
-  <tr><td>In Pot:</td><td>$0.75</td><td></td></tr>
-  <tr><td>Opened:</td><td>Ed</td><td>Nickle</td></tr>
-
-  <tr><td>Last Bet/Raise:</td><td>Scumbo</td><td></td></tr>
-  <tr><td>Bet to:</td><td>Alba</td><td></td></tr>
-  <tr><td>Current Bet:</td><td>Dime a Side</td><td></td></tr>
-  <tr><td>Raises remaining:</td><td>2</td><td></td></tr>
-  <tr style="height: 10px"><td></td></tr>
-  <tr><th><b>Bet Status</b></th></tr>
-  <tr><td>Player</td><td>Rnd/Side</td><td>Hand</td></tr>
-  <tr><td>Alba</td><td>0</td><td>0</td></tr>
-  <tr><td>Clyde</td><td>10</td><td>20</td></tr>
-  <tr><td>Bornstein</td><td>10</td><td>20</td></tr>
-  <tr><td>Scumbo</td><td>10</td><td>20</td></tr>
-  <tr><td>Dr. Dirty</td><td>5</td><td>10</td></tr>
-  <tr><td>Judogi</td><td>0</td><td>0</td></tr>
-  <tr><td>Ed</td><td>5</td><td>5</td></tr>
-  <tr><td>Beauv</td><td>0</td><td>0</td></tr>
-
-
-</table>
-
-</div>
-</div>
-
-
-<div class='container your_cards'>
-
-  <p><b>Your Cards:</b></p>
-    <form class="form-inline" method="POST" >
-    <div>
-      <table >
-        <tr>
-
-          <td class='your_cards_hand'>
-            <span style='color: #000000;font-size:40px;'>10</span>
-            <span style='font-size:50px;'>&#9824;</span>
-            <span style='color: #cc0000;font-size:40px;'>10</span>
-            <span style='color: #cc0000;font-size:50px;'>&#9830; </span>
-
-
-            <div class="dropup" >
-            <select  name="Hand_1">
-            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Keep/Fold
-            <span class="caret"></span></button>
-
-            <ul class="dropdown-menu">
-            <li ><a href="#"><option value='keep'>Keep</a></li>
-            <li ><a href="#"><option value='fold'>Fold</a></li>
-            </ul>
-          </select>
+            </table>
         </div>
-          </td>
 
-          <td style='width:10px'> </td>
-          <td style="border: 1px solid black ;" ><span style='color: #000000;font-size:40px;'>4</span>
-            <span style='font-size:50px;'>&#9824;</span>
-          </td>
+        <div class='common_card_div'>
+            <table class='common_card_table'>
+                <tr>
+                    <th style="text-align:center">Flip 1</th>
+                    <th style="text-align:center">Flip 2</th>
+                    <th style="text-align:center">Flip 3</th>
+                </tr>
+                <tr class='common_card_back_r'>
+                    <td>&#127136;</td>
+                    <td>&#127136;</td>
+                    <td>&#127136;</td>
+                </tr>
+                <tr class='common_card_back_r'>
+                    <td>&#127136;</td>
+                    <td>&#127136;</td>
+                    <td>&#127136;</td>
+                </tr>
+                <tr class='common_card_back_r'>
+                    <td>&#127136;</td>
+                    <td>&#127136;</td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
 
-          <td style='width:10px'> </td>
-          <td style="border: 1px solid black ;"><span style='color: #000000;font-size:40px;'>3</span>
-            <span style='font-size:50px;'>&#9824;</span>
-          <span style='color: #cc0000;font-size:40px;'>5</span>
-          <span style='color: #cc0000;font-size:50px;'>&#9830; </span>
+        <div class="summary_table">
+            <table>
+                <th><b>Table Status</b></th>
+                <tr>
+                    <td>Dealer:</td>
+                    <td>Beauv</td>
+                    <td style="width:50px"></td>
+                </tr>
+                <tr>
+                    <td>In Pot:</td>
+                    <td>$0.75</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Opened:</td>
+                    <td>Ed</td>
+                    <td>Nickle</td>
+                </tr>
 
-          <div class="dropup">
-            <select  name="Hand_2">
-          <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Keep/Fold
-          <span class="caret"></span></button>
-          <ul class="dropdown-menu">
-          <li><a href="#"><option value='keep'>Keep</a></li>
-          <li><a href="#"><option value='fold'>Fold</a></li>
-          </ul>
-          </select>
-          </div>
+                <tr>
+                    <td>Last Bet/Raise:</td>
+                    <td>Scumbo</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Bet to:</td>
+                    <td>Alba</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Current Bet:</td>
+                    <td>Dime a Side</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Raises remaining:</td>
+                    <td>2</td>
+                    <td></td>
+                </tr>
+                <tr style="height: 10px">
+                    <td></td>
+                </tr>
+                <tr>
+                    <th><b>Bet Status</b></th>
+                </tr>
+                <tr>
+                    <td>Player</td>
+                    <td>Rnd/Side</td>
+                    <td>Hand</td>
+                </tr>
+                <tr>
+                    <td>Alba</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>Clyde</td>
+                    <td>10</td>
+                    <td>20</td>
+                </tr>
+                <tr>
+                    <td>Bornstein</td>
+                    <td>10</td>
+                    <td>20</td>
+                </tr>
+                <tr>
+                    <td>Scumbo</td>
+                    <td>10</td>
+                    <td>20</td>
+                </tr>
+                <tr>
+                    <td>Dr. Dirty</td>
+                    <td>5</td>
+                    <td>10</td>
+                </tr>
+                <tr>
+                    <td>Judogi</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>Ed</td>
+                    <td>5</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td>Beauv</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
 
-          </td>
+
+            </table>
+
+        </div>
+    </div>
 
 
-          <td>
-            <div class="dropup" >
-            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Actions
-              <select name='bet_actions'>
-            <span class="caret"></span></button>
-            <ul class="dropdown-menu">
-            <li><a href="#"><option value='check'>Check</a></li>
-            <li><a href="#"><option value='call'>Call</a></li>
-            <li><a href="#"><option value='bet_5'>Bet 5</a></li>
-            <li><a href="#"><option value='bet_10'>Bet 10</a></li>
-            <li><a href="#"><option value='bet_15'>Bet 15</a></li>
-            <li><a href="#"><option value='bet_20'>Bet 20</a></li>
-            </ul>
-          </select>
+    <div class='container your_cards'>
+
+        <p><b>Your Cards:</b></p>
+        <form class="form-inline" method="POST">
+            <div>
+                <table>
+                    <tr>
+
+                        <td class='your_cards_hand'>
+                            <span style='color: #000000;font-size:40px;'>10</span>
+                            <span style='font-size:50px;'>&#9824;</span>
+                            <span style='color: #cc0000;font-size:40px;'>10</span>
+                            <span style='color: #cc0000;font-size:50px;'>&#9830; </span>
+
+
+                            <div class="dropup">
+                                <select name="Hand_1">
+                                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                            type="button">Keep/Fold
+                                        <span class="caret"></span></button>
+
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#">
+                                            <option value='keep'>Keep
+                                        </a></li>
+                                        <li><a href="#">
+                                            <option value='fold'>Fold
+                                        </a></li>
+                                    </ul>
+                                </select>
+                            </div>
+                        </td>
+
+                        <td style='width:10px'></td>
+                        <td style="border: 1px solid black ;"><span style='color: #000000;font-size:40px;'>4</span>
+                            <span style='font-size:50px;'>&#9824;</span>
+                        </td>
+
+                        <td style='width:10px'></td>
+                        <td style="border: 1px solid black ;"><span style='color: #000000;font-size:40px;'>3</span>
+                            <span style='font-size:50px;'>&#9824;</span>
+                            <span style='color: #cc0000;font-size:40px;'>5</span>
+                            <span style='color: #cc0000;font-size:50px;'>&#9830; </span>
+
+                            <div class="dropup">
+                                <select name="Hand_2">
+                                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                            type="button">Keep/Fold
+                                        <span class="caret"></span></button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#">
+                                            <option value='keep'>Keep
+                                        </a></li>
+                                        <li><a href="#">
+                                            <option value='fold'>Fold
+                                        </a></li>
+                                    </ul>
+                                </select>
+                            </div>
+
+                        </td>
+
+
+                        <td>
+                            <div class="dropup">
+                                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
+                                    Actions
+                                    <select name='bet_actions'>
+                                        <span class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">
+                                        <option value='check'>Check
+                                    </a></li>
+                                    <li><a href="#">
+                                        <option value='call'>Call
+                                    </a></li>
+                                    <li><a href="#">
+                                        <option value='bet_5'>Bet 5
+                                    </a></li>
+                                    <li><a href="#">
+                                        <option value='bet_10'>Bet 10
+                                    </a></li>
+                                    <li><a href="#">
+                                        <option value='bet_15'>Bet 15
+                                    </a></li>
+                                    <li><a href="#">
+                                        <option value='bet_20'>Bet 20
+                                    </a></li>
+                                </ul>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <button class="btn btn-default" type="submit">Take Action</button>
+                        </td>
             </div>
-          </td>
-          <td>
-            <div class="form-group">
-              <button type="submit" class="btn btn-default">Take Action</button></td>
-            </div>
-        </tr>
-    </table>
-
+            </tr>
+            </table>
 
 
     </div>
     </form>
-    </div>
+</div>
 
 
-    </div>
+</div>
 </body>
 </html>

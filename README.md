@@ -1,10 +1,27 @@
 # Status
 
-For now, I have changed the design a bit in order to get everything running and ease testing.  Currently, there are essentially four working pages: login, a master control, an active player, and an inactive player.  
+## Working pages: 
+
+login 
+
+master control
+
+active player
+
+inactive player.  
+
+## Working Functions:
+
+reset
+
+new deal
+
+first bet - Proper control passing, proper hands shown, properactive player status, no control for the inactive player.  One small bug,: in the last round of checks, the display shows an object.  Need to trap for a string and display.
+
 
 From the command line, run test program with:
 
-## python third_deal.py
+## python fourth_deal.py
 
 
 
@@ -20,9 +37,8 @@ When logged in, access as pic-a-wheel-root/master_control
 
 ## active player:
 
-The active and inactive screens are essentially the same, except that the inactive page has no controls for folding/keeping or betting.  Both pages are accessed by pointing your browser at the pic-a-wheel-root/full_table.  For rev 1, you will only be allowed to act if it is your turn.  This page is partially working.  For testing, active player= Bornstein.  Keep/Fold decisions are recorded correctly and passed back to the server.  Additionally, the betting is reported correctly to the server, but, nothing is done with it yet.
+The active and inactive screens are essentially the same, except that the inactive page has no controls for folding/keeping or betting.  Both pages are accessed by pointing your browser at the pic-a-wheel-root/full_table.  You are allowed to act if it is your turn.  This page is partially working.  For testing, active player= Bornstein.  Keep/Fold decisions are recorded correctly and passed back to the server.  Additionally, the betting is reported correctly to the server, but, nothing is done with it yet.
 
-Known bug:  folded hands are causing some unknown variable and illegal actions.  This is because the underlying algos expect a card datatype (or a hand) and the folded flags are strings.  An easy fix, but tedious, as calculations are done in various parts of the code.
 
 ## inactive player:
 See above.  Was working to show inactive players the hand status on an updating basis, but a lot of changes have been made since that was true.  Current status unknow, and will need to be rewritten to reflect the changes to active players page.

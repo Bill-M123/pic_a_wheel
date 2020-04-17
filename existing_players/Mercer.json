@@ -1,8 +1,8 @@
 {
-    "p_name": "Brian Mercer",
-    "p_nickname": "Mercer",
-    "email": "place_holder@place_holder.com",
-    "password": "password",
-    "bankroll": 0,
-    "deposits": []
+  "p_name": "Brian Mercer",
+  "p_nickname": "Mercer",
+  "email": "place_holder@place_holder.com",
+  "password": "password",
+  "bankroll": 0,
+  "deposits": []
 }

@@ -1,8 +1,8 @@
 {
-    "p_name": "Bob Vincent",
-    "p_nickname": "Clyde",
-    "email": "place_holder@place_holder.com",
-    "password": "password",
-    "bankroll": 0,
-    "deposits": []
+  "p_name": "Bob Vincent",
+  "p_nickname": "Clyde",
+  "email": "place_holder@place_holder.com",
+  "password": "password",
+  "bankroll": 0,
+  "deposits": []
 }
