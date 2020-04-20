@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="2" http-equiv="refresh"/>
+    <title></title>
+  </head>
+  <body>
+    <h1>Round {{dealer.betting_round_number}} Summary:</h1>
+    <div class="">
+      <table>
+        <tr>
+          <th>Name</th><th>Rnd/Side</th><th>In Pot</th><th>Status</th>
+        </tr>
+        {% for p in players %}
+        <tr>
+          <td>{{p.p_nickname}}</td>
+          <td>{{p.this_round_per_side}}</td>
+          <td>{{dealer.pot}}</td>
+          <td>{% if p.in_hand %}
+                Still alive.
+              {% else %}
+                Folded
+              {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+
+    </div>
+
+  </body>
+</html>

@@ -206,7 +206,7 @@ def full_table():
                 action = 'check'
 
             elif bet_action == 'call':
-                action = 'check'
+                action = 'call'
 
             elif bet_action == 'bet_5':
                 action = 'bet'
@@ -310,19 +310,17 @@ def master_control():
 
         # print(f"1 common_cards_flipped {dealer.common_cards_flipped}")
 
-
         #############################################
-        flip_controls=[flip1,flip2,flip3]
-        for i,f in enumerate(dealer.common_cards_flipped):
+        flip_controls = [flip1, flip2, flip3]
+        for i, f in enumerate(dealer.common_cards_flipped):
             if dealer.common_cards_flipped[i]:
                 pass
             else:
-                if flip_controls[i]==dealer.common_cards_flipped[i]:
+                if flip_controls[i] == dealer.common_cards_flipped[i]:
                     pass
                 else:
                     dealer.common_cards_flipped[i] = True
-                    
-                    
+
                     dealer.betting_complete = False
 
                     dealer.betting_round_number = 0
@@ -335,17 +333,20 @@ def master_control():
                     dealer.last_raise = 'No one'
                     dealer.active_player = 'No One'
 
-        #dealer.common_cards_flipped = [flip1, flip2, flip3]
-        ##############
-        #Calculate Round Action:
-        rounds=[first_bet,second_bet,third_bet,fourth_bet,fifth_bet]
+                    for p in players:
+                        p.this_round_per_side=0
 
-        for i,r in enumerate(rounds):
+        # dealer.common_cards_flipped = [flip1, flip2, flip3]
+        ##############
+        # Calculate Round Action:
+        rounds = [first_bet, second_bet, third_bet, fourth_bet, fifth_bet]
+
+        for i, r in enumerate(rounds):
             if dealer.betting_rounds[i]:
                 pass
             else:
-                dealer.betting_rounds[i]=True
-                dealer.betting_complete=False
+                dealer.betting_rounds[i] = True
+                dealer.betting_complete = False
 
     if (session['username'] == 'Bornstein') or (session['username'] == 'Clyde'):
         name = session['username']
@@ -378,16 +379,16 @@ def master_control():
             return render_template('master_control.html', form=form, name=name)
 
         if first_bet:
-            #for p in players:
+            # for p in players:
             #    p.get_number_hands()
             #    if p.num_hands > 0:
             #        p.in_hand = True
             #        dealer.new_betting_order.append(p)
             #    else:
             #       p.in_hand = False
-            new_players=dealer.get_betting_order(players)
-            for i,p in enumerate(new_players):
-                players[i]=new_players[i]
+            new_players = dealer.get_betting_order(players)
+            for i, p in enumerate(new_players):
+                players[i] = new_players[i]
             print(' ')
             print(f"new_betting_order: {dealer.new_betting_order}")
             tmp = dealer.new_betting_order[0]

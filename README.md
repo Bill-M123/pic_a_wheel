@@ -1,8 +1,19 @@
 # Status
 
-## Working pages: 
+Changes from fourth deal:
+requirments updated, no apparent Changes
+mastercontrols changes.  Reordered to reflect what really has to happen
+multiple changes to fifth_deal.py, to active player.html, and dealer.py to allow for cehcking through hand to work, summary page at end of round to be rendered, summary bets to be displayed on player pages.
 
-login 
+Note: refresh rate set to every 2 seconds for testing.  a little slow, but worth it.
+Active and inactive player controls switching correctly.
+
+Still a small logic problem in betting.  Calls and bets require checking through hand after betting is done.
+
+
+## Working pages:
+
+login
 
 master control
 
@@ -21,7 +32,7 @@ first bet - Proper control passing, proper hands shown, properactive player stat
 
 From the command line, run test program with:
 
-## python fourth_deal.py
+## python fifth_deal.py
 
 
 

@@ -13,65 +13,84 @@ class Dealer():
     common cards.'''
 
     def __init__(self):
+        # General Table variables
         self.perform_reset = False
         self.new_deck = [(rank, suit) for rank in range(1, 14) for suit in ['S', 'H', 'C', 'D']]
         self.first_deal = True
         self.deal_complete = False
-
         self.dealer_position = 0
-        self.active_player = 'No One'  # 'Bornstein'
-        self.deal_complete = False
-        self.pot = 0
+
+        # Card Variables
         self.common_cards = []  # Will have separate lists for each flip
         self.common_cards_pr = []
         self.common_cards_flipped = [False, False, False]  # True/False for each flip
-        self.bet_per_side = 0
-        self.declare_done = False
-        self.round_complete = False
-        self.num_raises = 0
-        self.who_opened = 'No one'
-        self.last_raise = 'No one'
         self.cards = Cards()
         self.display_suits_dict = {'S': '\u2660', 'C': '\u2663', 'H': '\u2665', 'D': '\u2666', }
         self.display_rank_dict = {1: 'A', 11: 'J', 12: 'Q', 13: 'K', 2: 2, 3: 3, 4: 4, 5: 5, 6: 6,
                                   7: 7, 8: 8, 9: 9, 10: 10}
 
-        # Added for betting rounds
+        # Controls Added for betting rounds
+        self.betting_round_number = 0
+        self.betting_rounds = [False, False, False, False, False]
         self.new_betting_order = []
         self.betting_complete = False
         self.new_bet = False
         self.check_count = 0
+        self.num_raises = 0
+        self.who_opened = 'No one'
+        self.last_raise = 'No one'
+        self.active_player = 'No One'
+
+        # Money variables
+        self.bet_per_side = 0
+        self.pot = 0
+
+        # Added for declare
+        self.declare_done = False
+
+        # House keeping
+        return
 
     def reset_table(self, players, this_game):
         '''Resets all table related values for players and dealer.'''
+
+        # General Table variables
         self.perform_reset = False
         self.new_deck = [(rank, suit) for rank in range(1, 14) for suit in ['S', 'H', 'C', 'D']]
         self.first_deal = True
         self.deal_complete = False
-
         self.dealer_position = 0
-        self.active_player = 'No One'
-        self.deal_complete = False
-        self.pot = 0
+
+        # Card Variables
         self.common_cards = []  # Will have separate lists for each flip
         self.common_cards_pr = []
         self.common_cards_flipped = [False, False, False]  # True/False for each flip
-        self.bet_per_side = 0
-        self.declare_done = False
-        self.round_complete = False
-        self.num_raises = 0
-        self.who_opened = 'No one'
-        self.last_raise = 'No one'
         self.cards = Cards()
         self.display_suits_dict = {'S': '\u2660', 'C': '\u2663', 'H': '\u2665', 'D': '\u2666', }
         self.display_rank_dict = {1: 'A', 11: 'J', 12: 'Q', 13: 'K', 2: 2, 3: 3, 4: 4, 5: 5, 6: 6,
                                   7: 7, 8: 8, 9: 9, 10: 10}
 
-        # Added for betting rounds
+        # Controls Added for betting rounds
+        self.betting_round_number=0
+        self.betting_rounds=[False,False,False,False,False]
         self.new_betting_order = []
         self.betting_complete = False
         self.new_bet = False
         self.check_count = 0
+        self.num_raises = 0
+        self.who_opened = 'No one'
+        self.last_raise = 'No one'
+        self.active_player = 'No One'
+
+        # Money variables
+        self.bet_per_side = 0
+        self.pot = 0
+
+        # Added for declare
+        self.declare_done = False
+
+        #House keeping
+
         return
 
     def assign_new_dealer(self, players):
@@ -481,22 +500,19 @@ class Dealer():
 
         print("Analyzing action: ", player.p_nickname, action, action_amount)
 
+        # check for end of round
+        if (self.last_raise == self.new_betting_order[0].p_nickname) and (self.check_count>0):
+            print(f"Got around to {self.last_raise}, this round betting ends")
+            self.new_bet == False
+            self.betting_complete=True
+            return player
+
         # check for no action
         if action == 'None':
             print('No action')
             return player
 
-        # check for end of round
-        if self.last_raise == self.new_betting_order[0].p_nickname:
-            print(f"Got around to {self.last_raise}, this round betting ends")
-            self.new_bet == False
-            return player
-
-        #if self.last_raise == 'No one':
-        self.last_raise = self.new_betting_order.pop(0)
-        #else:
-            #self.last_raise = self.new_betting_order.pop(0)
-       # self.new_betting_order.append(self.last_raise)
+        self.this_action = self.new_betting_order.pop(0)
 
         new_betting_order = self.new_betting_order.copy()
         max_bet = max([x.this_round_per_side for x in players])
@@ -512,7 +528,7 @@ class Dealer():
         elif action == 'check':
 
             self.new_betting_order = new_betting_order.copy()
-            self.new_betting_order.append(self.last_raise)
+            self.new_betting_order.append(self.this_action)
 
             # Addresses Clyde's first bug.
 
@@ -525,13 +541,13 @@ class Dealer():
             action_price = max_bet - player.this_round_per_side
 
             self.new_betting_order = new_betting_order.copy()
-            self.new_betting_order.append(self.last_bettor)
+            self.new_betting_order.append(self.this_action)
             self.pot += action_price
             self.new_bet = False
             self.first_check = False
-            player.bankroll -= action_price
-            player.this_round_per_side += action_price
-            tmp = [x.p_nickname for x in self.new_betting_order]
+            player.bankroll -= (action_price*player.num_hands)
+            player.this_round_per_side += (action_price)
+
 
 
         else:
@@ -539,16 +555,38 @@ class Dealer():
             da_raise = action_amount
 
             self.new_betting_order = new_betting_order.copy()
-            self.new_betting_order.append(self.last_bettor)
-            self.pot = self.pot + action_price + da_raise
+            self.new_betting_order.append(self.this_action)
+            self.pot = self.pot + (action_price + da_raise)*player.num_hands
             self.last_raise = player.p_nickname
             self.new_bet = True
 
             if self.who_opened == 'No one':
                 self.who_opened = player.p_nickname
 
-            player.bankroll = player.bankroll - action_price - da_raise
-            player.this_round_per_side = player.this_round_per_side + action_price + da_raise
-            tmp = [x.p_nickname for x in self.new_betting_order]
+            player.bankroll = player.bankroll - (action_price + da_raise)*player.num_hands
+            player.this_round_per_side = player.this_round_per_side + (action_price + da_raise)
+
+
+        # check for end of round
+        if (self.last_raise == self.new_betting_order[0].p_nickname) and (self.check_count > 0):
+            print(f"Got around to {self.last_raise}, this round betting ends")
+            self.new_bet == False
+            self.betting_complete = True
 
         return player
+
+    def get_betting_order(self,player_list):
+        """Accept a  list of player objects in order, slice out players that have folded, set the in_hand flag to False for
+        the folded players.  Sets new betting order in dealer object and returns a new player list with updated flags"""
+
+        new_player_list=[]
+        for p in player_list:
+            p.get_number_hands()
+            if p.num_hands > 0:
+                p.in_hand = True
+                self.new_betting_order.append(p)
+            else:
+                p.in_hand = False
+            new_player_list.append(p)
+
+        return new_player_list
