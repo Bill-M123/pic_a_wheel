@@ -1,0 +1,33 @@
+{% extends "player_base_table.html" %}
+  {% block hand_1_controls %}
+    <label for="hand1_kf">Hand 1:</label>
+      <select id="hand1_kf" name='hand1_kf' value='keep'>
+        <option value="keep">Keep</option>
+        <option value="fold">Fold</option>
+      </select>
+  {% endblock %}
+
+  {% block hand_2_controls %}
+    <label for="hand2_kf">Hand 2:</label>
+      <select id="hand2_kf" name='hand2_kf' value='keep'>
+        <option value="keep">Keep</option>
+        <option value="fold">Fold</option>
+      </select>
+  {% endblock %}
+
+  {% block bet_actions %}
+  <select id="action" name='bet_actions' value='None'>
+      <option value='check'>Check</option>
+      <option value='call'>Call</option>
+      <option value='bet_5'>Bet 5</option>
+      <option value='bet_10'>Bet 10</option>
+      <option value='bet_15'>Bet 15</option>
+      <option value='bet_20'>Bet 20</option>
+      </select>
+  {% endblock %}
+
+  {% block submit_block %}
+    <div class="form-group">
+        <button type="submit">Take Action</button>
+    </div>
+  {% endblock %}

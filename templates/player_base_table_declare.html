@@ -1,0 +1,26 @@
+{% extends "player_base_table.html" %}
+  {% block hand_1_controls %}
+    <label for="hand1_hl">Hand 1 H/L:</label>
+      <select id="hand1_hl" name='hand1_hl' value='low'>
+        <option value="high">High</option>
+        <option value="low">Low</option>
+      </select>
+  {% endblock %}
+
+  {% block hand_2_controls %}
+  <label for="hand2_hl">Hand 2 H/L:</label>
+    <select id="hand2_hl" name='hand2_hl' value='low'>
+      <option value="high">High</option>
+      <option value="low">Low</option>
+    </select>
+  {% endblock %}
+
+  {% block bet_actions %}
+  No bet yet
+  {% endblock %}
+
+  {% block submit_block %}
+    <div class="form-group">
+        <button type="submit">Declare</button>
+    </div>
+  {% endblock %}

@@ -39,7 +39,10 @@ class MasterControlForm(FlaskForm):
     first_flip = BooleanField(label="First Flip now?", default=False)
     second_flip = BooleanField(label="Second Flip now?", default=False)
     third_flip = BooleanField(label="Third Flip now?", default=False)
-    declare = BooleanField(label="Declare now?", default=False)
+
+    declare_open = BooleanField(label="Declare Open", default=False)
+    declare_closed = BooleanField(label="Declare Done", default=False)
+
     evaluate_now = BooleanField(label="Evaluate winners now?", default=False)
 
     submit = SubmitField("Submit")
@@ -49,6 +52,12 @@ class FullTableForm(FlaskForm):
     hand1_kf = SelectField(label="Hand 1", default='keep')
     hand2_kf = SelectField(label="Hand 2", default='keep')
     bet_action = SelectField(label="Action", default="None")
+
+class DeclareForm(FlaskForm):
+    hand1_hl = SelectField(label="Hand 1 H/L", default='low')
+    hand2_hl = SelectField(label="Hand 2 H/L", default='low')
+    submit = SubmitField("Take Action")
+
 
 
 #########################
@@ -109,6 +118,10 @@ def login():
     print(request.method)
     if request.method == 'POST':
         session['username'] = request.form['username']
+        session['declare_complete'] = False
+        session['declare_start'] = False
+
+
         print(session['username'])
         valid_ids = [p.p_nickname for p in players]
 
@@ -140,7 +153,18 @@ def full_table():
         return render_template('round_summary.html', dealer=dealer,
                                players=players, this_player=this_player, form=form)
 
-    whoami=session['username']
+    for p in players:
+        if p.p_nickname == session['username']:
+            this_guy=p
+
+    if dealer.declare_open and not this_guy.declare_complete:
+        this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+        this_player = dealer.make_your_hand_display_cards(this_player)
+        #return render_template('player_base_table_declare.html', dealer=dealer,
+                               #players=players, this_player=this_player, form=form)
+        return redirect(url_for("declare"))
+
+
 
     if session['username'] == dealer.active_player:
 
@@ -235,11 +259,11 @@ def full_table():
             dealer.active_player = tmp.p_nickname
 
             if this_player and dealer.active_player == session['username']:
-                return render_template('table_view_active.html', dealer=dealer,
+                return render_template('player_base_table_active.html', dealer=dealer,
                                        players=players, this_player=this_player, form=form)
 
             elif this_player and dealer.active_player != session['username']:
-                return render_template('table_view_inactive.html', dealer=dealer,
+                return render_template('player_base_table.html', dealer=dealer,
                                        players=players, this_player=this_player, form=form)
             else:
                 return f"{session['username']} is not welcome at this table, so get lost!"
@@ -248,13 +272,73 @@ def full_table():
     else:
 
         this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+        this_player = dealer.make_your_hand_display_cards(this_player)
 
         if this_player:
-            this_player = dealer.make_your_hand_display_cards(this_player)
-            return render_template('table_view_inactive.html', dealer=dealer,
+            #this_player = dealer.make_your_hand_display_cards(this_player)
+            return render_template('player_base_table.html', dealer=dealer,
                                    players=players, this_player=this_player)
         else:
             return f"{session['username']} is not welcome at this table, so get lost!"
+
+@app.route('/declare',methods=['GET', 'POST'])
+def declare():
+    global players, this_game,cards
+
+    form = DeclareForm()
+    print('In declare function')
+
+
+    for p in players:
+        if p.p_nickname == session['username']:
+            this_guy = p
+
+
+    if form.validate_on_submit:
+
+        if this_guy.declare_complete:
+            return redirect(redirect(url_for("full_table")))
+
+        if not this_guy.declare_start:
+            this_guy.declare_start = True
+
+            for i,p in enumerate(players):
+                if p.p_nickname == session['username']:
+                    players[i] = this_guy
+
+            this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+            this_player = dealer.make_your_hand_display_cards(this_player)
+            return render_template('player_base_table_declare.html',dealer=dealer,
+                                   players=players, this_player=this_player)
+
+        hand1_hl = request.form.get('hand1_hl')
+        hand2_hl = request.form.get('hand2_hl')
+
+        if hand1_hl == 'high':
+            this_guy.hands_hi_lo[0] = 'high'
+
+        if hand2_hl == 'high':
+            this_guy.hands_hi_lo[1] = 'high'
+
+        this_guy.declare_complete = True
+
+        for i,p in enumerate(players):
+            if p.p_nickname == session['username']:
+                players[i]=this_guy
+
+        this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+        this_player = dealer.make_your_hand_display_cards(this_player)
+        return redirect(url_for("full_table"))
+
+    #else:
+    #    this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+    #    this_player = dealer.make_your_hand_display_cards(this_player)
+    #    return render_template("player_base_table_declare.html", dealer=dealer, players=players, this_player=this_player, form=form)
+
+
+
+
+
 
 
 @app.route('/new_deal')
@@ -291,7 +375,15 @@ def master_control():
         flip1 = form.first_flip.data
         flip2 = form.second_flip.data
         flip3 = form.third_flip.data
-        declare = form.declare.data
+
+        declare_open = form.declare_open.data
+        if declare_open:
+            dealer.declare_open = True
+
+        declare_closed = form.declare_closed.data
+        if declare_closed:
+            dealer.declare_open = False
+
         evaluate_now = form.evaluate_now.data
         submit_value = form.submit.data
         print('Reset Table:', reset_table)
@@ -304,7 +396,8 @@ def master_control():
         print("first_flip", flip1)
         print("second_flip", flip2)
         print("third_flip", flip3)
-        print("declare", declare)
+        print("declare_open", declare_open)
+        print("declare_closed", declare_closed)
         print("submit", submit_value)
 
         # print(f"1 common_cards_flipped {dealer.common_cards_flipped}")
@@ -333,9 +426,9 @@ def master_control():
                     dealer.active_player = 'No One'
 
                     p: Player
-                    for i,p in enumerate(players):
-                        p.this_round_per_side=0
-                        players[i]=p
+                    for i, p in enumerate(players):
+                        p.this_round_per_side = 0
+                        players[i] = p
 
         # dealer.common_cards_flipped = [flip1, flip2, flip3]
         ##############
@@ -356,6 +449,8 @@ def master_control():
         if reset_table:
             print('resetting')
             new_players = []
+            session['declare_complete'] = False
+            session['declare_start'] = False
             dealer.reset_table(players, this_game)
             dealer.perform_reset = True
 

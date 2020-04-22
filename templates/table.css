@@ -35,7 +35,7 @@ td{
   width=100px;
   border: 2px solid black;
   text-align: left;
-  font-size:25px;
+  font-size:35px;
   color: black;
   padding: 0px 0px 0px 0px;
 
@@ -77,7 +77,7 @@ td{
 
 .common_card_back_r{
   color: #bb0000;
-  font-size:95px;
+  font-size:105px;
   background-color:white;
   border: 1px solid black;
 

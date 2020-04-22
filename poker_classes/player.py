@@ -20,6 +20,7 @@ class Player():
         self.total_deals_tonight = 0
         self.seconds_thinking = 0
         self.hands = [[], []]
+        self.hands_hi_lo=[[],[]]
         self.num_hands = len(self.hands)
         self.hands_pr = [[], []]
         self.backs_pr = ['backs', 'backs']
@@ -33,10 +34,13 @@ class Player():
         self.low_hands = []
         self.in_hand = True  # Flag for in hand
         self.at_table = True  # Flag for at table
+        self.declare_start = False
+        self.declare_complete = False
         self.check_player_existence()
 
     def reset_player_from_master_control(self):
         self.hands = [[], []]
+        self.hands_hi_lo=[[],[]]
         self.num_hands = len(self.hands)
         self.hands_pr = [[], []]
         self.backs_pr = ['backs', 'backs']
@@ -48,6 +52,8 @@ class Player():
         self.last_bet = 0
         self.high_hands = []
         self.low_hands = []
+        self.declare_start = False
+        self.declare_complete=False
         return self
 
     def split_cards(self, cards):

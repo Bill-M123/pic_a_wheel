@@ -46,6 +46,7 @@ class Dealer():
         self.pot = 0
 
         # Added for declare
+        self.declare_open = False
         self.declare_done = False
 
         # House keeping
@@ -87,6 +88,7 @@ class Dealer():
         self.pot = 0
 
         # Added for declare
+        self.declare_open = False
         self.declare_done = False
 
         #House keeping
@@ -542,7 +544,7 @@ class Dealer():
 
             self.new_betting_order = new_betting_order.copy()
             self.new_betting_order.append(self.this_action)
-            self.pot += action_price
+            self.pot += action_price*player.num_hands
             self.new_bet = False
             self.first_check = False
             player.bankroll -= (action_price*player.num_hands)
