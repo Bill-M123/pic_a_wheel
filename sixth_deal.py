@@ -58,8 +58,6 @@ class DeclareForm(FlaskForm):
     hand2_hl = SelectField(label="Hand 2 H/L", default='low')
     submit = SubmitField("Take Action")
 
-
-
 #########################
 
 working_dir = os.getcwd()
@@ -84,12 +82,13 @@ brian = Player(player_dir, name='Brian Mercer', nickname='Mercer')
 ed = Player(player_dir, name='Ed Mulhern', nickname='Ed')
 
 players = [alba, bornstein, clyde, brian, ed]
+players = [alba, bornstein, clyde]
+players = [bornstein]
 players = [alba, bornstein]
 for i, p in enumerate(players):
     p.add_funds(500)  # add funds
     p.player_position = i  # set table position
 
-print('Funds added')
 player_dict = {}
 
 # Initial Deal, display cards on console
@@ -104,9 +103,8 @@ app = Flask(__name__)
 # App config from Clyde
 app.config["SECRET_KEY"] = "yousecntuch"
 app.debug = True
-# socketio = SocketIO(app)
-login_manager = login_manager.init_app(app)
 
+login_manager = login_manager.init_app(app)
 
 @app.route('/')
 def index():
@@ -121,8 +119,6 @@ def login():
         session['declare_complete'] = False
         session['declare_start'] = False
 
-
-        print(session['username'])
         valid_ids = [p.p_nickname for p in players]
 
         if session['username'] in valid_ids:
@@ -143,11 +139,20 @@ def full_table():
 
     form = FullTableForm()
 
+    if session['username'] == 'Bornstein' and dealer.declare_open:
+        print('Fake Breakpoint')
+
     tmp = dealer
     if tmp.betting_complete:
         print(f"{tmp.active_player},{tmp.betting_complete}")
 
-    if dealer.betting_complete:
+    if dealer.betting_complete and not dealer.declare_open and not dealer.declare_done:
+        this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+        this_player = dealer.make_your_hand_display_cards(this_player)
+        return render_template('round_summary.html', dealer=dealer,
+                               players=players, this_player=this_player, form=form)
+
+    if dealer.betting_complete and  dealer.declare_done:
         this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
         this_player = dealer.make_your_hand_display_cards(this_player)
         return render_template('round_summary.html', dealer=dealer,
@@ -157,12 +162,25 @@ def full_table():
         if p.p_nickname == session['username']:
             this_guy=p
 
+    # this_guy declare is not done
+    if dealer.declare_open:
+        print(f"Declare open, {this_guy.p_nickname} trying to play.")
+        print(f"His declare flag is: {this_guy.declare_complete}")
+
     if dealer.declare_open and not this_guy.declare_complete:
         this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
         this_player = dealer.make_your_hand_display_cards(this_player)
         #return render_template('player_base_table_declare.html', dealer=dealer,
                                #players=players, this_player=this_player, form=form)
         return redirect(url_for("declare"))
+
+    # this_guy declare is done
+    if dealer.declare_open and this_guy.declare_complete:
+        this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+        this_player = dealer.make_your_hand_display_cards(this_player)
+        return render_template('player_base_table_declare_wait_state.html', dealer=dealer,
+                               players=players, this_player=this_player, form=form)
+        #return redirect(url_for("declare"))
 
 
 
@@ -198,8 +216,6 @@ def full_table():
                         for i in range(10):
                             print(p.p_nickname, p.hands, p.hands)
 
-                    if p.p_nickname == 'JohnAlba':
-                        alba = p
 
             if hand2_kf == 'fold':
                 for p in players:
@@ -217,8 +233,6 @@ def full_table():
             this_player.get_number_hands()
             if this_player.num_hands == 0:
                 this_player.common_cards_pr = [['folded']]
-            print(f"{this_player.p_nickname} has {this_player.num_hands} remaining.")
-            print(f"They are: {this_player.hands_pr} {this_player.common_cards_pr}")
 
             action = 'check'
             action_amount = 0
@@ -275,7 +289,6 @@ def full_table():
         this_player = dealer.make_your_hand_display_cards(this_player)
 
         if this_player:
-            #this_player = dealer.make_your_hand_display_cards(this_player)
             return render_template('player_base_table.html', dealer=dealer,
                                    players=players, this_player=this_player)
         else:
@@ -287,7 +300,6 @@ def declare():
 
     form = DeclareForm()
     print('In declare function')
-
 
     for p in players:
         if p.p_nickname == session['username']:
@@ -316,9 +328,13 @@ def declare():
 
         if hand1_hl == 'high':
             this_guy.hands_hi_lo[0] = 'high'
+        else:
+            this_guy.hands_hi_lo[0] = 'low'
 
         if hand2_hl == 'high':
             this_guy.hands_hi_lo[1] = 'high'
+        else:
+            this_guy.hands_hi_lo[1] = 'low'
 
         this_guy.declare_complete = True
 
@@ -334,12 +350,6 @@ def declare():
     #    this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
     #    this_player = dealer.make_your_hand_display_cards(this_player)
     #    return render_template("player_base_table_declare.html", dealer=dealer, players=players, this_player=this_player, form=form)
-
-
-
-
-
-
 
 @app.route('/new_deal')
 def new_deal():
@@ -383,24 +393,26 @@ def master_control():
         declare_closed = form.declare_closed.data
         if declare_closed:
             dealer.declare_open = False
+            dealer.declare_done = True
+            dealer.betting_complete = False
+            dealer.betting_round_number += 1
+            dealer.new_betting_order = []
+            dealer.betting_complete = False
+            dealer.new_bet = False
+            dealer.check_count = 0
+            dealer.num_raises = 0
+            dealer.who_opened = 'No one'
+            dealer.last_raise = 'No one'
+            dealer.active_player = 'No One'
+
+            p: Player
+            for i, p in enumerate(players):
+                p.this_round_per_side = 0
+                players[i] = p
+
 
         evaluate_now = form.evaluate_now.data
         submit_value = form.submit.data
-        print('Reset Table:', reset_table)
-        print('New Deal:', new_deal)
-        print("first_bet", first_bet)
-        print("second_bet", second_bet)
-        print("third_bet", third_bet)
-        print("fourth_bet", fourth_bet)
-        print("fifth_bet", fifth_bet)
-        print("first_flip", flip1)
-        print("second_flip", flip2)
-        print("third_flip", flip3)
-        print("declare_open", declare_open)
-        print("declare_closed", declare_closed)
-        print("submit", submit_value)
-
-        # print(f"1 common_cards_flipped {dealer.common_cards_flipped}")
 
         #############################################
         flip_controls = [flip1, flip2, flip3]
@@ -412,10 +424,8 @@ def master_control():
                     pass
                 else:
                     dealer.common_cards_flipped[i] = True
-
                     dealer.betting_complete = False
-
-                    dealer.betting_round_number = 0
+                    dealer.betting_round_number = i
                     dealer.new_betting_order = []
                     dealer.betting_complete = False
                     dealer.new_bet = False
@@ -430,7 +440,6 @@ def master_control():
                         p.this_round_per_side = 0
                         players[i] = p
 
-        # dealer.common_cards_flipped = [flip1, flip2, flip3]
         ##############
         # Calculate Round Action:
         rounds = [first_bet, second_bet, third_bet, fourth_bet, fifth_bet]
@@ -444,7 +453,6 @@ def master_control():
 
     if (session['username'] == 'Bornstein') or (session['username'] == 'Clyde'):
         name = session['username']
-        # print(f"Found Right Guys, common_cards_flipped {dealer.common_cards_flipped}")
 
         if reset_table:
             print('resetting')
@@ -454,6 +462,7 @@ def master_control():
             dealer.reset_table(players, this_game)
             dealer.perform_reset = True
 
+            print("Flagging Reset")
             for i, p in enumerate(players):
                 players[i] = p.reset_player_from_master_control()
                 print((p.p_nickname, p.hands, p.common_cards))
@@ -461,7 +470,6 @@ def master_control():
             for p in players:
                 if p.p_nickname == 'Bornstein':
                     print(p.p_nickname, p.hands, p.common_cards)
-            # print(f"2 common_cards_flipped {dealer.common_cards_flipped}")
             return redirect(url_for('master_control'))
 
         if new_deal and ~dealer.deal_complete:
@@ -471,27 +479,19 @@ def master_control():
             dealer.first_deal = False
             form.new_deal.data = False
 
-            # print(f"3 common_cards_flipped {dealer.common_cards_flipped}")
             return render_template('master_control.html', form=form, name=name)
 
         if first_bet:
-            # for p in players:
-            #    p.get_number_hands()
-            #    if p.num_hands > 0:
-            #        p.in_hand = True
-            #        dealer.new_betting_order.append(p)
-            #    else:
-            #       p.in_hand = False
+
             new_players = dealer.get_betting_order(players)
             for i, p in enumerate(new_players):
                 players[i] = new_players[i]
             print(' ')
-            print(f"new_betting_order: {dealer.new_betting_order}")
+            print(f"At first_bet: new_betting_order: {dealer.new_betting_order}")
             tmp = dealer.new_betting_order[0]
             dealer.active_player = tmp.p_nickname
             print(f"Active Player: {dealer.active_player}")
 
-        # print(f"4 common_cards_flipped {dealer.common_cards_flipped}")
         return render_template('master_control.html', form=form, name=name)
 
     else:
@@ -499,4 +499,5 @@ def master_control():
 
 
 if __name__ == '__main__':
+    #app.run(Host='0.0.0.0',debug=False)
     app.run(debug=True)

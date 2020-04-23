@@ -404,7 +404,7 @@ class Dealer():
                 tmp.append(' ')
 
             common_dict[i] = tmp
-        # print(common_dict)
+
         return common_dict
 
     def make_player_cards_no_options(self, players, session_name, cards):
@@ -412,17 +412,12 @@ class Dealer():
 
         this_player = False
         for p in players:
-            print(p.p_nickname, p.hands_pr)
             if session_name == p.p_nickname:
                 this_player = p
-                print(f'Working on {this_player.p_nickname},hands: {p.hands}, common: {p.common_cards}')
-                print(f'Working on {this_player.p_nickname},hands: {p.hands_pr}, common: {p.common_cards_pr}')
 
         try:
             tmp = []
             for i, h in enumerate(this_player.hands):
-                # print
-                # print('Hands: ',this_player.hands[0],this_player.hands[1],i,h)
                 tmp_hand = []
                 if h != "folded":
                     tmp_hand.append([cards.get_simple_u_card_p(h[0]), cards.get_simple_u_card_p(h[1])])
@@ -431,7 +426,6 @@ class Dealer():
                     tmp.append(['folded'])
             this_player.hands_pr = tmp
 
-            # print('Initial Common: ',this_player.common_cards)
 
             if this_player.common_cards == []:
                 this_player.common_cards = []
@@ -439,24 +433,18 @@ class Dealer():
             else:
                 this_player.common_cards_pr = [cards.get_simple_u_card_p(this_player.common_cards[0])]
 
-            print('Hands: ', this_player.hands_pr)
-            print('Common: ', this_player.common_cards_pr)
-            # print('Passed card string to hex')
-
         except:
             print('Failed card string to hex')
             pass
         return this_player
 
     def convert_value_card_to_display(self, c):
-        # print(f"Card: {c}, len: {len(c)} type: {type(c)}")
         if isinstance(c, str):
             print(f"Card: {c} is a really a string.  Returning {c}")
             return c
         return (self.display_rank_dict[c[0]], self.display_suits_dict[c[1]])
 
     def convert_value_hand_to_display(self, hand):
-        # print(f"Convert_hand_input: {hand} len: {len(hand)} type: {type(hand)}")
         if hand == ['folded']:
             print(f"Hand folded.  Returning: {hand}")
             return hand
@@ -486,8 +474,7 @@ class Dealer():
         else:
 
             this_player.common_cards_pr = [(self.convert_value_card_to_display(this_player.common_cards[0]))]
-            print(f" In dealer, hands {this_player.hands}, common {this_player.common_cards}")
-        print('this_player.common_cards_pr', this_player.common_cards_pr)
+
 
         new_common = []
         for f in self.common_cards:

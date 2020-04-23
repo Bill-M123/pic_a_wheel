@@ -1,0 +1,30 @@
+{% extends "player_base_table.html" %}
+  {% block hand_1_controls %}
+  <table>
+    <tr>
+      Hand 1
+    </tr>
+    <tr>
+      {{this_player.hands_hi_lo[0]}}
+    </tr>
+  </table>
+  {% endblock %}
+
+  {% block hand_2_controls %}
+
+    <table>
+      <tr>
+        Hand 2
+      </tr>
+      <tr>
+        {{this_player.hands_hi_lo[1]}}
+      </tr>
+    </table>
+  {% endblock %}
+
+  {% block bet_actions %}
+  Declare Incomplete
+  {% endblock %}
+
+  {% block submit_block %}
+  {% endblock %}
