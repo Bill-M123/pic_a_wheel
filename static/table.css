@@ -52,6 +52,16 @@ td{
 
 }
 
+.hand_play_box_r_show{
+  border: 2px solid black;
+  margin: 0px;
+  text-align: center;
+  font-size:30px;
+  color: #cc0000;
+  padding: 0px 0px 0px 0px;
+
+}
+
 .hand_play_box_b{
   border: 2px solid black;
   margin: 0px;

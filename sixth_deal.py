@@ -80,11 +80,15 @@ bornstein = Player(player_dir, name='Bill Murphy', nickname='Bornstein')
 clyde = Player(player_dir, name='Bob Vincent', nickname='Clyde')
 brian = Player(player_dir, name='Brian Mercer', nickname='Mercer')
 ed = Player(player_dir, name='Ed Mulhern', nickname='Ed')
+tardie = Player(player_dir, name='Michael Tardie', nickname='Tardie')
+judogi = Player(player_dir, name='Bob Powers', nickname='Judogi')
+jeff = Player(player_dir, name='Jeff', nickname='Jeff')
 
 players = [alba, bornstein, clyde, brian, ed]
 players = [alba, bornstein, clyde]
 players = [bornstein]
 players = [alba, bornstein]
+players = [clyde,tardie,judogi,brian,ed,bornstein,jeff]
 for i, p in enumerate(players):
     p.add_funds(500)  # add funds
     p.player_position = i  # set table position
@@ -136,8 +140,21 @@ def login():
 @app.route('/full_table', methods=['GET', 'POST'])
 def full_table():
     global players, this_game
+    #print(dealer.showdown)
 
     form = FullTableForm()
+
+    #if dealer.showdown:
+    #    new_players=[]
+    #    for p in players:
+           # p.hands_pr[0]=dealer.convert_value_hand_to_display(p.hands[0])
+           # p.hands_pr[1] = dealer.convert_value_hand_to_display(p.hands[1])
+            #p.common_cards = dealer.convert_value_hand_to_display(p.common_cards)
+    #        new_players.append(p)
+     #       this_player=[]
+     #   return render_template('table_showdown.html', dealer=dealer,
+     #                          players=new_players)
+
 
     if session['username'] == 'Bornstein' and dealer.declare_open:
         print('Fake Breakpoint')
@@ -412,6 +429,9 @@ def master_control():
 
 
         evaluate_now = form.evaluate_now.data
+        if evaluate_now:
+            dealer.showdown = True
+
         submit_value = form.submit.data
 
         #############################################
@@ -499,5 +519,5 @@ def master_control():
 
 
 if __name__ == '__main__':
-    #app.run(Host='0.0.0.0',debug=False)
-    app.run(debug=True)
+    app.run(host='0.0.0.0',debug=True)
+    #app.run(debug=True)

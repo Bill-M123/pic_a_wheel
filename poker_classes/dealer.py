@@ -50,6 +50,7 @@ class Dealer():
         self.declare_done = False
 
         # House keeping
+        self.showdown = False
         return
 
     def reset_table(self, players, this_game):
@@ -92,6 +93,7 @@ class Dealer():
         self.declare_done = False
 
         #House keeping
+        self.showdown = False
 
         return
 
