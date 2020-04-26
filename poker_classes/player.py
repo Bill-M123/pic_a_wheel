@@ -64,11 +64,11 @@ class Player():
         return self.hands
 
     def get_number_hands(self):
-        for x in self.hands:
-            print(str(x), str(x).find('folded'))
+        #for x in self.hands:
+            #print(str(x), str(x).find('folded'))
         tmp = [str(x) for x in self.hands if str(x).find('folded') < 0]
-        print(tmp)
         self.num_hands = (len([x for x in self.hands if str(x).find('folded') < 0]))
+        print(f"{self.p_nickname} has {self.num_hands} hands")
         return
 
     def fold_decisions(self):

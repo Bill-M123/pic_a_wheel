@@ -41,9 +41,6 @@
                     <th style="width:10px"></th>
                     <th>Hand 2</th>
                     <th style="width:10px"></th>
-                    <th>/Side</th>
-                    <th style="width:10px"></th>
-                    <th>Bet</th>
                 </tr>
 
                 {% for p in players%}
@@ -54,17 +51,80 @@
                     <td style="width: 10px"></td>
 
                     <td class="hand_play_box_r_show">
-                      {{p.hands[0]}}
+                        {% if (p.hands_pr[0] != 'folded') and (p.hands_pr[0] != ['folded']) %}
+                            {% if p["hands_pr"][0][0][1] in ["\u2665","\u2666"] %}
+                                <span class="your_cards_card_r_rnk">{{p["hands_pr"][0][0][0]}}</span>
+                                <span class="your_cards_card_r_st">{{p["hands_pr"][0][0][1]}}</span>
+                            {% else %}
+                            <span class="your_cards_card_b_rnk">{{p["hands_pr"][0][0][0]}}</span>
+                            <span class="your_cards_card_b_st">{{p["hands_pr"][0][0][1]}}</span>
+                            {% endif %}
+
+
+                            {% if p.hands_hi_lo[0]=="high" %}
+                            <span style="color: #777777"> &#9679;</span>
+                            {% endif %}
+
+                            {% if p["hands_pr"][0][1][1] in ["\u2665","\u2666"] %}
+                                <span class="your_cards_card_r_rnk">{{p["hands_pr"][0][1][0]}}</span>
+                                <span class="your_cards_card_r_st">{{p["hands_pr"][0][1][1]}}</span>
+                            {% else %}
+                            <span class="your_cards_card_b_rnk">{{p["hands_pr"][0][1][0]}}</span>
+                            <span class="your_cards_card_b_st">{{p["hands_pr"][0][1][1]}}</span>
+                            {% endif %}
+
+                        {% else %}
+
+                        {% endif %}
+
+
+
                     </td>
 
 
                     <td style="width:10px"></td>
+
                     <td class="hand_play_box_r_show">
-                        {{p.common_cards[0]}}
-                    </td>
+                    {% if (p.hands_pr[0] != 'folded') and (p.hands_pr[0] != ['folded']) %}
+                        
+                        {% if p["common_cards_pr"][1] in ["\u2665","\u2666"] %}
+                            <span class="your_cards_card_r_rnk">{{p["common_cards_pr"][0]}}</span>
+                            <span class="your_cards_card_r_st">{{p["common_cards_pr"][1]}}</span>
+                            {% else %}
+                            <span class="your_cards_card_b_rnk">{{p["common_cards_pr"][0]}}</span>
+                            <span class="your_cards_card_b_st">{{p["common_cards_pr"][1]}}</span>
+                        {% endif %}
+                    {% endif %}
+                    </td>td
+
                     <td style="width:10px"></td>
+
                     <td class="hand_play_box_r_show">
-                        {{p.hands[1]}}
+                        {% if (p.hands_pr[1] != 'folded') and (p.hands_pr[0] != ['folded']) %}
+                            {% if p["hands_pr"][0][0][1] in ["\u2665","\u2666"] %}
+                                <span class="your_cards_card_r_rnk">{{p["hands_pr"][1][0][0]}}</span>
+                                <span class="your_cards_card_r_st">{{p["hands_pr"][1][0][1]}}</span>
+                            {% else %}
+                            <span class="your_cards_card_b_rnk">{{p["hands_pr"][1][0][0]}}</span>
+                            <span class="your_cards_card_b_st">{{p["hands_pr"][1][0][1]}}</span>
+                            {% endif %}
+
+
+                            {% if p.hands_hi_lo[1]=="high" %}
+                            <span style="color: #777777"> &#9679;</span>
+                            {% endif %}
+
+                            {% if p["hands_pr"][1][1][1] in ["\u2665","\u2666"] %}
+                                <span class="your_cards_card_r_rnk">{{p["hands_pr"][1][1][0]}}</span>
+                                <span class="your_cards_card_r_st">{{p["hands_pr"][1][1][1]}}</span>
+                            {% else %}
+                            <span class="your_cards_card_b_rnk">{{p["hands_pr"][1][1][0]}}</span>
+                            <span class="your_cards_card_b_st">{{p["hands_pr"][1][1][1]}}</span>
+                            {% endif %}
+
+                        {% else %}
+
+                        {% endif %}
                     </td>
 
                 </tr>

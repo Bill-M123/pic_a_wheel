@@ -73,8 +73,8 @@ class Dealer():
                                   7: 7, 8: 8, 9: 9, 10: 10}
 
         # Controls Added for betting rounds
-        self.betting_round_number=0
-        self.betting_rounds=[False,False,False,False,False]
+        self.betting_round_number = 0
+        self.betting_rounds = [False, False, False, False, False]
         self.new_betting_order = []
         self.betting_complete = False
         self.new_bet = False
@@ -92,7 +92,7 @@ class Dealer():
         self.declare_open = False
         self.declare_done = False
 
-        #House keeping
+        # House keeping
         self.showdown = False
 
         return
@@ -416,7 +416,6 @@ class Dealer():
         for p in players:
             if session_name == p.p_nickname:
                 this_player = p
-
         try:
             tmp = []
             for i, h in enumerate(this_player.hands):
@@ -427,7 +426,6 @@ class Dealer():
                 else:
                     tmp.append(['folded'])
             this_player.hands_pr = tmp
-
 
             if this_player.common_cards == []:
                 this_player.common_cards = []
@@ -441,9 +439,19 @@ class Dealer():
         return this_player
 
     def convert_value_card_to_display(self, c):
+        print('passed c: ', c)
         if isinstance(c, str):
             print(f"Card: {c} is a really a string.  Returning {c}")
             return c
+
+
+        if c == 'folded' or c==['folded']:
+            print(f"{session['username']} common passed to convert_value_card: {c}")
+            return c
+
+        if c[1] in self.display_suits_dict.values():
+            return (self.display_rank_dict[c[0]], [c[1]])
+
         return (self.display_rank_dict[c[0]], self.display_suits_dict[c[1]])
 
     def convert_value_hand_to_display(self, hand):
@@ -477,7 +485,6 @@ class Dealer():
 
             this_player.common_cards_pr = [(self.convert_value_card_to_display(this_player.common_cards[0]))]
 
-
         new_common = []
         for f in self.common_cards:
             tmp_h = self.convert_value_hand_to_display(f)
@@ -492,10 +499,10 @@ class Dealer():
         print("Analyzing action: ", player.p_nickname, action, action_amount)
 
         # check for end of round
-        if (self.last_raise == self.new_betting_order[0].p_nickname) and (self.check_count>0):
+        if (self.last_raise == self.new_betting_order[0].p_nickname) and (self.check_count > 0):
             print(f"Got around to {self.last_raise}, this round betting ends")
             self.new_bet == False
-            self.betting_complete=True
+            self.betting_complete = True
             return player
 
         # check for no action
@@ -533,10 +540,11 @@ class Dealer():
 
             self.new_betting_order = new_betting_order.copy()
             self.new_betting_order.append(self.this_action)
-            self.pot += action_price*player.num_hands
+            self.pot += action_price * player.num_hands
             self.new_bet = False
-            self.first_check = False
-            player.bankroll -= (action_price*player.num_hands)
+            # self.first_check = False
+            self.check_count += 1
+            player.bankroll -= (action_price * player.num_hands)
             player.this_round_per_side += (action_price)
 
 
@@ -547,16 +555,15 @@ class Dealer():
 
             self.new_betting_order = new_betting_order.copy()
             self.new_betting_order.append(self.this_action)
-            self.pot = self.pot + (action_price + da_raise)*player.num_hands
+            self.pot = self.pot + (action_price + da_raise) * player.num_hands
             self.last_raise = player.p_nickname
             self.new_bet = True
 
             if self.who_opened == 'No one':
                 self.who_opened = player.p_nickname
 
-            player.bankroll = player.bankroll - (action_price + da_raise)*player.num_hands
+            player.bankroll = player.bankroll - (action_price + da_raise) * player.num_hands
             player.this_round_per_side = player.this_round_per_side + (action_price + da_raise)
-
 
         # check for end of round
         if (self.last_raise == self.new_betting_order[0].p_nickname) and (self.check_count > 0):
@@ -566,11 +573,11 @@ class Dealer():
 
         return player
 
-    def get_betting_order(self,player_list):
+    def get_betting_order(self, player_list):
         """Accept a  list of player objects in order, slice out players that have folded, set the in_hand flag to False for
         the folded players.  Sets new betting order in dealer object and returns a new player list with updated flags"""
 
-        new_player_list=[]
+        new_player_list = []
         for p in player_list:
             p.get_number_hands()
             if p.num_hands > 0:
