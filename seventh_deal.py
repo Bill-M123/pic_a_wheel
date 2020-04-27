@@ -16,7 +16,7 @@ from flask_login import LoginManager
 from flask_login import login_required, current_user
 #########################
 from flask_wtf import Form, FlaskForm
-from wtforms import BooleanField, SubmitField, TextField, SelectField
+from wtforms import BooleanField, SubmitField, TextField, SelectField, StringField
 
 from poker_classes.cards import Cards
 from poker_classes.dealer import Dealer
@@ -91,8 +91,7 @@ players = [alba, bornstein, clyde]
 players = [bornstein]
 players = [alba, bornstein]
 players = [clyde, tardie, judogi, brian, ed, bornstein, jeff]
-players = [jeff,brian,bornstein]
-
+players = [jeff, brian, bornstein]
 
 for i, p in enumerate(players):
     p.add_funds(500)  # add funds
@@ -103,7 +102,6 @@ player_dict = {}
 # Initial Deal, display cards on console
 shuffled = dealer.deal_cards(players, this_game)
 for i, p in enumerate(players):
-    print(p.p_nickname, p.hands[0], p.common_cards, p.hands[1])
     player_dict = dealer.add_to_display_dict(player_dict, i, p, cards)
 
 #########################
@@ -120,7 +118,47 @@ login_manager = login_manager.init_app(app)
 def index():
     return '<h1>Home page for third_deal.py</h1>'
 
+#Simply change the following two lines to login2 and delete the doc string notation in the folling function
+#to revert to original login Also change two references below back to login2
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    global players, this_game
+
+    if not session.get('offered_login'):
+        session['offered_login']= True
+        return render_template('login.html')
+
+
+    elif session.get('logged_in'):
+        return f"{session['username']} is already logged in."
+
+    elif request.method in ['POST','GET']:
+
+        session['username'] = request.form.get('username')
+        valid_ids = [p.p_nickname for p in players]
+
+        if session['username'] in valid_ids:
+            if (session['username'] not in this_game.players_logged_in):
+                this_game.players_logged_in.append(session['username'])
+                print(f"Players logged in: {this_game.players_logged_in}")
+                return redirect(url_for("full_table"))
+
+            else:
+                tmp = f"{session['username']} is already logged in.  Only one session allowed."
+                session.clear()
+                return tmp
+
+        else:
+            session.clear()
+            return "Invalid Id.  I don't know you, go away."
+
+    else:
+        session.clear()
+        #return render_template('login2.html')
+        return redirect(url_for('login.html'))
+
+'''Commented out for testing.  THe following code represents the original login code put together by Clyde
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     print(request.method)
@@ -135,7 +173,7 @@ def login():
             return redirect(url_for("full_table"))
         else:
             return f"Invalid Login.  I don't know you.  I don't want to know you.  Go away."
-    return '''
+    return  add_three_quotes_here_to_revert_to_previous_login
         <form method="post">
             <p><input type=text name=username>
             <p><input type=submit value=Login>
@@ -151,23 +189,20 @@ def full_table():
     form = FullTableForm()
 
     if dealer.showdown:
-        new_players=[]
-        for i,p in enumerate(players):
-            print(f"{p.p_nickname}, {p.hands_pr[0]}, {p.hands_pr[1]}",end='')
-            print(f"common: {p.common_cards} len: {len(p.common_cards)} common_pr: {p.common_cards_pr}")
-            p.hands_pr[0]=dealer.convert_value_hand_to_display(p.hands[0])
+        new_players = []
+        for i, p in enumerate(players):
+
+            p.hands_pr[0] = dealer.convert_value_hand_to_display(p.hands[0])
             p.hands_pr[1] = dealer.convert_value_hand_to_display(p.hands[1])
-            if len(p.common_cards)== 1 and isinstance(p.common_cards,list):
-                print(f"len= {len(p.common_cards)} type list: {isinstance(p.common_cards,list)} {p.common_cards}")
+            if len(p.common_cards) == 1 and isinstance(p.common_cards, list):
                 p.common_cards_pr = dealer.convert_value_card_to_display(p.common_cards[0])
             else:
-                print(f"else p.common_cards: {p.common_cards}")
                 p.common_cards_pr = dealer.convert_value_hand_to_display(p.common_cards)
-            print(f"p_common_cards_pr: {p.common_cards}")
+
             new_players.append(p)
-            players[i]=p
+            players[i] = p
         return render_template('table_showdown.html', dealer=dealer,
-                              players=new_players)
+                               players=new_players)
 
     if session['username'] == 'Bornstein' and dealer.declare_open:
         print('Fake Breakpoint')
@@ -237,19 +272,17 @@ def full_table():
             bet_action = request.form.get('bet_actions')
 
             if hand1_kf == 'fold':
-                for i,p in enumerate(players):
+                for i, p in enumerate(players):
                     if session['username'] == p.p_nickname:
                         p.hands[0] = 'folded'
                         p.hands_pr[0] = 'folded'
                         players[i] = p
 
-
             if hand2_kf == 'fold':
-                for i,p in enumerate(players):
+                for i, p in enumerate(players):
                     if session['username'] == p.p_nickname:
                         p.hands[1] = 'folded'
                         p.hands_pr[1] = 'folded'
-
 
                         if (p.hands[0] == 'folded') & (p.hands[1] == 'folded'):
                             p.common_cards = ['folded']
@@ -267,9 +300,9 @@ def full_table():
                 this_player.common_cards_pr = ['folded']
 
             #  Fix for folding issue
-            for i,p in enumerate(players):
-                    if this_player.p_nickname == p.p_nickname:
-                        players[i] = this_player
+            for i, p in enumerate(players):
+                if this_player.p_nickname == p.p_nickname:
+                    players[i] = this_player
 
             action = 'check'
             action_amount = 0
@@ -310,10 +343,6 @@ def full_table():
             dealer.active_player = tmp.p_nickname
 
             print(f"this player: {this_player.p_nickname} ACTIVE")
-            print(f"hands: {this_player.hands[0]},{this_player.hands[1]}")
-            print(f"common {this_player.common_cards}")
-            print(f"hands_pr: {this_player.hands_pr[0]},{this_player.hands_pr[1]}")
-            print(f"common_pr {this_player.common_cards_pr}")
 
             if this_player and dealer.active_player == session['username']:
                 return render_template('player_base_table_active.html', dealer=dealer,
@@ -332,10 +361,7 @@ def full_table():
         this_player = dealer.make_your_hand_display_cards(this_player)
 
         print(f"this player: {this_player.p_nickname} is not currently active")
-        print(f"hands: {this_player.hands[0]},{this_player.hands[1]}")
-        print(f"common {this_player.common_cards}")
-        print(f"hands_pr: {this_player.hands_pr[0]},{this_player.hands_pr[1]}")
-        print(f"common_pr {this_player.common_cards_pr}")
+
         if this_player:
             return render_template('player_base_table.html', dealer=dealer,
                                    players=players, this_player=this_player)
@@ -551,5 +577,5 @@ def master_control():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
-    # app.run(debug=True)
+    # app.run(host='0.0.0.0', debug=True)
+    app.run(debug=True)

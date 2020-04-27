@@ -173,7 +173,7 @@ class Dealer():
         to a completely folded hand and sets p.in_hand'''
         for p in players:
             p.in_hand = not all(x == 'folded' for x in p.hands)
-            print(p.p_nickname, p.hands, 'in hand: ', p.in_hand)
+
         return
 
     def get_possible_hands(self, this_hand, common, omaha=False):
@@ -439,7 +439,7 @@ class Dealer():
         return this_player
 
     def convert_value_card_to_display(self, c):
-        print('passed c: ', c)
+
         if isinstance(c, str):
             print(f"Card: {c} is a really a string.  Returning {c}")
             return c

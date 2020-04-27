@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+    <meta charset="utf-8">
+    <link href="static/table.css" rel="stylesheet">
+    <title></title>
+</head>
+<body>
+
+<form method="POST">
+    {{form.hidden_tag() }}
+    <div class="the_whole_window">
+      <div class="player_div">
+        <IMG  SRC="static/images/splash.png" ALT="ruht-row">
+      </div>
+
+    <div class="sp_login_div">
+      <table class="sp_login_table">
+
+          <tr><th>Currently Logged In</th></tr>
+          {% for p in logged_in_players%}
+          <tr>
+            <td>{{p}}</td>
+          </tr>
+          {% endfor %}
+          <tr></tr>
+          <tr>
+                <td>Enter Name</td>
+                <td><input name = "login_name"</td>
+                <td><input type = "submit"></td>
+          </tr>
+      </table>
+    </div>
+    </div>
+
+
+
+</form>
+</body>
+</html>

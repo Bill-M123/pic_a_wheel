@@ -20,7 +20,11 @@ td{
   min-width:100%;
 }
 
-
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
 .player_div{
   display: inline-block;
   border: 2px solid black;
@@ -127,4 +131,15 @@ td{
 .your_cards_card_b_st{
   color: #000000;
   font-size:50px;
+}
+
+.sp_login_div{
+
+  display: inline-block;
+  border: 2px solid black;
+  vertical-align: top;
+
+}
+.sp_login_table{
+  min-width:30vw;
 }

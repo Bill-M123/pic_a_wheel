@@ -1,14 +1,20 @@
+<head>
+    <link href="static/table.css" rel="stylesheet">
+</head>
+
 {% block body %}
+<div class="the_whole_window">
+<IMG SRC="static/images/splash.png" ALT="ruht-row" class="center">
 
-{% if session['logged_in'] %}
+    <div style="width: 25%; margin: 0 auto;">
+    <form action="/login" method="POST">
 
-You're logged in already!
+        <label for="username">Username</label>
+        <input name="username" placeholder="Guest" type="username">
+        <input type="submit" value="Log in">
 
-{% else %}
-<form action="/login" method="POST">
-    <input name="username" placeholder="Username" type="username">
-    <input name="password" placeholder="Password" type="password">
-    <input type="submit" value="Log in">
-</form>
-{% endif %}
+
+    </form>
+    </div>
+</div>
 {% endblock %}

@@ -2,6 +2,7 @@ class Game():
     '''Game structure data.'''
 
     def __init__(self):
+        self.players_logged_in=[]
         self.betting_rounds = 4
         self.max_raises = 3
         self.high_low = "high-low"
