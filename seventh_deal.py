@@ -44,8 +44,10 @@ class MasterControlForm(FlaskForm):
     declare_closed = BooleanField(label="Declare Done", default=False)
 
     evaluate_now = BooleanField(label="Evaluate winners now?", default=False)
-
     submit = SubmitField("Submit")
+
+    seat_new_players = BooleanField(label="Seat new Players", default=False)
+    remove_player = BooleanField(label="Remove Player", default=False)
 
 
 class FullTableForm(FlaskForm):
@@ -84,7 +86,10 @@ brian = Player(player_dir, name='Brian Mercer', nickname='Mercer')
 ed = Player(player_dir, name='Ed Mulhern', nickname='Ed')
 tardie = Player(player_dir, name='Michael Tardie', nickname='Tardie')
 judogi = Player(player_dir, name='Bob Powers', nickname='Judogi')
-jeff = Player(player_dir, name='Jeff', nickname='Jeff')
+jeff = Player(player_dir, name='Jeff Andersen', nickname='Jeff')
+degroot = Player(player_dir, name='Henry DeGroot', nickname='Grout')
+
+possible_players = [alba, bornstein, brian, clyde, degroot, ed, jeff, judogi, tardie]
 
 players = [alba, bornstein, clyde, brian, ed]
 players = [alba, bornstein, clyde]
@@ -93,16 +98,19 @@ players = [alba, bornstein]
 players = [clyde, tardie, judogi, brian, ed, bornstein, jeff]
 players = [jeff, brian, bornstein]
 
-for i, p in enumerate(players):
-    p.add_funds(500)  # add funds
-    p.player_position = i  # set table position
+players = []
+
+# Removing Funds until login corrected
+# for i, p in enumerate(players):
+#    p.add_funds(500)  # add funds
+#    p.player_position = i  # set table position
 
 player_dict = {}
 
 # Initial Deal, display cards on console
-shuffled = dealer.deal_cards(players, this_game)
-for i, p in enumerate(players):
-    player_dict = dealer.add_to_display_dict(player_dict, i, p, cards)
+# shuffled = dealer.deal_cards(players, this_game)
+# for i, p in enumerate(players):
+#    player_dict = dealer.add_to_display_dict(player_dict, i, p, cards)
 
 #########################
 app = Flask(__name__)
@@ -118,31 +126,38 @@ login_manager = login_manager.init_app(app)
 def index():
     return '<h1>Home page for third_deal.py</h1>'
 
-#Simply change the following two lines to login2 and delete the doc string notation in the folling function
-#to revert to original login Also change two references below back to login2
+
+# Simply change the following two lines to login2 and delete the doc string notation in the folling function
+# to revert to original login Also change two references below back to login2
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     global players, this_game
 
     if not session.get('offered_login'):
-        session['offered_login']= True
+        session['offered_login'] = True
         return render_template('login.html')
 
 
     elif session.get('logged_in'):
         return f"{session['username']} is already logged in."
 
-    elif request.method in ['POST','GET']:
+    elif request.method in ['POST', 'GET']:
 
         session['username'] = request.form.get('username')
-        valid_ids = [p.p_nickname for p in players]
+        valid_ids = [p.p_nickname for p in possible_players]
 
         if session['username'] in valid_ids:
             if (session['username'] not in this_game.players_logged_in):
-                this_game.players_logged_in.append(session['username'])
-                print(f"Players logged in: {this_game.players_logged_in}")
-                return redirect(url_for("full_table"))
+                for guy in possible_players:
+                    if guy.p_nickname == session['username']:
+                        dealer.players_waiting_to_enter.append(guy)
+                        this_game.players_logged_in.append(guy)
+                        print(f"Players logged in: {[p.p_nickname for p in this_game.players_logged_in]}")
+                        # return f"Hello {guy.p_nickname}.  Thank-you for logging in.  Please wait patiently."
+                        return redirect(url_for("full_table"))
+
+                return f"{guy.p_nickname}:  You pooched your login.  Please fess up."
 
             else:
                 tmp = f"{session['username']} is already logged in.  Only one session allowed."
@@ -155,8 +170,9 @@ def login():
 
     else:
         session.clear()
-        #return render_template('login2.html')
+        # return render_template('login2.html')
         return redirect(url_for('login.html'))
+
 
 '''Commented out for testing.  THe following code represents the original login code put together by Clyde
 @app.route('/login', methods=['GET', 'POST'])
@@ -203,9 +219,6 @@ def full_table():
             players[i] = p
         return render_template('table_showdown.html', dealer=dealer,
                                players=new_players)
-
-    if session['username'] == 'Bornstein' and dealer.declare_open:
-        print('Fake Breakpoint')
 
     tmp = dealer
     if tmp.betting_complete:
@@ -356,17 +369,24 @@ def full_table():
 
 
     else:
+        try:
+            this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+            this_player = dealer.make_your_hand_display_cards(this_player)
 
-        this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
-        this_player = dealer.make_your_hand_display_cards(this_player)
-
-        print(f"this player: {this_player.p_nickname} is not currently active")
+            print(f"this player: {this_player.p_nickname} is not currently active")
+        except:
+            pass
 
         if this_player:
             return render_template('player_base_table.html', dealer=dealer,
                                    players=players, this_player=this_player)
+        elif players == []:
+            print("Empty players")
+            return render_template('player_base_table.html', dealer=dealer,
+                                   players=players, this_player=this_player)
+
         else:
-            return f"{session['username']} is not welcome at this table, so get lost!"
+            return f"Sorry.  {session['username']} is not welcome at this table, so either wait or get lost!"
 
 
 @app.route('/declare', methods=['GET', 'POST'])
@@ -448,6 +468,7 @@ def new_deal():
 
 @app.route('/master_control', methods=['GET', 'POST'])
 def master_control():
+    global players
     form = MasterControlForm()
 
     if form.validate_on_submit:
@@ -461,6 +482,29 @@ def master_control():
         flip1 = form.first_flip.data
         flip2 = form.second_flip.data
         flip3 = form.third_flip.data
+
+        # New Player
+        seat_new_players = form.seat_new_players.data
+        if seat_new_players:
+
+            for p in dealer.players_waiting_to_enter:
+                dealer.insert_new_player(players, p)
+            dealer.players_waiting_to_enter = []
+            return render_template('master_control.html', form=form, name='Bornstein',
+                                   players=players, this_game=this_game, dealer=dealer)
+        # Remove Player
+        remove_player_flag = form.remove_player.data
+        if remove_player_flag:
+            guy = request.form.get("player_to_remove")
+            print(f"Found player_to_remove_flag:  {guy}")
+            for p in players:
+                if guy == p.p_nickname:
+                    print(f"Players: {[p.p_nickname for p in players]}")
+                    dead_guy = players.pop(players.index(p))
+                    dealer.dead_guys.append(dead_guy)
+                    print(f"Players: {[p.p_nickname for p in players]}")
+                    return redirect(url_for("master_control"))
+
 
         declare_open = form.declare_open.data
         if declare_open:
@@ -557,7 +601,8 @@ def master_control():
             dealer.first_deal = False
             form.new_deal.data = False
 
-            return render_template('master_control.html', form=form, name=name)
+            return render_template('master_control.html', form=form, name=name,
+                                   players=players, this_game=this_game, dealer=dealer)
 
         if first_bet:
 
@@ -570,7 +615,8 @@ def master_control():
             dealer.active_player = tmp.p_nickname
             print(f"Active Player: {dealer.active_player}")
 
-        return render_template('master_control.html', form=form, name=name)
+        return render_template('master_control.html', form=form, name=name,
+                               players=players, this_game=this_game, dealer=dealer)
 
     else:
         return f"You are not Bornstein or Clyde, Fuck Off!"

@@ -6,6 +6,7 @@ import os
 class Player():
     '''The player class holds player information including the players hand and
     bankroll.'''
+    p_nickname: str
 
     def __init__(self, player_dir='', name='', nickname='', email='place_holder@place_holder.com',
                  password='password'):
@@ -33,7 +34,8 @@ class Player():
         self.high_hands = []
         self.low_hands = []
         self.in_hand = True  # Flag for in hand
-        self.at_table = True  # Flag for at table
+        self.at_table = False  # Flag for at table
+        self.waiting = False # Flag for logged in but waiting
         self.declare_start = False
         self.declare_complete = False
         self.check_player_existence()

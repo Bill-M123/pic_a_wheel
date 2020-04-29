@@ -19,6 +19,7 @@ class Dealer():
         self.first_deal = True
         self.deal_complete = False
         self.dealer_position = 0
+        self.original_dealer = 'Not defined yet'
 
         # Card Variables
         self.common_cards = []  # Will have separate lists for each flip
@@ -51,6 +52,8 @@ class Dealer():
 
         # House keeping
         self.showdown = False
+        self.players_waiting_to_enter = []
+        self.dead_guys = []
         return
 
     def reset_table(self, players, this_game):
@@ -97,6 +100,7 @@ class Dealer():
 
         return
 
+    # Current option. Changing
     def assign_new_dealer(self, players):
         '''Get next dealer position'''
         print(f'Old dealer position: {self.dealer_position}', end=' ')
@@ -111,6 +115,53 @@ class Dealer():
                 self.dealer_position = 0
             print(f'New dealer position: {self.dealer_position}')
             return
+
+    def rotate_deal(self,last_order):
+        dealer = last_order.pop(0)
+        last_order.append(dealer)
+        return last_order
+
+    def insert_new_player(self,last_order, new_player):
+        ''' Insert new player from waiting list, verify original dealer '''
+
+        if last_order == []:
+            last_order.append(new_player)
+            self.original_dealer = new_player
+            return
+
+        where_orig_dealer = last_order.index(self.original_dealer)
+        print(where_orig_dealer)
+        if where_orig_dealer == 0:
+            last_order.append(new_player)
+        else:
+            last_order.insert(where_orig_dealer, 9)
+        return
+
+    '''l1=[1,2,3,4,5,6,7,8]
+l1=[1]
+
+original_dealer=l1[-1]
+original_dealer
+
+def rotate_deal(last_order):
+    dealer=last_order.pop(-1)
+    last_order.insert(0,dealer)
+    return last_order
+
+l1=rotate_deal(l1)
+l1
+
+def insert_new_player(last_order,new_player):
+    where_orig_dealer=last_order.index(original_dealer)
+    if where_orig_dealer==0:
+        last_order.insert(-1,new_player)
+    else:
+        last_order.insert(where_orig_dealer,9)
+    return last_order
+
+new_player=9
+l1=insert_new_player(l1,new_player)
+l1'''
 
     def take_ante(self, dealing_player, ante=50):
         '''Takes ante from player, deposits in live pot'''

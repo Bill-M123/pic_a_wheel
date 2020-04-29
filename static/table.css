@@ -13,8 +13,29 @@ td{
 .the_whole_window{
   min-height:100vh;
   min-width:100vw;
-
 }
+
+.vertical_half{
+  display: inline-block;
+  min-width:40vw;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.vertical_half_right{
+  display: inline-block;
+  min-width:40vw;
+  min-height:60vh;
+  vertical-align: top;
+}
+
+.control_table{
+   display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+}
+
 .common_table_view{
   border: 2px solid black;
   min-width:100%;
@@ -25,6 +46,7 @@ td{
   margin-left: auto;
   margin-right: auto;
 }
+
 .player_div{
   display: inline-block;
   border: 2px solid black;
