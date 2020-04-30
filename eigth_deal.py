@@ -125,6 +125,7 @@ login_manager = login_manager.init_app(app)
 
 @app.route('/')
 def index():
+
     return '<h1>Home page for third_deal.py</h1>'
 
 
@@ -164,7 +165,7 @@ def login():
             else:
                 tmp = f"{session['username']} is already logged in.  Only one session allowed."
                 #session.clear()
-                return tmp
+                return redirect(url_for("full_table"))
 
         else:
             return "Invalid Id.  I don't know you, go away."

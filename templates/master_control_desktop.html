@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>Master_Control</title>
+
+    <link href="static/table.css" rel="stylesheet">
+
+    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" rel="stylesheet">
+    <script crossorigin="anonymous"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script crossorigin="anonymous"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script crossorigin="anonymous"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+<div class="the_whole_window">
+  <div class="vertical_half">
+      <div class="jumbotron">
+        {% if name %}
+            <p class="control_table">Welcome to the control panel {{name}}.</p>
+        {% endif %}
+
+
+        <form method="POST">
+            {{form.hidden_tag() }}
+                <table class="center">
+                    <th>Hand Controls</th>
+                  <tr>
+                      <td>{{form.reset_table.label}}</td>
+                      <td style="width: 10px"></td>
+                      <td>{{form.reset_table}}</td>
+                  </tr>
+                  <tr>
+                      <td>{{form.new_deal.label}}</td>
+                      <td style="width: 10px"></td>
+                      <td>{{form.new_deal}}</td>
+                  </tr>
+                  <tr>
+                      <td>{{form.first_bet.label}}</td>
+                      <td style="width: 10px"></td>
+                      <td>{{form.first_bet}}</td>
+                  </tr>
+                  <tr>
+                      <td>{{form.first_flip.label}}</td>
+                      <td style="width: 10px"></td>
+                      <td>{{form.first_flip}}
+                  </tr>
+                  <tr>
+                      <td>{{form.second_flip.label}}</td>
+                      <td style="width: 10px"></td>
+                      <td>{{form.second_flip}}</td>
+                  </tr>
+                  <tr>
+                      <td>{{form.third_flip.label}}</td>
+                      <td style="width: 10px"></td>
+                      <td>{{form.third_flip}}</td>
+                  </tr>
+
+                  <tr>
+                      <td>{{form.declare_open.label}}</td>
+                      <td style="width: 10px"></td>
+                      <td>{{form.declare_open}}</td>
+                  </tr>
+
+                    <tr>
+                      <td>{{form.declare_closed.label}}</td>
+                        <td style="width: 10px"></td>
+                      <td>{{form.declare_closed}}</td>
+                    </tr>
+
+                  <tr>
+                      <td>{{form.evaluate_now.label}}</td>
+                      <td style="width: 10px"></td>
+                      <td>{{form.evaluate_now}}</td>
+                  </tr>
+                    <tr>
+                        <td>
+                          <label for="player_to_remove">Player to Remove</label>
+                          <select id="player_to_remove" name='player_to_remove' value='No One' default = 'No One'>
+                              <option value="No One">No One</option>
+                              {% for p in players%}
+                            <option value={{p.p_nickname}}>{{p.p_nickname}}</option>
+                              {% endfor %}
+                          </select>
+                        </td>
+                        <td style="width: 10px"></td>
+                        <td>{{form.remove_player}}</td>
+                  </tr>
+                    <tr>
+                      <td>{{form.seat_new_players.label}}</td>
+                      <td style="width: 10px"></td>
+                      <td>{{form.seat_new_players}}</td>
+                    </tr>
+
+                </table>
+
+            {{form.submit}}
+        </form>
+  </div>
+</div> <!--vertical_half-->
+
+<div class="vertical_half_right">
+    <div class="jumbotron">
+        {% if players %}
+
+      <table>
+        <tr>
+          <th>At table</th><td style="width: 10px"></td><th>Position</th>
+        </tr>
+        {% for p in players %}
+        <tr>
+          <td>{{p.p_nickname}}</td><td style="width: 10px"></td><td>{{loop.index0}}</td>
+        </tr>
+        {% endfor %}
+          <tr><td style="height:10px; width: 10px;"></td><td style="width: 10px"></td></tr>
+          <tr><td style="height:10px; width: 10px;"></td><td style="width: 10px"></td></tr>
+      </table>
+        {% endif %}
+
+    </div>
+
+    <div class="jumbotron">
+        {% if dealer.players_waiting_to_enter %}
+            <table>
+                <tr><th>Waiting</th></tr>
+                {% for p in dealer.players_waiting_to_enter %}
+                <tr><td>{{p.p_nickname}}</td></tr>
+                {% endfor %}
+
+            </table>
+        {% endif %}
+    </div>
+
+</div>
+
+</div>
+
+</body>
+</html>
