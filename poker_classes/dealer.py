@@ -54,6 +54,13 @@ class Dealer():
         self.showdown = False
         self.players_waiting_to_enter = []
         self.dead_guys = []
+        self.players_w_two_hands = 0
+        self.players_w_one_hand = 0
+        self.players_folded = 0
+        self.calc_highs_lows = True
+        self.high_hands = 0
+        self.low_hands = 0
+
         return
 
     def reset_table(self, players, this_game):
@@ -97,6 +104,13 @@ class Dealer():
 
         # House keeping
         self.showdown = False
+        self.dead_guys = []
+        self.players_w_two_hands = 0
+        self.players_w_one_hand = 0
+        self.players_folded = 0
+        self.calc_highs_lows = True
+        self.high_hands = 0
+        self.low_hands = 0
 
         return
 

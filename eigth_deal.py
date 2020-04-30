@@ -129,7 +129,7 @@ login_manager = login_manager.init_app(app)
 @app.route('/')
 def index():
     session.clear()
-    return '<h1>Home page for third_deal.py</h1>'
+    return "<h1>Home page for tonight's picawheel game</h1>"
 
 
 # Simply change the following two lines to login2 and delete the doc string notation in the folling function
@@ -222,6 +222,7 @@ def full_table():
 
             new_players.append(p)
             players[i] = p
+
         return render_template('table_showdown.html', dealer=dealer,
                                players=new_players)
 
@@ -354,9 +355,28 @@ def full_table():
                 action = 'None'
                 action_amount = 0
 
+            # Set table display for number of hands
+            tmp_2 = 0
+            tmp_1 = 0
+            tmp_folded = 0
+
             for p in players:
                 if session['username'] == p.p_nickname:
                     p = dealer.analyze_action(action, action_amount, players, p)
+                fold_count=0
+                for h in p.hands:
+                    if h == 'folded':
+                        fold_count+=1
+                if fold_count == 0:
+                    tmp_2 +=1
+                elif fold_count == 1:
+                    tmp_1 += 1
+                else:
+                    tmp_folded += 1
+
+            dealer.players_w_two_hands = tmp_2
+            dealer.players_w_one_hand = tmp_1
+            dealer.players_folded = tmp_folded
 
             tmp = dealer.new_betting_order[0]
             dealer.active_player = tmp.p_nickname
@@ -532,6 +552,15 @@ def master_control():
             dealer.last_raise = 'No one'
             dealer.active_player = 'No One'
 
+            if dealer.calc_highs_lows:
+                for p in players:
+                    for h in p.hands_hi_lo:
+                        if h == 'high':
+                            dealer.high_hands +=1
+                        if h == 'low':
+                            dealer.low_hands += 1
+                dealer.calc_highs_lows = False
+
             p: Player
             for i, p in enumerate(players):
                 p.this_round_per_side = 0
@@ -614,6 +643,7 @@ def master_control():
             dealer.deal_complete = True
             dealer.first_deal = False
             form.new_deal.data = False
+            dealer.players_w_two_hands = len(players)
 
             return render_template('master_control.html', form=form, name=name,
                                    players=players, this_game=this_game, dealer=dealer)

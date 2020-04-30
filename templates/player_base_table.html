@@ -253,21 +253,33 @@
                     <th><b>Table Status</b></th>
                 </tr>
                 <tr>
-                    <td>first_deal</td>
-                    <td>{{dealer.first_deal}}</td>
+                    <td>Players w/ Two Hands</td>
+                    <td>{{dealer.players_w_two_hands}}</td>
                     <td>-</td>
                 </tr>
                 <tr>
-                    <td>deal_complete</td>
-                    <td>{{dealer.deal_complete}}</td>
-                    <td>0</td>
+                    <td>Players w/ One Hand</td>
+                    <td>{{dealer.players_w_one_hand}}</td>
+                    <td>-</td>
                 </tr>
                 <tr>
-                    <td>Active Player</td>
-                    <td>{{dealer.active_player}}</td>
-                    <td>0</td>
+                    <tr>
+                    <td>Players Folded</td>
+                    <td>{{dealer.players_folded}}</td>
                 </tr>
-
+                {% if dealer.declare_done %}
+                  <tr>
+                      <tr>
+                      <td>High hands</td>
+                      <td>{{dealer.high_hands}}</td>
+                  </tr>
+                  <tr>
+                      <tr>
+                      <td>Low hands</td>
+                      <td>{{dealer.low_hands}}</td>
+                  </tr>
+                {% endif %}
+                
             </table>
 
         </div>
