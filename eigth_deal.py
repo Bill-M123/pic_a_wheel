@@ -89,8 +89,11 @@ tardie = Player(player_dir, name='Michael Tardie', nickname='Tardie')
 judogi = Player(player_dir, name='Bob Powers', nickname='Judogi')
 jeff = Player(player_dir, name='Jeff Andersen', nickname='Jeff')
 degroot = Player(player_dir, name='Henry DeGroot', nickname='Grout')
+bart = Player(player_dir, name='Steve Bart', nickname='Bartman')
+smith = Player(player_dir, name='Walt Smith', nickname='Walt')
 
-possible_players = [alba, bornstein, brian, clyde, degroot, ed, jeff, judogi, tardie]
+possible_players = [alba, bornstein, brian, clyde, degroot, ed, jeff,
+                    judogi, tardie, bart, smith]
 
 players = [alba, bornstein, clyde, brian, ed]
 players = [alba, bornstein, clyde]
@@ -125,7 +128,7 @@ login_manager = login_manager.init_app(app)
 
 @app.route('/')
 def index():
-
+    session.clear()
     return '<h1>Home page for third_deal.py</h1>'
 
 
