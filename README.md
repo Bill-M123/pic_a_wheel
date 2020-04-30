@@ -1,6 +1,8 @@
 # Status
 
-Currently Running seventh_deal.py:
+Currently Running eigth_deal.py:
+
+Fixes:  Dealer Rotation Added, login problem fixed
 
 requirments: unchanged
 

@@ -603,7 +603,8 @@ l1'''
         else:
             action_price = max_bet - player.this_round_per_side
             da_raise = action_amount
-
+            
+            self.num_raises+=1
             self.new_betting_order = new_betting_order.copy()
             self.new_betting_order.append(self.this_action)
             self.pot = self.pot + (action_price + da_raise) * player.num_hands

@@ -17,6 +17,7 @@
 
   {% block bet_actions %}
   <select id="action" name='bet_actions' value='None'>
+    {% if dealer.num_raises < 4 %}
       <option value='check'>Check</option>
       <option value='call'>Call</option>
       <option value='bet_5'>Bet 5</option>
@@ -24,6 +25,11 @@
       <option value='bet_15'>Bet 15</option>
       <option value='bet_20'>Bet 20</option>
       </select>
+    {% else %}
+    <option value='check'>Check</option>
+    <option value='call'>Call</option>
+    </select>
+    {% endif %}
   {% endblock %}
 
   {% block submit_block %}
