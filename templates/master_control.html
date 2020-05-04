@@ -87,6 +87,14 @@
                       <td style="width: 10px"></td>
                       <td>{{form.evaluate_now}}</td>
                   </tr>
+
+                    <tr>
+                      <td>{{form.distribute_winnings.label}}</td>
+                      <td style="width: 10px"></td>
+                      <td>{{form.distribute_winnings}}</td>
+                  </tr>
+
+
                     <tr>
                         <td>
                           <label for="player_to_remove">Player to Remove</label>
@@ -143,6 +151,119 @@
 
             </table>
         {% endif %}
+    </div>
+
+    <div class="jumbotron">
+            <table>
+                <tr><th>Winnings Low</th></tr>
+                <tr>
+                        <td>
+                          <label for="winner_l1">Winner Low</label>
+                          <select id="winner_l1" name='winner_l1' value='No One' default = 'No One'>
+                              <option value="No One">No One</option>
+                              {% for p in players%}
+                            <option value={{p.p_nickname}}>{{p.p_nickname}}</option>
+                              {% endfor %}
+                          </select>
+                        </td>
+                        <td style="width: 10px"></td>
+                        <td>{{form.winnings_l1}}</td>
+                  </tr>
+                 <tr>
+                        <td>
+                          <label for="winner_l2">Winner Low</label>
+                          <select id="winner_l2" name='winner_l2' value='No One' default = 'No One'>
+                              <option value="No One">No One</option>
+                              {% for p in players%}
+                            <option value={{p.p_nickname}}>{{p.p_nickname}}</option>
+                              {% endfor %}
+                          </select>
+                        </td>
+                        <td style="width: 10px"></td>
+                        <td>{{form.winnings_l2}}</td>
+                  </tr>
+                 <tr>
+                        <td>
+                          <label for="winner_l3">Winner Low</label>
+                          <select id="winner_l3" name='winner_l3' value='No One' default = 'No One'>
+                              <option value="No One">No One</option>
+                              {% for p in players%}
+                            <option value={{p.p_nickname}}>{{p.p_nickname}}</option>
+                              {% endfor %}
+                          </select>
+                        </td>
+                        <td style="width: 10px"></td>
+                        <td>{{form.winnings_l3}}</td>
+                  </tr>
+                <tr>
+                        <td>
+                          <label for="winner_l4">Winner Low</label>
+                          <select id="winner_l4" name='winner_l4' value='No One' default = 'No One'>
+                              <option value="No One">No One</option>
+                              {% for p in players%}
+                            <option value={{p.p_nickname}}>{{p.p_nickname}}</option>
+                              {% endfor %}
+                          </select>
+                        </td>
+                        <td style="width: 10px"></td>
+                        <td>{{form.winnings_l4}}</td>
+                  </tr>
+                <tr><th>Winnings High</th></tr>
+                <tr>
+                        <td>
+                          <label for="winner_h1">Winner Low</label>
+                          <select id="winner_h1" name='winner_h1' value='No One' default = 'No One'>
+                              <option value="No One">No One</option>
+                              {% for p in players%}
+                            <option value={{p.p_nickname}}>{{p.p_nickname}}</option>
+                              {% endfor %}
+                          </select>
+                        </td>
+                        <td style="width: 10px"></td>
+                        <td>{{form.winnings_l1}}</td>
+                  </tr>
+                 <tr>
+                        <td>
+                          <label for="winner_h2">Winner Low</label>
+                          <select id="winner_h2" name='winner_h2' value='No One' default = 'No One'>
+                              <option value="No One">No One</option>
+                              {% for p in players%}
+                            <option value={{p.p_nickname}}>{{p.p_nickname}}</option>
+                              {% endfor %}
+                          </select>
+                        </td>
+                        <td style="width: 10px"></td>
+                        <td>{{form.winnings_l2}}</td>
+                  </tr>
+                 <tr>
+                        <td>
+                          <label for="winner_h3">Winner Low</label>
+                          <select id="winner_h3" name='winner_h3' value='No One' default = 'No One'>
+                              <option value="No One">No One</option>
+                              {% for p in players%}
+                            <option value={{p.p_nickname}}>{{p.p_nickname}}</option>
+                              {% endfor %}
+                          </select>
+                        </td>
+                        <td style="width: 10px"></td>
+                        <td>{{form.winnings_l3}}</td>
+                  </tr>
+                <tr>
+                        <td>
+                          <label for="winner_h4">Winner Low</label>
+                          <select id="winner_h4" name='winner_h4' value='No One' default = 'No One'>
+                              <option value="No One">No One</option>
+                              {% for p in players%}
+                            <option value={{p.p_nickname}}>{{p.p_nickname}}</option>
+                              {% endfor %}
+                          </select>
+                        </td>
+                        <td style="width: 10px"></td>
+                        <td>{{form.winnings_l4}}</td>
+                  </tr>
+
+            </table>
+
     </div>
 
 </div>

@@ -1,9 +1,14 @@
 import json
 import random as random
+import datetime as dt
 from collections import Counter
 from itertools import combinations
 
 import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import copy
 
 from poker_classes.cards import Cards
 
@@ -19,6 +24,7 @@ class Dealer():
         self.first_deal = True
         self.deal_complete = False
         self.dealer_position = 0
+        self.hand_number = 0
         self.original_dealer = 'Not defined yet'
 
         # Card Variables
@@ -35,6 +41,7 @@ class Dealer():
         self.betting_rounds = [False, False, False, False, False]
         self.new_betting_order = []
         self.betting_complete = False
+        self.made_round_summary = False
         self.new_bet = False
         self.check_count = 0
         self.num_raises = 0
@@ -60,6 +67,9 @@ class Dealer():
         self.calc_highs_lows = True
         self.high_hands = 0
         self.low_hands = 0
+        self.show_winnings = False
+        self.flips_complete = 0
+        self.round_chart_location = ''
 
         return
 
@@ -72,6 +82,7 @@ class Dealer():
         self.first_deal = True
         self.deal_complete = False
         self.dealer_position = 0
+        self.hand_number += 1
 
         # Card Variables
         self.common_cards = []  # Will have separate lists for each flip
@@ -87,6 +98,7 @@ class Dealer():
         self.betting_rounds = [False, False, False, False, False]
         self.new_betting_order = []
         self.betting_complete = False
+        self.made_round_summary = False
         self.new_bet = False
         self.check_count = 0
         self.num_raises = 0
@@ -111,6 +123,9 @@ class Dealer():
         self.calc_highs_lows = True
         self.high_hands = 0
         self.low_hands = 0
+        self.show_winnings = False
+        self.flips_complete = 0
+        self.round_chart_location = ''
 
         return
 
@@ -130,12 +145,12 @@ class Dealer():
             print(f'New dealer position: {self.dealer_position}')
             return
 
-    def rotate_deal(self,last_order):
+    def rotate_deal(self, last_order):
         dealer = last_order.pop(0)
         last_order.append(dealer)
         return last_order
 
-    def insert_new_player(self,last_order, new_player):
+    def insert_new_player(self, last_order, new_player):
         ''' Insert new player from waiting list, verify original dealer '''
 
         if last_order == []:
@@ -185,6 +200,7 @@ l1'''
 
     def shuffle_deck(self, deck):
         '''Shuffles card in deck, returns decl'''
+        random.seed(dt.datetime.now().microsecond)
         random.shuffle(deck)
         return deck
 
@@ -235,10 +251,12 @@ l1'''
 
     def check_which_players_are_folded(self, players):
         '''Accepts a list of player objects, compares remaining hands
-        to a completely folded hand and sets p.in_hand'''
+        to a completely folded hand and sets self.dead_guys to list of folded players'''
+        self.dead_guys = []
         for p in players:
-            p.in_hand = not all(x == 'folded' for x in p.hands)
-
+            if all(x == 'folded' for x in p.hands):
+                self.dead_guys.append(p.p_nickname)
+        print(f"Folded players: {self.dead_guys}")
         return
 
     def get_possible_hands(self, this_hand, common, omaha=False):
@@ -259,6 +277,11 @@ l1'''
     def rank_single_hand(self, hand):
         '''accept list of 5 cards, return hand rank
         If Ace, run calculations twice, returns a list of best hand(s).'''
+
+        # trap for folded hand
+        if hand == 'folded':
+            folded_hand = (100, f"Folded", ['folded'], 'folded')
+            return folded_hand,folded_hand
 
         # Separate cards into ranks and suits
         rank_list = [x[0] for x in hand]
@@ -283,6 +306,7 @@ l1'''
             a_h_list = [x if x != 1 else 14 for x in rank_list]
             a_l_list = rank_list
             hand_options = [a_h_list, a_l_list]
+            print(f"hand_options: {hand_options}")
 
         high_hands = []
         low_hands = []
@@ -385,49 +409,50 @@ l1'''
                 high_hand_ranks = []
                 low_hand_ranks = []
 
-                tmp_hand = hand + p.common_cards
-                flat_list = [item for sublist in self.common_cards for item in sublist]
-                combos = self.get_possible_hands(tmp_hand, flat_list)
-                for c in combos:
-                    tmp_high, tmp_low = self.rank_single_hand((c))
+                if hand != 'folded':
+                    tmp_hand = hand + p.common_cards
+                    flat_list = [item for sublist in self.common_cards for item in sublist]
+                    combos = self.get_possible_hands(tmp_hand, flat_list)
+                    for c in combos:
+                        tmp_high, tmp_low = self.rank_single_hand((c))
 
-                    sorting_dict = {1: '01', 2: '02', 3: '03', 4: '04', 5: '05',
-                                    6: '06', 7: '07', 8: '08', 9: '09', 10: '10',
-                                    11: '11', 12: '12', 13: '13', 14: '14', 15: '15'}
+                        sorting_dict = {1: '01', 2: '02', 3: '03', 4: '04', 5: '05',
+                                        6: '06', 7: '07', 8: '08', 9: '09', 10: '10',
+                                        11: '11', 12: '12', 13: '13', 14: '14', 15: '15'}
 
-                    tmp_high_c = [sorting_dict[x] for x in tmp_high[2]]
-                    tmp_low_c = [sorting_dict[x] for x in tmp_low[2]]
-                    tmp_high = [tmp_high[0], tmp_high[1], tmp_high_c, tmp_high[3]]
-                    tmp_low = [tmp_low[0], tmp_low[1], tmp_low_c, tmp_low[3]]
+                        tmp_high_c = [sorting_dict[x] for x in tmp_high[2]]
+                        tmp_low_c = [sorting_dict[x] for x in tmp_low[2]]
+                        tmp_high = [tmp_high[0], tmp_high[1], tmp_high_c, tmp_high[3]]
+                        tmp_low = [tmp_low[0], tmp_low[1], tmp_low_c, tmp_low[3]]
 
-                    high_hand_ranks.append(tmp_high)
-                    low_hand_ranks.append(tmp_low)
+                        high_hand_ranks.append(tmp_high)
+                        low_hand_ranks.append(tmp_low)
 
-                df_data_h = high_hand_ranks
-                df_data_l = low_hand_ranks
+                    df_data_h = high_hand_ranks
+                    df_data_l = low_hand_ranks
 
-                high_df = pd.DataFrame(columns=['Rank', 'Hand', 'Card_Values', 'Cards'], data=df_data_h)
-                high_df.drop('Cards', axis=1, inplace=True)
+                    high_df = pd.DataFrame(columns=['Rank', 'Hand', 'Card_Values', 'Cards'], data=df_data_h)
+                    high_df.drop('Cards', axis=1, inplace=True)
 
-                low_df = pd.DataFrame(columns=['Rank', 'Hand', 'Card_Values', 'Cards'], data=df_data_l)
-                low_df.drop('Cards', axis=1, inplace=True)
+                    low_df = pd.DataFrame(columns=['Rank', 'Hand', 'Card_Values', 'Cards'], data=df_data_l)
+                    low_df.drop('Cards', axis=1, inplace=True)
 
-                high_df['Card_Values'] = high_df.Card_Values.apply(lambda x: '-'.join([str(y) for y in x]))
-                high_df = high_df.drop_duplicates(keep="first")
-                high_df = high_df.sort_values(['Rank', 'Card_Values'], ascending=[True, False]).reset_index(drop=True)
+                    high_df['Card_Values'] = high_df.Card_Values.apply(lambda x: '-'.join([str(y) for y in x]))
+                    high_df = high_df.drop_duplicates(keep="first")
+                    high_df = high_df.sort_values(['Rank', 'Card_Values'], ascending=[True, False]).reset_index(drop=True)
 
-                low_df['Card_Values'] = low_df.Card_Values.apply(lambda x: '-'.join([str(y) for y in x]))
-                low_df = low_df.drop_duplicates(keep="first")
-                low_df = low_df.sort_values(['Rank', 'Card_Values'], ascending=[False, False]).reset_index(drop=True)
+                    low_df['Card_Values'] = low_df.Card_Values.apply(lambda x: '-'.join([str(y) for y in x]))
+                    low_df = low_df.drop_duplicates(keep="first")
+                    low_df = low_df.sort_values(['Rank', 'Card_Values'], ascending=[False, False]).reset_index(drop=True)
 
-                print(
-                    f"{p.p_nickname} rank: {high_df['Rank'][0]} high_new: {high_df['Hand'][0]} {high_df['Card_Values'][0]}")
-                print(
-                    f"{p.p_nickname} rank: {high_df['Rank'][len(low_df) - 1]} low_new: {low_df['Hand'][len(low_df) - 1]} {low_df['Card_Values'][len(low_df) - 1]}\n")
+                    print(
+                        f"{p.p_nickname} rank: {high_df['Rank'][0]} high_new: {high_df['Hand'][0]} {high_df['Card_Values'][0]}")
+                    print(
+                        f"{p.p_nickname} rank: {high_df['Rank'][len(low_df) - 1]} low_new: {low_df['Hand'][len(low_df) - 1]} {low_df['Card_Values'][len(low_df) - 1]}\n")
 
-                high_hand_list.append([p.p_nickname, high_df['Rank'][0], high_df['Hand'][0], high_df['Card_Values'][0]])
-                low_hand_list.append([p.p_nickname, low_df['Rank'][len(low_df) - 1], low_df['Hand'][len(low_df) - 1],
-                                      low_df['Card_Values'][len(low_df) - 1]])
+                    high_hand_list.append([p.p_nickname, high_df['Rank'][0], high_df['Hand'][0], high_df['Card_Values'][0]])
+                    low_hand_list.append([p.p_nickname, low_df['Rank'][len(low_df) - 1], low_df['Hand'][len(low_df) - 1],
+                                          low_df['Card_Values'][len(low_df) - 1]])
 
         high_hand_df = pd.DataFrame(columns=['Name', 'Rank', 'Hand', 'Card_Values'], data=high_hand_list)
         low_hand_df = pd.DataFrame(columns=['Name', 'Rank', 'Hand', 'Card_Values'], data=low_hand_list)
@@ -436,6 +461,38 @@ l1'''
         low_hand_df = low_hand_df.sort_values(['Rank', 'Card_Values'], ascending=[False, True])
 
         return high_hand_df, low_hand_df
+
+    def get_high_low_hands(self,players):
+        '''Used post declare to set evaluate groups.'''
+        players_high = []
+        players_low = []
+        for p in players:
+            tmp_high = copy.deepcopy(p)
+            tmp_low = copy.deepcopy(p)
+            add_low=0
+            add_high=0
+
+            Add_flag = 0
+            for k in [0,1]:
+                if p.hands_hi_lo[k] == 'high':
+                    add_high = 1
+                else:
+                    tmp_high.hands[k] = 'folded'
+            for k in [0, 1]:
+                if p.hands_hi_lo[k] == 'low':
+                    add_low = 1
+                else:
+                    tmp_low.hands[k] = 'folded'
+
+            if add_high == 1:
+                players_high.append(tmp_high)
+            if add_low == 1:
+                players_low.append(tmp_low)
+
+        print("\n\nDeclared High Hands:\n",players_high)
+        print("Declared Low Hands:\n",players_low,"\n\n")
+
+        return players_high, players_low
 
     def add_to_display_dict(self, player_dict, i, p, Cards):
 
@@ -509,8 +566,7 @@ l1'''
             print(f"Card: {c} is a really a string.  Returning {c}")
             return c
 
-
-        if c == 'folded' or c==['folded']:
+        if c == 'folded' or c == ['folded']:
             print(f"{session['username']} common passed to convert_value_card: {c}")
             return c
 
@@ -611,14 +667,16 @@ l1'''
             self.check_count += 1
             player.bankroll -= (action_price * player.num_hands)
             player.this_round_per_side += (action_price)
+            player.in_pot += (action_price) * player.num_hands
+            player.in_pot_this_round += (action_price) * player.num_hands
 
 
 
         else:
             action_price = max_bet - player.this_round_per_side
             da_raise = action_amount
-            
-            self.num_raises+=1
+
+            self.num_raises += 1
             self.new_betting_order = new_betting_order.copy()
             self.new_betting_order.append(self.this_action)
             self.pot = self.pot + (action_price + da_raise) * player.num_hands
@@ -630,6 +688,8 @@ l1'''
 
             player.bankroll = player.bankroll - (action_price + da_raise) * player.num_hands
             player.this_round_per_side = player.this_round_per_side + (action_price + da_raise)
+            player.in_pot += (action_price + da_raise) * player.num_hands
+            player.in_pot_this_round += (action_price + da_raise) * player.num_hands
 
         # check for end of round
         if (self.last_raise == self.new_betting_order[0].p_nickname) and (self.check_count > 0):
@@ -654,3 +714,65 @@ l1'''
             new_player_list.append(p)
 
         return new_player_list
+
+    def make_hand_plot(self, players):
+        '''Make bettinground summary plot'''
+        tmp = []
+        for g, guy in enumerate(players):
+            for h, hand in enumerate(guy.in_pot_by_round):
+                tmp.append([guy.p_nickname, h, hand, guy.hands_by_round[h]])
+        guys_df = pd.DataFrame(columns=['Name', 'rnd', 'rnd_pot', 'num_hnds'],
+                               data=tmp)
+        print("guys_df\n", guys_df)
+        guys_df['rnd_ttl'] = guys_df['rnd_pot']
+        guys_df['cum_bet'] = guys_df.groupby("Name")["rnd_ttl"].cumsum().fillna(0)
+        tls = guys_df.pivot_table(index='Name', values='rnd_ttl', \
+                                  aggfunc='sum').reset_index(drop=False).rename(columns={'rnd_ttl': 'ttl'})
+        guys_df = pd.merge(guys_df, tls, on='Name')
+        guys_df.sort_values(["ttl", "rnd"], ascending=[False, True], inplace=True)
+
+        colors_dict = {0: 'red', 1: 'yellow', 2: 'darkgreen'}
+
+        plt.figure(figsize=(5, 3), dpi=100)
+        for r in sorted(list(guys_df.rnd.unique())):
+            tmp = guys_df.loc[guys_df.rnd == r, :]
+
+            if r == 0:
+                bottoms = tmp.rnd
+            else:
+                tmp2 = guys_df.loc[guys_df.rnd == r - 1, :]
+                bottoms = tmp2.cum_bet
+            xs = list(tmp.Name)
+            colors = [colors_dict[x] for x in tmp.num_hnds.values]
+            plt.bar(range(len(xs)), tmp.rnd_ttl, bottom=bottoms, color=colors, edgecolor='gray')
+
+        legend_x_base = len(xs)+1
+        x_txt = 0.5
+        legend_y_base = guys_df.ttl.max()
+        y_rect = 5
+        #rectangle = plt.Rectangle((legend_x_base, legend_y_base), .25, 5, fc='darkgreen', ec="black")
+        #rectangle = plt.Rectangle((0, 0-0.3*legend_y_base), .25, 5, fc='darkgreen', ec="black")
+        #plt.gca().add_patch(rectangle)
+        #plt.text(legend_x_base, legend_y_base + y_rect + 5, "End of Round")
+        #plt.text(legend_x_base + x_txt, legend_y_base + 2.5, "Two Hands")
+        #plt.text(x_txt, 0-0.3*legend_y_base, "2H")
+        #rectangle = plt.Rectangle((legend_x_base, legend_y_base - y_rect), .25, 5, fc='yellow', ec="black")
+        #rectangle = plt.Rectangle((1.5, 0 - 0.3 * legend_y_base), .25, 5, fc='yellow', ec="black")
+        #plt.gca().add_patch(rectangle)
+        #plt.text(legend_x_base + x_txt, legend_y_base - y_rect + 2.5, "One Hands")
+        #plt.text(1.5+x_txt, 0 - 0.3 * legend_y_base, "1H")
+        #rectangle = plt.Rectangle((legend_x_base, legend_y_base - 2 * y_rect), .25, 5, fc='red', ec="black")
+        #rectangle = plt.Rectangle((3, 0 - 0.3 * legend_y_base), .25, 5, fc='red', ec="black")
+        #plt.gca().add_patch(rectangle)
+        #plt.text(3 + x_txt, 0 - 0.3 * legend_y_base, "Folded")
+
+        plt.title("How committed are they? (g=2h,y=1h,r=Folded)")
+        plt.xticks(np.arange(len(xs)), labels=xs, rotation=15)
+        plt.tight_layout()
+        pwd = os.getcwd()
+        print(f'pwd: {pwd}')
+        self.round_chart_location='/static/images/betting_rounds_sum_table_hand'+\
+                                  str(self.hand_number)+'_round_'+str(self.betting_round_number)+'.png'
+        plt.savefig(pwd+self.round_chart_location)
+
+        return

@@ -4,30 +4,66 @@
     <meta charset="utf-8">
     <meta content="2" http-equiv="refresh"/>
     <title></title>
+    <link href="static/table.css" rel="stylesheet">
+
+    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" rel="stylesheet">
+    <script crossorigin="anonymous"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script crossorigin="anonymous"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script crossorigin="anonymous"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
   </head>
   <body>
-    <h1>Flip {{dealer.betting_round_number+1}} Summary:</h1>
-    <div class="">
+  <div class="the_whole_window">
+
+    <h1>Round {{dealer.betting_round_number+1}} Summary
+      {% if dealer.flips_complete>0 %}
+      {{dealer.flips_complete}} Flips Complete
+      {% endif %}:</h1>
+
+    <div class="round_summary_table">
       <table>
         <tr>
-          <th>Name</th><th>Rnd/Side</th><th>In Pot</th><th>Status</th>
+          <th>Name</th>
+          <td style="width:10px"></td>
+          <th>Rnd/Side</th>
+          <td style="width:10px"></td>
+          <th>In Pot</th>
+          <td style="width:10px"></td>
+          <th>Bankroll</th>
+          <td style="width:10px"></td>
+          <th>Status</th>
         </tr>
         {% for p in players %}
         <tr>
           <td>{{p.p_nickname}}</td>
+          <td style="width:10px"></td>
           <td>{{p.this_round_per_side}}</td>
-          <td>{{dealer.pot}}</td>
-          <td>{% if p.in_hand %}
-                Still alive.
+          <td style="width:10px"></td>
+          <td>{{p.in_pot}}</td>
+          <td style="width:10px"></td>
+          <td>{{p.bankroll}}</td>
+          <td style="width:10px"></td>
+          <td>{% if p.p_nickname in dealer.dead_guys %}
+                Folded.
               {% else %}
-                Folded
+                Still Alive
               {% endif %}
           </td>
         </tr>
         {% endfor %}
       </table>
+    </div> <!-- round_summary_table -->
 
+    <div class="round_summary_chart">
+      <IMG class="center" SRC={{dealer.round_chart_location}} ALT="ruht-row no chart found" >
     </div>
 
+  </div> <!-- the_whole_window -->
   </body>
 </html>

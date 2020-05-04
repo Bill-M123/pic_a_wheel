@@ -16,7 +16,7 @@ from flask_login import LoginManager
 from flask_login import login_required, current_user
 #########################
 from flask_wtf import Form, FlaskForm
-from wtforms import BooleanField, SubmitField, TextField, SelectField, StringField
+from wtforms import BooleanField, SubmitField, TextField, SelectField, StringField, IntegerField
 
 from poker_classes.cards import Cards
 from poker_classes.dealer import Dealer
@@ -49,6 +49,20 @@ class MasterControlForm(FlaskForm):
 
     seat_new_players = BooleanField(label="Seat new Players", default=False)
     remove_player = BooleanField(label="Remove Player", default=False)
+
+    winnings_l1 = IntegerField(label='Low_1',default=0)
+    winnings_l2 = IntegerField(label='Low_2', default=0)
+    winnings_l3 = IntegerField(label='Low_3', default=0)
+    winnings_l4 = IntegerField(label='Low_4', default=0)
+
+    winnings_h1 = IntegerField(label='High_1', default=0)
+    winnings_h2 = IntegerField(label='High_2', default=0)
+    winnings_h3 = IntegerField(label='High_3', default=0)
+    winnings_h4 = IntegerField(label='High_4', default=0)
+
+    distribute_winnings = BooleanField(label="Distribute Winnings", default=False)
+
+
 
 
 class FullTableForm(FlaskForm):
@@ -84,7 +98,7 @@ alba = Player(player_dir, name='John Alba', nickname='JohnAlba')
 bornstein = Player(player_dir, name='Bill Murphy', nickname='Bornstein')
 clyde = Player(player_dir, name='Bob Vincent', nickname='Clyde')
 brian = Player(player_dir, name='Brian Mercer', nickname='Mercer')
-ed = Player(player_dir, name='Ed Mulhern', nickname='Ed')
+ed = Player(player_dir, name='Ed Mulhern', nickname='Mr.Pink')
 tardie = Player(player_dir, name='Michael Tardie', nickname='Tardie')
 judogi = Player(player_dir, name='Bob Powers', nickname='Judogi')
 jeff = Player(player_dir, name='Jeff Andersen', nickname='Jeff')
@@ -94,6 +108,10 @@ smith = Player(player_dir, name='Walt Smith', nickname='Walt')
 
 possible_players = [alba, bornstein, brian, clyde, degroot, ed, jeff,
                     judogi, tardie, bart, smith]
+starting_funds=500
+for i,p in enumerate(possible_players):
+    p.bankroll += starting_funds
+    possible_players[i]=p
 
 players = [alba, bornstein, clyde, brian, ed]
 players = [alba, bornstein, clyde]
@@ -118,6 +136,8 @@ player_dict = {}
 
 #########################
 app = Flask(__name__)
+
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # App config from Clyde
 app.config["SECRET_KEY"] = "yousecntuch"
@@ -144,17 +164,20 @@ def login():
         return render_template('login.html')
 
 
-    elif session.get('logged_in'):
+    if session.get('logged_in'):
         return f"{session['username']} is already logged in."
 
     elif request.method in ['POST', 'GET']:
 
-        session['username'] = request.form.get('username')
+        #session['username'] = request.form.get('username')
+        tmp_name = request.form.get('username')
         valid_ids = [p.p_nickname for p in possible_players]
 
-        if session['username'] in valid_ids:
-            if (session['username'] not in [p.p_nickname for p in this_game.players_logged_in]) and\
-                (session['username'] not in [p.p_nickname for p in players]):
+        if tmp_name in valid_ids:
+            if (tmp_name not in [p.p_nickname for p in this_game.players_logged_in]) and\
+                (tmp_name not in [p.p_nickname for p in players]):
+                session['username']=tmp_name
+
                 for guy in possible_players:
                     if guy.p_nickname == session['username']:
                         dealer.players_waiting_to_enter.append(guy)
@@ -163,12 +186,12 @@ def login():
                         # return f"Hello {guy.p_nickname}.  Thank-you for logging in.  Please wait patiently."
                         return redirect(url_for("full_table"))
 
-                return f"{guy.p_nickname}:  You pooched your login.  Please fess up."
+                return f"{guy.p_nickname}:  You pooched your login.  Please return to kindergarten."
 
             else:
-                tmp = f"{session['username']} is already logged in.  Only one session allowed."
+                tmp = f"{tmp_name} is already logged in.  You can't log in as someone else."
                 #session.clear()
-                return redirect(url_for("full_table"))
+                return f"{tmp}"
 
         else:
             return "Invalid Id.  I don't know you, go away."
@@ -209,6 +232,7 @@ def full_table():
 
     form = FullTableForm()
 
+    dealer.check_which_players_are_folded(players)
     if dealer.showdown:
         new_players = []
         for i, p in enumerate(players):
@@ -223,23 +247,50 @@ def full_table():
             new_players.append(p)
             players[i] = p
 
+        declared_high,declared_low = dealer.get_high_low_hands(players)
+        high_hand_df, trash_high = dealer.evaluate_all_hands((declared_high))
+        trash_low, low_hand_df = dealer.evaluate_all_hands((declared_low))
+        print("\n\nhigh_hand_df:\n",high_hand_df,"\n")
+        print("\n\low_hand_df:\n", low_hand_df, "\n\n")
+
+
         return render_template('table_showdown.html', dealer=dealer,
-                               players=new_players)
+                               players=new_players,high_hand_df=high_hand_df,
+                               low_hand_df=low_hand_df)
 
 
     if dealer.betting_complete:
         print(f"{dealer.active_player},{dealer.betting_complete}")
         dealer.num_raises = 0
+        if not dealer.made_round_summary:
+            for i,p in enumerate(players):
+                p.get_number_hands()
+                p.hands_by_round.append(p.num_hands)
+                p.in_pot_by_round.append(p.in_pot_this_round)
+                p.in_pot_this_round = 0
+                players[i] = p
+            dealer.made_round_summary = True
+            dealer.make_hand_plot(players)
+            return redirect(url_for("full_table"))
+    else:
+        dealer.made_round_summary = False
+
 
     if dealer.betting_complete and not dealer.declare_open and not dealer.declare_done:
+
         this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
         this_player = dealer.make_your_hand_display_cards(this_player)
+        dealer.check_which_players_are_folded(players)
+        dealer.flips_complete=len([x for x in dealer.common_cards_flipped if x == True])
         return render_template('round_summary.html', dealer=dealer,
                                players=players, this_player=this_player, form=form)
 
     if dealer.betting_complete and dealer.declare_done:
+
         this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
         this_player = dealer.make_your_hand_display_cards(this_player)
+        dealer.check_which_players_are_folded(players)
+        dealer.flips_complete = len([x for x in dealer.common_cards_flipped if x == True])
         return render_template('round_summary.html', dealer=dealer,
                                players=players, this_player=this_player, form=form)
 
@@ -380,6 +431,7 @@ def full_table():
 
             tmp = dealer.new_betting_order[0]
             dealer.active_player = tmp.p_nickname
+            dealer.check_which_players_are_folded(players)
 
             print(f"this player: {this_player.p_nickname} ACTIVE")
 
@@ -391,7 +443,7 @@ def full_table():
                 return render_template('player_base_table.html', dealer=dealer,
                                        players=players, this_player=this_player, form=form)
             else:
-                return f"{session['username']} is not welcome at this table, so get lost!"
+                return f"Houston, we have a problem.  {session['username']} is attempting to access table, and I am confused about what to do."
 
 
     else:
@@ -412,7 +464,10 @@ def full_table():
                                    players=players, this_player=this_player)
 
         else:
-            return f"Sorry.  {session['username']} is not welcome at this table, so either wait or get lost!"
+            sorry_message = f"Sorry.  {session['username']} is not currently welcome at this table, " +\
+                          "likely because you pooched your login (or you are trying to cheat.)  \n" +\
+                          "Please wait while we investigate."
+            return sorry_message
 
 
 @app.route('/declare', methods=['GET', 'POST'])
@@ -529,8 +584,84 @@ def master_control():
                     print(f"Players: {[p.p_nickname for p in players]}")
                     dead_guy = players.pop(players.index(p))
                     dealer.dead_guys.append(dead_guy)
-                    print(f"Players: {[p.p_nickname for p in players]}")
+
+                    for pl in this_game.players_logged_in:
+                        if pl.p_nickname == guy:
+                            this_game.players_logged_in.pop(this_game.players_logged_in.index(pl))
+                    print(f"Removed {guy} from players and players_logged_in")
+                    print(f"Remaining Players: {[p.p_nickname for p in players]}")
                     return redirect(url_for("master_control"))
+
+        distribute_winnings_flag = form.distribute_winnings.data
+        if distribute_winnings_flag:
+            guy_l1 = request.form.get("winner_l1")
+            win_l1 = form.winnings_l1.data
+
+            for i,p in enumerate(players):
+                if guy_l1 == p.p_nickname:
+                    p.bankroll+=win_l1
+                    players[i]=p
+
+            guy_l2 = request.form.get("winner_l2")
+            win_l2 = form.winnings_l2.data
+
+            for i, p in enumerate(players):
+                if guy_l2 == p.p_nickname:
+                    p.bankroll += win_l2
+                    players[i] = p
+
+            guy_l3 = request.form.get("winner_l3")
+            win_l3 = form.winnings_l3.data
+
+            for i, p in enumerate(players):
+                if guy_l3 == p.p_nickname:
+                    p.bankroll += win_l3
+                    players[i] = p
+
+            guy_l4 = request.form.get("winner_l4")
+            win_l4 = form.winnings_l4.data
+
+            for i, p in enumerate(players):
+                if guy_l4 == p.p_nickname:
+                    p.bankroll += win_l4
+                    players[i] = p
+            # Highs
+            guy_h1 = request.form.get("winner_h1")
+            win_h1 = form.winnings_h1.data
+            for i,p in enumerate(players):
+                if guy_h1 == p.p_nickname:
+                    p.bankroll+=win_h1
+                    players[i]=p
+
+            guy_h2 = request.form.get("winner_h2")
+            win_h2 = form.winnings_h2.data
+
+            for i, p in enumerate(players):
+                if guy_h2 == p.p_nickname:
+                    p.bankroll += win_h2
+                    players[i] = p
+
+            guy_h3 = request.form.get("winner_h3")
+            win_h3 = form.winnings_h3.data
+
+            for i, p in enumerate(players):
+                if guy_h3 == p.p_nickname:
+                    p.bankroll += win_h3
+                    players[i] = p
+
+            guy_h4 = request.form.get("winner_h4")
+            win_h4 = form.winnings_h4.data
+
+            for i, p in enumerate(players):
+                if guy_h4 == p.p_nickname:
+                    p.bankroll += win_h4
+                    players[i] = p
+            dealer.show_winnings = True
+            for p in players:
+                print(f"{p.p_nickname} {p.bankroll}")
+
+            return render_template('master_control.html', form=form, name='Bornstein',
+                                   players=players, this_game=this_game, dealer=dealer)
 
 
         declare_open = form.declare_open.data
@@ -610,6 +741,7 @@ def master_control():
                 dealer.betting_rounds[i] = True
                 dealer.betting_complete = False
 
+
     if (session['username'] == 'Bornstein') or (session['username'] == 'Clyde'):
         name = session['username']
 
@@ -640,6 +772,12 @@ def master_control():
         if new_deal and ~dealer.deal_complete:
             dealer.reset_table(players, this_game)
             shuffled = dealer.deal_cards(players, this_game)
+            for i,p in enumerate(players):
+                p.bankroll -= 10 #automatic ante
+                p.in_pot += 10 #automatic ante
+                players[i] = p
+                dealer.pot += 10
+
             dealer.deal_complete = True
             dealer.first_deal = False
             form.new_deal.data = False
@@ -659,6 +797,9 @@ def master_control():
             dealer.active_player = tmp.p_nickname
             print(f"Active Player: {dealer.active_player}")
 
+
+
+
         return render_template('master_control.html', form=form, name=name,
                                players=players, this_game=this_game, dealer=dealer)
 
@@ -667,5 +808,5 @@ def master_control():
 
 
 if __name__ == '__main__':
-    # app.run(host='0.0.0.0', debug=True)
+    #app.run(host='0.0.0.0', debug=True)
     app.run(debug=True)

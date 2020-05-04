@@ -29,7 +29,6 @@
 {% if players == [] %}
 <div class="jumbotron center">
     <h1 class="center">Please Wait.</h1>
-
     <IMG SRC="static/images/waiting-meme.png" ALT="waiting" style="width:50%">
 </div>
 
@@ -41,7 +40,7 @@
             <table class="jumbotron">
 
                 <tr>
-                    <th style="width: 10px"></th>
+                    <td style="width: 10px"> </td>
                     <th>Name</th>
                     <th style="width: 10px"></th>
                     <th>Hand 1</th>
@@ -397,7 +396,19 @@
     </form>
 </div>
 
-</div>
+{% if dealer.show_winnings %}
+    <div class="jumbotron">
+        <h1>Bankrolls</h1>
+        <table>
+            <tr><th>Player</th><th>Funds</th></tr>
+            {% for p in players %}
+            <tr><td>{{p.p_nickname}}</td><td>{{p.bankroll}}</td></tr>
+            {% endfor%}
+        </table>
+    </div>
 {% endif %}
+
+{% endif %}
+</div>
 </body>
 </html>

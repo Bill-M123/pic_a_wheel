@@ -29,6 +29,9 @@ class Player():
         self.common_cards = []
         self.common_cards_pr = ['backs']
         self.in_pot = 0
+        self.in_pot_this_round = 0
+        self.in_pot_by_round = []
+        self.hands_by_round = []
         self.this_round_per_side = 0
         self.last_bet = 0
         self.high_hands = []
@@ -50,6 +53,9 @@ class Player():
         self.common_cards = []
         self.common_cards_pr = []
         self.in_pot = 0
+        self.in_pot_this_round = 0
+        self.in_pot_by_round = []
+        self.hands_by_round = []
         self.this_round_per_side = 0
         self.last_bet = 0
         self.high_hands = []
@@ -66,11 +72,8 @@ class Player():
         return self.hands
 
     def get_number_hands(self):
-        #for x in self.hands:
-            #print(str(x), str(x).find('folded'))
         tmp = [str(x) for x in self.hands if str(x).find('folded') < 0]
         self.num_hands = (len([x for x in self.hands if str(x).find('folded') < 0]))
-        print(f"{self.p_nickname} has {self.num_hands} hands")
         return
 
     def fold_decisions(self):
