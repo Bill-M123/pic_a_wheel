@@ -256,7 +256,11 @@
                     <td>{{dealer.pot}}</td>
                     <td></td>
                 </tr>
-
+                <tr>
+                    <td>Pot hi/low:</td>
+                    <td>{{dealer.high_pot}}/{{dealer.low_pot}}</td>
+                    <td></td>
+                </tr>
                 <tr style="height: 10px">
                     <td></td>
                 </tr>
@@ -318,7 +322,7 @@
             <td style="width:10px"></td>
             <td>{{high_hand_df['Card_Values'][r]}}</td>
             <td style="width:10px"></td>
-            <td>TBD</td>
+            <td>{{high_hand_df['Winnings'][r]}}</td>
           </tr>
           {% endfor %}
         </table>
@@ -348,7 +352,7 @@
             <td style="width:10px"></td>
             <td>{{low_hand_df['Card_Values'][r]}}</td>
             <td style="width:10px"></td>
-            <td>TBD</td>
+            <td>{{low_hand_df['Winnings'][r]}}</td>
           </tr>
           {% endfor %}
         </table>

@@ -33,86 +33,89 @@
         <form method="POST">
             {{form.hidden_tag() }}
                 <table class="center">
-                    <th>Hand Controls</th>
-                  <tr>
-                      <td>{{form.reset_table.label}}</td>
+                  <tr><th>Player Controls (indiv reset)</th></tr>
+                  <tr class="mc_player_controls">
+                      <td>
+                        <label for="player_to_remove">Player to Remove</label>
+                        <select id="player_to_remove" name='player_to_remove' value='No One' default = 'No One'>
+                            <option value="No One">No One</option>
+                            {% for p in players%}
+                          <option value={{p.p_nickname}}>{{p.p_nickname}}</option>
+                            {% endfor %}
+                        </select>
+                      </td>
                       <td style="width: 10px"></td>
-                      <td>{{form.reset_table}}</td>
+                      <td>{{form.remove_player}}</td>
+                </tr>
+                  <tr class="mc_player_controls">
+                    <td>{{form.seat_new_players.label}}</td>
+                    <td style="width: 10px"></td>
+                    <td>{{form.seat_new_players}}</td>
                   </tr>
-                  <tr>
+                  <tr class="mc_player_controls">
                       <td>{{form.rotate_dealer.label}}</td>
                       <td style="width: 10px"></td>
                       <td>{{form.rotate_dealer}}</td>
                   </tr>
-                  <tr>
+
+                  <th>Hand Controls</th>
+                  <tr class="mc_hand_controls">
+                      <td>{{form.reset_table.label}}</td>
+                      <td style="width: 10px"></td>
+                      <td>{{form.reset_table}}</td>
+                  </tr>
+                  <tr class="mc_hand_controls">
                       <td>{{form.new_deal.label}}</td>
                       <td style="width: 10px"></td>
                       <td>{{form.new_deal}}</td>
                   </tr>
-                  <tr>
+                  <tr class="mc_hand_controls">
                       <td>{{form.first_bet.label}}</td>
                       <td style="width: 10px"></td>
                       <td>{{form.first_bet}}</td>
                   </tr>
-                  <tr>
+                  <tr class="mc_hand_controls">
                       <td>{{form.first_flip.label}}</td>
                       <td style="width: 10px"></td>
                       <td>{{form.first_flip}}
                   </tr>
-                  <tr>
+                  <tr class="mc_hand_controls">
                       <td>{{form.second_flip.label}}</td>
                       <td style="width: 10px"></td>
                       <td>{{form.second_flip}}</td>
                   </tr>
-                  <tr>
+                  <tr class="mc_hand_controls">
                       <td>{{form.third_flip.label}}</td>
                       <td style="width: 10px"></td>
                       <td>{{form.third_flip}}</td>
                   </tr>
 
-                  <tr>
+                  <tr class="mc_hand_controls">
                       <td>{{form.declare_open.label}}</td>
                       <td style="width: 10px"></td>
                       <td>{{form.declare_open}}</td>
                   </tr>
 
-                    <tr>
+                    <tr class="mc_hand_controls">
                       <td>{{form.declare_closed.label}}</td>
                         <td style="width: 10px"></td>
                       <td>{{form.declare_closed}}</td>
                     </tr>
 
-                  <tr>
+                  <tr class="mc_hand_controls">
                       <td>{{form.evaluate_now.label}}</td>
                       <td style="width: 10px"></td>
                       <td>{{form.evaluate_now}}</td>
                   </tr>
 
-                    <tr>
+                    <tr class="mc_hand_controls">
                       <td>{{form.distribute_winnings.label}}</td>
                       <td style="width: 10px"></td>
                       <td>{{form.distribute_winnings}}</td>
                   </tr>
 
 
-                    <tr>
-                        <td>
-                          <label for="player_to_remove">Player to Remove</label>
-                          <select id="player_to_remove" name='player_to_remove' value='No One' default = 'No One'>
-                              <option value="No One">No One</option>
-                              {% for p in players%}
-                            <option value={{p.p_nickname}}>{{p.p_nickname}}</option>
-                              {% endfor %}
-                          </select>
-                        </td>
-                        <td style="width: 10px"></td>
-                        <td>{{form.remove_player}}</td>
-                  </tr>
-                    <tr>
-                      <td>{{form.seat_new_players.label}}</td>
-                      <td style="width: 10px"></td>
-                      <td>{{form.seat_new_players}}</td>
-                    </tr>
+
 
                 </table>
 

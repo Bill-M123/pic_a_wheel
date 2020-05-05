@@ -52,6 +52,8 @@ class Dealer():
         # Money variables
         self.bet_per_side = 0
         self.pot = 0
+        self.high_pot = 0
+        self.low_pot = 0
 
         # Added for declare
         self.declare_open = False
@@ -109,6 +111,8 @@ class Dealer():
         # Money variables
         self.bet_per_side = 0
         self.pot = 0
+        self.high_pot = 0
+        self.low_pot = 0
 
         # Added for declare
         self.declare_open = False
@@ -259,6 +263,19 @@ l1'''
         print(f"Folded players: {self.dead_guys}")
         return
 
+    def calc_hi_low_pots(self):
+        '''divide pot into high and low portions'''
+        num_nicks = int(self.pot)/5
+        self.high_pot = int(num_nicks/2)*5
+        self.low_pot = self.high_pot
+        if num_nicks % 2 == 1:
+            self.high_pot +=5
+        self.high_pot = int(self.high_pot)
+        self.low_pot = int(self.low_pot)
+        return
+
+
+
     def get_possible_hands(self, this_hand, common, omaha=False):
         '''return a list of all possible hands based on hand and common cards.
         Sets omaha flag which drives to two cards from hand'''
@@ -306,12 +323,16 @@ l1'''
             a_h_list = [x if x != 1 else 14 for x in rank_list]
             a_l_list = rank_list
             hand_options = [a_h_list, a_l_list]
-            print(f"hand_options: {hand_options}")
 
         high_hands = []
         low_hands = []
 
         for tmp in hand_options:
+
+            # Find two most common combinations, allows id of all hands including fh
+            cnt_rnk = Counter(tmp)
+            mc_1 = cnt_rnk.most_common()[0]
+            mc_2 = cnt_rnk.most_common()[1]
 
             hand_decision = False
 
@@ -438,17 +459,19 @@ l1'''
                     low_df.drop('Cards', axis=1, inplace=True)
 
                     high_df['Card_Values'] = high_df.Card_Values.apply(lambda x: '-'.join([str(y) for y in x]))
+                    high_df = high_df.sort_values(['Rank', 'Card_Values'], ascending=[True, False])
                     high_df = high_df.drop_duplicates(keep="first")
-                    high_df = high_df.sort_values(['Rank', 'Card_Values'], ascending=[True, False]).reset_index(drop=True)
+                    high_df.reset_index(drop=True,inplace=True)
 
                     low_df['Card_Values'] = low_df.Card_Values.apply(lambda x: '-'.join([str(y) for y in x]))
+                    low_df = low_df.sort_values(['Rank', 'Card_Values'], ascending=[False, False])
                     low_df = low_df.drop_duplicates(keep="first")
-                    low_df = low_df.sort_values(['Rank', 'Card_Values'], ascending=[False, False]).reset_index(drop=True)
+                    low_df.reset_index(drop=True, inplace=True)
 
-                    print(
-                        f"{p.p_nickname} rank: {high_df['Rank'][0]} high_new: {high_df['Hand'][0]} {high_df['Card_Values'][0]}")
-                    print(
-                        f"{p.p_nickname} rank: {high_df['Rank'][len(low_df) - 1]} low_new: {low_df['Hand'][len(low_df) - 1]} {low_df['Card_Values'][len(low_df) - 1]}\n")
+                    #print(
+                     #   f"{p.p_nickname} rank: {high_df['Rank'][0]} high_new: {high_df['Hand'][0]} {high_df['Card_Values'][0]}")
+                    #print(
+                       # f"{p.p_nickname} rank: {high_df['Rank'][len(low_df) - 1]} low_new: {low_df['Hand'][len(low_df) - 1]} {low_df['Card_Values'][len(low_df) - 1]}\n")
 
                     high_hand_list.append([p.p_nickname, high_df['Rank'][0], high_df['Hand'][0], high_df['Card_Values'][0]])
                     low_hand_list.append([p.p_nickname, low_df['Rank'][len(low_df) - 1], low_df['Hand'][len(low_df) - 1],
@@ -461,6 +484,41 @@ l1'''
         low_hand_df = low_hand_df.sort_values(['Rank', 'Card_Values'], ascending=[False, True])
 
         return high_hand_df, low_hand_df
+
+    def calc_winnings(self,hand_df,pot):
+        '''Accept dorted df, allocate winnings'''
+        tmp_df=hand_df.copy()
+        tmp_df.reset_index(drop=True,inplace=True)
+
+        winning_rank = tmp_df['Rank'][0]
+        winning_card_values = tmp_df['Card_Values'][0]
+
+        tmp_df['sh_pot'] = 0
+        tmp_df['Winnings'] = 0
+        tmp_df.loc[(tmp_df.Rank==winning_rank) & (tmp_df.Card_Values==winning_card_values),'sh_pot']=1
+        num_winning_shares=tmp_df['sh_pot'].sum()
+
+        if pot % num_winning_shares ==0:
+            winning_share = int(pot/num_winning_shares)
+            tmp_df.loc[tmp_df.sh_pot == 1, 'Winnings'] = winning_share
+        else:
+            num_winning_shares = tmp_df['sh_pot'].sum()
+
+            num_nickels = int(pot / 5)
+            base_winning_share = int(num_nickels / num_winning_shares) * 5
+            tmp_df['Winnings'] = 0
+            tmp_df.loc[tmp_df.sh_pot == 1, 'Winnings'] = base_winning_share
+
+            extra_shares = num_nickels % num_winning_shares
+            winning_names = tmp_df.loc[tmp_df.sh_pot == 1, 'Name'].values
+            random.shuffle(winning_names)
+            winning_names = winning_names[0:extra_shares]
+
+            tmp_df.loc[tmp_df.Name.isin(winning_names), 'Winnings'] = tmp_df.loc[tmp_df.Name.isin(
+                winning_names), 'Winnings'] + 5
+
+        print("Winnings\n", tmp_df, "\n")
+        return tmp_df
 
     def get_high_low_hands(self,players):
         '''Used post declare to set evaluate groups.'''
@@ -489,8 +547,6 @@ l1'''
             if add_low == 1:
                 players_low.append(tmp_low)
 
-        print("\n\nDeclared High Hands:\n",players_high)
-        print("Declared Low Hands:\n",players_low,"\n\n")
 
         return players_high, players_low
 
@@ -599,7 +655,6 @@ l1'''
             pass
 
         elif set([str(x) for x in this_player.hands]) == {'folded'}:
-            print('In dealer All folded')
             this_player.common_cards_pr = []
 
         else:
@@ -624,11 +679,13 @@ l1'''
             print(f"Got around to {self.last_raise}, this round betting ends")
             self.new_bet == False
             self.betting_complete = True
+            self.calc_hi_low_pots()
             return player
 
         # check for no action
         if action == 'None':
             print('No action')
+            self.calc_hi_low_pots()
             return player
 
         self.this_action = self.new_betting_order.pop(0)
@@ -697,6 +754,7 @@ l1'''
             self.new_bet == False
             self.betting_complete = True
 
+        self.calc_hi_low_pots()
         return player
 
     def get_betting_order(self, player_list):

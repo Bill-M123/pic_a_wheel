@@ -223,6 +223,10 @@ td{
   color: black;
   vertical-align: top;
 }
+.mc_player_controls{
+  background-color: powderblue;
+}
 
-
-
+.mc_hand_controls{
+  background-color: navajowhite;
+}

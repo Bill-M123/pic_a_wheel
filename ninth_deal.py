@@ -122,21 +122,17 @@ players = [jeff, brian, bornstein]
 
 players = []
 
+player_dict = {}
 # Removing Funds until login corrected
 # for i, p in enumerate(players):
 #    p.add_funds(500)  # add funds
 #    p.player_position = i  # set table position
 
-player_dict = {}
 
-# Initial Deal, display cards on console
-# shuffled = dealer.deal_cards(players, this_game)
-# for i, p in enumerate(players):
-#    player_dict = dealer.add_to_display_dict(player_dict, i, p, cards)
+
 
 #########################
 app = Flask(__name__)
-
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # App config from Clyde
@@ -152,9 +148,6 @@ def index():
     return "<h1>Home page for tonight's picawheel game</h1>"
 
 
-# Simply change the following two lines to login2 and delete the doc string notation in the folling function
-# to revert to original login Also change two references below back to login2
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     global players, this_game
@@ -162,7 +155,6 @@ def login():
     if not session.get('offered_login'):
         session['offered_login'] = True
         return render_template('login.html')
-
 
     if session.get('logged_in'):
         return f"{session['username']} is already logged in."
@@ -202,37 +194,15 @@ def login():
         return redirect(url_for('login.html'))
 
 
-'''Commented out for testing.  THe following code represents the original login code put together by Clyde
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    print(request.method)
-    if request.method == 'POST':
-        session['username'] = request.form['username']
-        session['declare_complete'] = False
-        session['declare_start'] = False
-
-        valid_ids = [p.p_nickname for p in players]
-
-        if session['username'] in valid_ids:
-            return redirect(url_for("full_table"))
-        else:
-            return f"Invalid Login.  I don't know you.  I don't want to know you.  Go away."
-    return  add_three_quotes_here_to_revert_to_previous_login
-        <form method="post">
-            <p><input type=text name=username>
-            <p><input type=submit value=Login>
-        </form>
-    '''
-
-
 @app.route('/full_table', methods=['GET', 'POST'])
 def full_table():
     global players, this_game
-    # print(dealer.showdown)
 
     form = FullTableForm()
 
+    # Check for folded players
     dealer.check_which_players_are_folded(players)
+
     if dealer.showdown:
         new_players = []
         for i, p in enumerate(players):
@@ -247,18 +217,19 @@ def full_table():
             new_players.append(p)
             players[i] = p
 
+        # Evaluate hands for showdown
         declared_high,declared_low = dealer.get_high_low_hands(players)
-        high_hand_df, trash_high = dealer.evaluate_all_hands((declared_high))
-        trash_low, low_hand_df = dealer.evaluate_all_hands((declared_low))
-        print("\n\nhigh_hand_df:\n",high_hand_df,"\n")
-        print("\n\low_hand_df:\n", low_hand_df, "\n\n")
+        high_hand_df, trash_high = dealer.evaluate_all_hands(declared_high)
+        trash_low, low_hand_df = dealer.evaluate_all_hands(declared_low)
 
+        high_hand_df = dealer.calc_winnings(high_hand_df,dealer.high_pot)
+        low_hand_df = dealer.calc_winnings(low_hand_df,dealer.low_pot)
 
         return render_template('table_showdown.html', dealer=dealer,
                                players=new_players,high_hand_df=high_hand_df,
                                low_hand_df=low_hand_df)
 
-
+    # Betting Complete housekeeping, make round summary
     if dealer.betting_complete:
         print(f"{dealer.active_player},{dealer.betting_complete}")
         dealer.num_raises = 0
@@ -275,7 +246,7 @@ def full_table():
     else:
         dealer.made_round_summary = False
 
-
+    # Betting complete before declare
     if dealer.betting_complete and not dealer.declare_open and not dealer.declare_done:
 
         this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
@@ -285,6 +256,7 @@ def full_table():
         return render_template('round_summary.html', dealer=dealer,
                                players=players, this_player=this_player, form=form)
 
+    # Betting complete after declare
     if dealer.betting_complete and dealer.declare_done:
 
         this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
@@ -316,10 +288,11 @@ def full_table():
         this_player = dealer.make_your_hand_display_cards(this_player)
         return render_template('player_base_table_declare_wait_state.html', dealer=dealer,
                                players=players, this_player=this_player, form=form)
-        # return redirect(url_for("declare"))
 
+    # Active player form processing
     if session['username'] == dealer.active_player:
 
+        # Process reset
         if (dealer.perform_reset):
             for p in players:
                 new_players.append(p.reset_player_from_master_control())
@@ -333,9 +306,9 @@ def full_table():
             form.hand2_kf = 'keep'
             form.bet_action = 'Check'
             dealer.perform_reset = False
-            print("Reset done.  Redirecting to full_table")
             return redirect(url_for("full_table"))
 
+        # Process active player form
         if form.validate_on_submit:
 
             hand1_kf = request.form.get('hand1_kf')
@@ -355,12 +328,14 @@ def full_table():
                         p.hands[1] = 'folded'
                         p.hands_pr[1] = 'folded'
 
+                        # Fold common cards
                         if (p.hands[0] == 'folded') & (p.hands[1] == 'folded'):
                             p.common_cards = ['folded']
                             p.common_cards_pr = ['folded']
 
                         players[i] = p
 
+            # Set basic display parameters and this_player variable for processing
             this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
             this_player = dealer.make_your_hand_display_cards(this_player)
 
@@ -375,6 +350,7 @@ def full_table():
                 if this_player.p_nickname == p.p_nickname:
                     players[i] = this_player
 
+            # Process form actions
             action = 'check'
             action_amount = 0
             if this_player.num_hands == 0:
@@ -406,6 +382,7 @@ def full_table():
                 action = 'None'
                 action_amount = 0
 
+            #######################################
             # Set table display for number of hands
             tmp_2 = 0
             tmp_1 = 0
@@ -428,6 +405,7 @@ def full_table():
             dealer.players_w_two_hands = tmp_2
             dealer.players_w_one_hand = tmp_1
             dealer.players_folded = tmp_folded
+            #######################################
 
             tmp = dealer.new_betting_order[0]
             dealer.active_player = tmp.p_nickname
@@ -475,8 +453,8 @@ def declare():
     global players, this_game, cards
 
     form = DeclareForm()
-    print('In declare function')
 
+    # set this_guy to player requesting declare info
     for p in players:
         if p.p_nickname == session['username']:
             this_guy = p
@@ -522,10 +500,6 @@ def declare():
         this_player = dealer.make_your_hand_display_cards(this_player)
         return redirect(url_for("full_table"))
 
-    # else:
-    #    this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
-    #    this_player = dealer.make_your_hand_display_cards(this_player)
-    #    return render_template("player_base_table_declare.html", dealer=dealer, players=players, this_player=this_player, form=form)
 
 
 @app.route('/new_deal')
@@ -778,10 +752,12 @@ def master_control():
                 players[i] = p
                 dealer.pot += 10
 
+
             dealer.deal_complete = True
             dealer.first_deal = False
             form.new_deal.data = False
             dealer.players_w_two_hands = len(players)
+            dealer.calc_hi_low_pots()
 
             return render_template('master_control.html', form=form, name=name,
                                    players=players, this_game=this_game, dealer=dealer)
