@@ -223,6 +223,20 @@ td{
   color: black;
   vertical-align: top;
 }
+
+.high_low_results{
+  display: block;
+  min-width:90vw;
+  margin-left: 10%;
+  margin-right: 10%;
+
+}
+.scoreplots{
+  display: block;
+  min-width:100vw;
+  margin-left: 3px;
+  margin-right: 3px;
+}
 .mc_player_controls{
   background-color: powderblue;
 }

@@ -204,6 +204,7 @@ def full_table():
     dealer.check_which_players_are_folded(players)
 
     if dealer.showdown:
+
         new_players = []
         for i, p in enumerate(players):
 
@@ -217,13 +218,49 @@ def full_table():
             new_players.append(p)
             players[i] = p
 
+
+
         # Evaluate hands for showdown
         declared_high,declared_low = dealer.get_high_low_hands(players)
         high_hand_df, trash_high = dealer.evaluate_all_hands(declared_high)
         trash_low, low_hand_df = dealer.evaluate_all_hands(declared_low)
 
+        # Check for everyone going the same way:
+        try:
+            name_check = high_hand_df['Name'][0]
+        except:
+            name_check='No One'
+        if name_check == 'No One':
+            print("high side found no one.")
+            dealer.low_pot += dealer.high_pot
+            dealer.high_pot = 0
+
+        name_check='No One'
+        try:
+            name_check = low_hand_df['Name'][0]
+        except:
+            name_check='No One'
+        if name_check == 'No One':
+            print("low side found no one.")
+            dealer.high_pot += dealer.low_pot
+            dealer.low_pot = 0
+
         high_hand_df = dealer.calc_winnings(high_hand_df,dealer.high_pot)
         low_hand_df = dealer.calc_winnings(low_hand_df,dealer.low_pot)
+
+        # Make round and nightly scores
+        dealer.make_pandl_df(players, high_hand_df, low_hand_df)
+        print("dealer.pandl_df:\n",dealer.pandl_df,"\n")
+
+        if not dealer.done_scoring:
+            for i,p in enumerate(players):
+                p.old_bankroll=p.bankroll
+                players[i]=p
+
+            dealer.add_winnings_to_bankroll(players)
+            dealer.make_summary_plots(players)
+            dealer.done_scoring = True
+            print("done with plot")
 
         return render_template('table_showdown.html', dealer=dealer,
                                players=new_players,high_hand_df=high_hand_df,
@@ -784,5 +821,5 @@ def master_control():
 
 
 if __name__ == '__main__':
-    #app.run(host='0.0.0.0', debug=True)
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
+    #app.run(debug=True)

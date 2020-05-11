@@ -356,9 +356,35 @@
           </tr>
           {% endfor %}
         </table>
-      </div>
+      </div> <!-- Hi_low results right-->
+    </div> <!-- Hi_low results-->
+
+    <div class="scoreplots">
+        <h2>The Score Now</h2>
+        <IMG class="center" SRC={{dealer.pandl_chart_location}} ALT="ruht-row no pandl chart found" >
     </div>
 
+    <div class="scoreplots">
+        <h2>The Table</h2>
+        <table>
+        <tr>
+            <th>Player</th>
+            <th style="width:20px"></th>
+            <th>Last Bankroll</th>
+            <th style="width:20px"></th>
+            <th>Bankroll</th>
+        </tr>
+        {% for p in players %}
+        <tr>
+            <td>{{p.p_nickname}}</td>
+            <td style="width:20px"></td>
+            <td>{{p.old_bankroll}}</td>
+            <td style="width:20px"></td>
+            <td>{{p.bankroll}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+    </div>
 </div> <!-- the_whole_window -->
 </body>
 </html>

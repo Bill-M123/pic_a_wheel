@@ -1,6 +1,6 @@
 # Status
 
-Currently Running eigth_deal.py:
+Currently Running ninth_deal.py:  This is the version played last Thursday
 
 Fixes:  Dealer Rotation Added, login problem fixed
 

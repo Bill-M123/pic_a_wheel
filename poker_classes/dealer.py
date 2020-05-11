@@ -72,6 +72,10 @@ class Dealer():
         self.show_winnings = False
         self.flips_complete = 0
         self.round_chart_location = ''
+        self.pandl_chart_location = ''
+        self.pandl_df = pd.DataFrame()
+        self.done_scoring = False
+
 
         return
 
@@ -130,6 +134,10 @@ class Dealer():
         self.show_winnings = False
         self.flips_complete = 0
         self.round_chart_location = ''
+        self.pandl_chart_location = ''
+        self.pandl_df = pd.DataFrame()
+        self.done_scoring = False
+
 
         return
 
@@ -265,16 +273,14 @@ l1'''
 
     def calc_hi_low_pots(self):
         '''divide pot into high and low portions'''
-        num_nicks = int(self.pot)/5
-        self.high_pot = int(num_nicks/2)*5
+        num_nicks = int(self.pot) / 5
+        self.high_pot = int(num_nicks / 2) * 5
         self.low_pot = self.high_pot
         if num_nicks % 2 == 1:
-            self.high_pot +=5
+            self.high_pot += 5
         self.high_pot = int(self.high_pot)
         self.low_pot = int(self.low_pot)
         return
-
-
 
     def get_possible_hands(self, this_hand, common, omaha=False):
         '''return a list of all possible hands based on hand and common cards.
@@ -298,7 +304,7 @@ l1'''
         # trap for folded hand
         if hand == 'folded':
             folded_hand = (100, f"Folded", ['folded'], 'folded')
-            return folded_hand,folded_hand
+            return folded_hand, folded_hand
 
         # Separate cards into ranks and suits
         rank_list = [x[0] for x in hand]
@@ -461,21 +467,23 @@ l1'''
                     high_df['Card_Values'] = high_df.Card_Values.apply(lambda x: '-'.join([str(y) for y in x]))
                     high_df = high_df.sort_values(['Rank', 'Card_Values'], ascending=[True, False])
                     high_df = high_df.drop_duplicates(keep="first")
-                    high_df.reset_index(drop=True,inplace=True)
+                    high_df.reset_index(drop=True, inplace=True)
 
                     low_df['Card_Values'] = low_df.Card_Values.apply(lambda x: '-'.join([str(y) for y in x]))
                     low_df = low_df.sort_values(['Rank', 'Card_Values'], ascending=[False, False])
                     low_df = low_df.drop_duplicates(keep="first")
                     low_df.reset_index(drop=True, inplace=True)
 
-                    #print(
-                     #   f"{p.p_nickname} rank: {high_df['Rank'][0]} high_new: {high_df['Hand'][0]} {high_df['Card_Values'][0]}")
-                    #print(
-                       # f"{p.p_nickname} rank: {high_df['Rank'][len(low_df) - 1]} low_new: {low_df['Hand'][len(low_df) - 1]} {low_df['Card_Values'][len(low_df) - 1]}\n")
+                    # print(
+                    #   f"{p.p_nickname} rank: {high_df['Rank'][0]} high_new: {high_df['Hand'][0]} {high_df['Card_Values'][0]}")
+                    # print(
+                    # f"{p.p_nickname} rank: {high_df['Rank'][len(low_df) - 1]} low_new: {low_df['Hand'][len(low_df) - 1]} {low_df['Card_Values'][len(low_df) - 1]}\n")
 
-                    high_hand_list.append([p.p_nickname, high_df['Rank'][0], high_df['Hand'][0], high_df['Card_Values'][0]])
-                    low_hand_list.append([p.p_nickname, low_df['Rank'][len(low_df) - 1], low_df['Hand'][len(low_df) - 1],
-                                          low_df['Card_Values'][len(low_df) - 1]])
+                    high_hand_list.append(
+                        [p.p_nickname, high_df['Rank'][0], high_df['Hand'][0], high_df['Card_Values'][0]])
+                    low_hand_list.append(
+                        [p.p_nickname, low_df['Rank'][len(low_df) - 1], low_df['Hand'][len(low_df) - 1],
+                         low_df['Card_Values'][len(low_df) - 1]])
 
         high_hand_df = pd.DataFrame(columns=['Name', 'Rank', 'Hand', 'Card_Values'], data=high_hand_list)
         low_hand_df = pd.DataFrame(columns=['Name', 'Rank', 'Hand', 'Card_Values'], data=low_hand_list)
@@ -485,21 +493,26 @@ l1'''
 
         return high_hand_df, low_hand_df
 
-    def calc_winnings(self,hand_df,pot):
+    def calc_winnings(self, hand_df, pot):
         '''Accept dorted df, allocate winnings'''
-        tmp_df=hand_df.copy()
-        tmp_df.reset_index(drop=True,inplace=True)
-
-        winning_rank = tmp_df['Rank'][0]
-        winning_card_values = tmp_df['Card_Values'][0]
+        tmp_df = hand_df.copy()
+        tmp_df.reset_index(drop=True, inplace=True)
+        try:
+            winning_rank = tmp_df['Rank'][0]
+            winning_card_values = tmp_df['Card_Values'][0]
+        except:
+            fail_df = pd.DataFrame(columns=['Name', 'Rank', 'Hand', 'Card_Values', 'sh_pot', 'Winnings'],
+                                   data=[['No One', 100, 'None', 'All Joker', 0, 0]])
+            print("Returning failing_df")
+            return fail_df
 
         tmp_df['sh_pot'] = 0
         tmp_df['Winnings'] = 0
-        tmp_df.loc[(tmp_df.Rank==winning_rank) & (tmp_df.Card_Values==winning_card_values),'sh_pot']=1
-        num_winning_shares=tmp_df['sh_pot'].sum()
+        tmp_df.loc[(tmp_df.Rank == winning_rank) & (tmp_df.Card_Values == winning_card_values), 'sh_pot'] = 1
+        num_winning_shares = tmp_df['sh_pot'].sum()
 
-        if pot % num_winning_shares ==0:
-            winning_share = int(pot/num_winning_shares)
+        if pot % num_winning_shares == 0:
+            winning_share = int(pot / num_winning_shares)
             tmp_df.loc[tmp_df.sh_pot == 1, 'Winnings'] = winning_share
         else:
             num_winning_shares = tmp_df['sh_pot'].sum()
@@ -520,18 +533,18 @@ l1'''
         print("Winnings\n", tmp_df, "\n")
         return tmp_df
 
-    def get_high_low_hands(self,players):
+    def get_high_low_hands(self, players):
         '''Used post declare to set evaluate groups.'''
         players_high = []
         players_low = []
         for p in players:
             tmp_high = copy.deepcopy(p)
             tmp_low = copy.deepcopy(p)
-            add_low=0
-            add_high=0
+            add_low = 0
+            add_high = 0
 
             Add_flag = 0
-            for k in [0,1]:
+            for k in [0, 1]:
                 if p.hands_hi_lo[k] == 'high':
                     add_high = 1
                 else:
@@ -546,7 +559,6 @@ l1'''
                 players_high.append(tmp_high)
             if add_low == 1:
                 players_low.append(tmp_low)
-
 
         return players_high, players_low
 
@@ -804,33 +816,100 @@ l1'''
             colors = [colors_dict[x] for x in tmp.num_hnds.values]
             plt.bar(range(len(xs)), tmp.rnd_ttl, bottom=bottoms, color=colors, edgecolor='gray')
 
-        legend_x_base = len(xs)+1
+        legend_x_base = len(xs) + 1
         x_txt = 0.5
         legend_y_base = guys_df.ttl.max()
         y_rect = 5
-        #rectangle = plt.Rectangle((legend_x_base, legend_y_base), .25, 5, fc='darkgreen', ec="black")
-        #rectangle = plt.Rectangle((0, 0-0.3*legend_y_base), .25, 5, fc='darkgreen', ec="black")
-        #plt.gca().add_patch(rectangle)
-        #plt.text(legend_x_base, legend_y_base + y_rect + 5, "End of Round")
-        #plt.text(legend_x_base + x_txt, legend_y_base + 2.5, "Two Hands")
-        #plt.text(x_txt, 0-0.3*legend_y_base, "2H")
-        #rectangle = plt.Rectangle((legend_x_base, legend_y_base - y_rect), .25, 5, fc='yellow', ec="black")
-        #rectangle = plt.Rectangle((1.5, 0 - 0.3 * legend_y_base), .25, 5, fc='yellow', ec="black")
-        #plt.gca().add_patch(rectangle)
-        #plt.text(legend_x_base + x_txt, legend_y_base - y_rect + 2.5, "One Hands")
-        #plt.text(1.5+x_txt, 0 - 0.3 * legend_y_base, "1H")
-        #rectangle = plt.Rectangle((legend_x_base, legend_y_base - 2 * y_rect), .25, 5, fc='red', ec="black")
-        #rectangle = plt.Rectangle((3, 0 - 0.3 * legend_y_base), .25, 5, fc='red', ec="black")
-        #plt.gca().add_patch(rectangle)
-        #plt.text(3 + x_txt, 0 - 0.3 * legend_y_base, "Folded")
 
         plt.title("How committed are they? (g=2h,y=1h,r=Folded)")
         plt.xticks(np.arange(len(xs)), labels=xs, rotation=15)
         plt.tight_layout()
         pwd = os.getcwd()
         print(f'pwd: {pwd}')
-        self.round_chart_location='/static/images/betting_rounds_sum_table_hand'+\
-                                  str(self.hand_number)+'_round_'+str(self.betting_round_number)+'.png'
-        plt.savefig(pwd+self.round_chart_location)
+        self.round_chart_location = '/static/images/betting_rounds_sum_table_hand' + \
+                                    str(self.hand_number) + '_round_' + str(self.betting_round_number) + '.png'
+        plt.savefig(pwd + self.round_chart_location)
 
+        return
+
+    def make_pandl_df(self, players, high_hand_df, low_hand_df):
+        '''Accept list of player objects, adjust bankrolls for winnings,
+        convert df to userful df for score summary'''
+
+        pl = []
+        for i, p in enumerate(players):
+            print("Pre fail High_hand_df\n",high_hand_df)
+            try:
+                winnings_h = high_hand_df.loc[high_hand_df.Name == p.p_nickname, "Winnings"].values[0]
+            except:
+                winnings_h = 0
+            print("Pre fail Low_hand_df\n", low_hand_df)
+            try:
+                winnings_l = low_hand_df.loc[low_hand_df.Name == p.p_nickname, "Winnings"].values[0]
+            except:
+                winnings_l = 0
+
+            winnings_t = winnings_h + winnings_l
+
+            pl.append([p.p_nickname, p.bankroll, p.in_pot, winnings_t])
+
+        self.pandl_df = pd.DataFrame(columns=["Name", "Stake", "in_hnd", "winnings"], data=pl)
+        return
+
+    def add_winnings_to_bankroll(self, players):
+        for i, p in enumerate(players):
+            try:
+                winnings = self.pandl_df.loc[self.pandl_df['Name'] == p.p_nickname, 'winnings'].values[0]
+                print(f"{p.p_nickname} winnings: {winnings}")
+            except:
+                print(f"Failed to add winnings: {p.p_nickname}")
+                winnings = 0
+            p.bankroll += winnings
+            players[i] = p
+        return
+
+    def make_summary_plots(self, players):
+        '''Accept list of player objects, combine with dealer object (pandl_df)
+        generate round and nightly score plots'''
+
+        ###################################
+
+        df = self.pandl_df.copy()
+
+        df['colors'] = df.winnings.apply(lambda x: 'red' if x < 0 else 'navy')
+        df.sort_values(['winnings', 'in_hnd'], ascending=[False, False], inplace=True)
+        print("1st df before plotting:\n", df, "\n")
+
+        shft_wid = 0.25
+        bar_width = 0.5
+        inv_width = 0.75
+        xs = list(range(1, len(df.Name) + 1))
+
+        plt.subplots(1, 2, figsize=(10, 3), dpi=100)
+
+        plt.subplot(1, 2, 1)
+        plt.bar(xs, df.winnings, width=inv_width, color='navy', label="Winnings")
+        plt.bar(xs, df.in_hnd, width=bar_width, color='red', label="Bets")
+
+        plt.title('Last Hand Hall of Fame (Shame?)')
+        plt.xticks(xs, df.Name.values)
+        plt.legend(loc="best")
+
+        ##################################
+        plt.subplot(1, 2, 2)
+        df = self.pandl_df.copy()
+        df['winnings'] = df.Stake - 500
+        df['colors'] = df.winnings.apply(lambda x: 'red' if x < 0 else 'navy')
+        df.sort_values('winnings', ascending=False, inplace=True)
+        print("2nd df before plotting:\n", df)
+
+        plt.bar(df.Name, df.winnings, color=df.colors)
+        plt.title("Tonight's P&L")
+        plt.tight_layout()
+
+        pwd = os.getcwd()
+        print(f'pwd: {pwd}')
+        self.pandl_chart_location = '/static/images/pandl_post_hand_' + \
+                                    str(self.hand_number) + '_round_' + str(self.betting_round_number) + '.png'
+        plt.savefig(pwd + self.pandl_chart_location)
         return
