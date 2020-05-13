@@ -62,6 +62,7 @@ class Dealer():
         # House keeping
         self.showdown = False
         self.players_waiting_to_enter = []
+        self.folded_players_list=[]
         self.dead_guys = []
         self.players_w_two_hands = 0
         self.players_w_one_hand = 0
@@ -125,6 +126,7 @@ class Dealer():
         # House keeping
         self.showdown = False
         self.dead_guys = []
+        self.folded_players_list=[]
         self.players_w_two_hands = 0
         self.players_w_one_hand = 0
         self.players_folded = 0
@@ -263,12 +265,12 @@ l1'''
 
     def check_which_players_are_folded(self, players):
         '''Accepts a list of player objects, compares remaining hands
-        to a completely folded hand and sets self.dead_guys to list of folded players'''
-        self.dead_guys = []
+        to a completely folded hand and sets self.folded_players_list=[] to list of folded players'''
+        self.folded_players_list = []
         for p in players:
             if all(x == 'folded' for x in p.hands):
-                self.dead_guys.append(p.p_nickname)
-        print(f"Folded players: {self.dead_guys}")
+                self.folded_players_list.append(p.p_nickname)
+        print(f"Folded players: {self.folded_players_list}")
         return
 
     def calc_hi_low_pots(self):

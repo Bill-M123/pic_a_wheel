@@ -11,7 +11,7 @@ from flask import Flask
 from flask import flash
 from flask import render_template
 from flask import request, session, redirect, url_for
-from flask_login import LoginManager
+from flask_login import LoginManager, logout_user
 #########################
 from flask_login import login_required, current_user
 #########################
@@ -202,6 +202,17 @@ def full_table():
 
     # Check for folded players
     dealer.check_which_players_are_folded(players)
+
+#################################################################
+    # Check if player has been removed:
+    if session['username'] in dealer.dead_guys:
+        dead_guy = dealer.dead_guys.pop(dealer.dead_guys.index(session['username']))
+        print(f"Deleteing cookie from {dead_guy}")
+        print(f"Remaining deadguys: {dealer.dead_guys}")
+        logout_user()
+        #session.clear()
+        return f"{dead_guy} has been removed from the game."
+#################################################################
 
     if dealer.showdown:
 
@@ -480,8 +491,9 @@ def full_table():
 
         else:
             sorry_message = f"Sorry.  {session['username']} is not currently welcome at this table, " +\
-                          "likely because you pooched your login (or you are trying to cheat.)  \n" +\
-                          "Please wait while we investigate."
+                          f"likely because you pooched your login, \n"+\
+                           f" negelcted to clear your cookies before starting, (or you are trying to cheat.)  \n\n" +\
+                          f"Please wait while we investigate."
             return sorry_message
 
 
@@ -592,14 +604,14 @@ def master_control():
             print(f"Found player_to_remove_flag:  {guy}")
             for p in players:
                 if guy == p.p_nickname:
-                    print(f"Players: {[p.p_nickname for p in players]}")
                     dead_guy = players.pop(players.index(p))
-                    dealer.dead_guys.append(dead_guy)
+                    dealer.dead_guys.append(dead_guy.p_nickname)
 
                     for pl in this_game.players_logged_in:
                         if pl.p_nickname == guy:
                             this_game.players_logged_in.pop(this_game.players_logged_in.index(pl))
                     print(f"Removed {guy} from players and players_logged_in")
+                    print(f"List of dead guys: {dealer.dead_guys}")
                     print(f"Remaining Players: {[p.p_nickname for p in players]}")
                     return redirect(url_for("master_control"))
 
@@ -821,5 +833,5 @@ def master_control():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
-    #app.run(debug=True)
+    #app.run(host='0.0.0.0', debug=True)
+    app.run(debug=True)
