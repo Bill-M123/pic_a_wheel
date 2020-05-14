@@ -43,6 +43,12 @@ class Player():
         self.declare_complete = False
         self.check_player_existence()
         self.old_bankroll = 500
+        self.bankroll2 = 0
+        self.total_winnings = 0
+        self.total_bets =0
+        self.evening_winnings = []
+        self.evening_bets = []
+        self.starting_funds = 0
 
     def reset_player_from_master_control(self):
         self.hands = [[], []]

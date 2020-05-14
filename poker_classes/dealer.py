@@ -50,6 +50,10 @@ class Dealer():
         self.active_player = 'No One'
 
         # Money variables
+        self.initial_player_funds = 500
+        self.total_funds_check = False
+
+        self.total_player_bankroll = 0
         self.bet_per_side = 0
         self.pot = 0
         self.high_pot = 0
@@ -76,6 +80,8 @@ class Dealer():
         self.pandl_chart_location = ''
         self.pandl_df = pd.DataFrame()
         self.done_scoring = False
+        self.low_hand_df = pd.DataFrame()
+        self.high_hand_df = pd.DataFrame()
 
 
         return
@@ -139,6 +145,8 @@ class Dealer():
         self.pandl_chart_location = ''
         self.pandl_df = pd.DataFrame()
         self.done_scoring = False
+        self.low_hand_df = pd.DataFrame()
+        self.high_hand_df = pd.DataFrame()
 
 
         return
@@ -270,7 +278,7 @@ l1'''
         for p in players:
             if all(x == 'folded' for x in p.hands):
                 self.folded_players_list.append(p.p_nickname)
-        print(f"Folded players: {self.folded_players_list}")
+        #print(f"Folded players: {self.folded_players_list}")
         return
 
     def calc_hi_low_pots(self):
@@ -532,7 +540,7 @@ l1'''
             tmp_df.loc[tmp_df.Name.isin(winning_names), 'Winnings'] = tmp_df.loc[tmp_df.Name.isin(
                 winning_names), 'Winnings'] + 5
 
-        print("Winnings\n", tmp_df, "\n")
+        #print("calc_winnings: Winnings\n", tmp_df, "\n")
         return tmp_df
 
     def get_high_low_hands(self, players):
@@ -647,10 +655,10 @@ l1'''
 
     def convert_value_hand_to_display(self, hand):
         if hand == ['folded']:
-            print(f"Hand folded.  Returning: {hand}")
+            #print(f"Hand folded.  Returning: {hand}")
             return hand
         if hand == 'folded':
-            print(f"Hand folded.  Returning: {hand}")
+            #print(f"Hand folded.  Returning: {hand}")
             return hand
         new_hand = []
         for c in hand:
@@ -740,6 +748,7 @@ l1'''
             player.this_round_per_side += (action_price)
             player.in_pot += (action_price) * player.num_hands
             player.in_pot_this_round += (action_price) * player.num_hands
+            player.evening_bets.append(action_price * player.num_hands)
 
 
 
@@ -761,6 +770,7 @@ l1'''
             player.this_round_per_side = player.this_round_per_side + (action_price + da_raise)
             player.in_pot += (action_price + da_raise) * player.num_hands
             player.in_pot_this_round += (action_price + da_raise) * player.num_hands
+            player.evening_bets.append((action_price + da_raise) * player.num_hands)
 
         # check for end of round
         if (self.last_raise == self.new_betting_order[0].p_nickname) and (self.check_count > 0):
@@ -840,33 +850,45 @@ l1'''
 
         pl = []
         for i, p in enumerate(players):
-            print("Pre fail High_hand_df\n",high_hand_df)
+            winnings_h = 0
+            winnings_l = 0
+
+
             try:
                 winnings_h = high_hand_df.loc[high_hand_df.Name == p.p_nickname, "Winnings"].values[0]
             except:
+                print(f"{p.p_nickname} failed high_hand_df.  winnings_h remains 0\n", high_hand_df)
                 winnings_h = 0
-            print("Pre fail Low_hand_df\n", low_hand_df)
+
             try:
                 winnings_l = low_hand_df.loc[low_hand_df.Name == p.p_nickname, "Winnings"].values[0]
             except:
+                print(f"{p.p_nickname} failed low_hand_df.  winnings_l remains 0\n", high_hand_df)
                 winnings_l = 0
 
             winnings_t = winnings_h + winnings_l
 
-            pl.append([p.p_nickname, p.bankroll, p.in_pot, winnings_t])
+            # Assign winnings:
+            p.evening_winnings.append(winnings_t)
+            p_and_l = sum(p.evening_winnings) - sum(p.evening_bets)
+            print(f"{p.p_nickname} Evening_bets {p.evening_bets} Evening_winnings {p.evening_winnings}")
 
-        self.pandl_df = pd.DataFrame(columns=["Name", "Stake", "in_hnd", "winnings"], data=pl)
+            pl.append([p.p_nickname, p.bankroll, p.in_pot, winnings_t,p_and_l])
+
+        self.pandl_df = pd.DataFrame(columns=["Name", "Stake", "in_hnd", "winnings","p_and_l"], data=pl)
         return
 
     def add_winnings_to_bankroll(self, players):
         for i, p in enumerate(players):
             try:
-                winnings = self.pandl_df.loc[self.pandl_df['Name'] == p.p_nickname, 'winnings'].values[0]
+                winnings = self.pandl_df.loc[self.pandl_df['Name'] == p.p_nickname, 'winnings'].values[0].sum()
                 print(f"{p.p_nickname} winnings: {winnings}")
             except:
-                print(f"Failed to add winnings: {p.p_nickname}")
+                print(f"{p.p_nickname} Failed to add winnings: {p.p_nickname}")
                 winnings = 0
+
             p.bankroll += winnings
+            #p.evening_winnings.append(winnings)
             players[i] = p
         return
 
@@ -880,7 +902,7 @@ l1'''
 
         df['colors'] = df.winnings.apply(lambda x: 'red' if x < 0 else 'navy')
         df.sort_values(['winnings', 'in_hnd'], ascending=[False, False], inplace=True)
-        print("1st df before plotting:\n", df, "\n")
+
 
         shft_wid = 0.25
         bar_width = 0.5
@@ -900,12 +922,12 @@ l1'''
         ##################################
         plt.subplot(1, 2, 2)
         df = self.pandl_df.copy()
-        df['winnings'] = df.Stake - 500
-        df['colors'] = df.winnings.apply(lambda x: 'red' if x < 0 else 'navy')
-        df.sort_values('winnings', ascending=False, inplace=True)
-        print("2nd df before plotting:\n", df)
+        #df['winnings'] = df.Stake - 500
+        df['colors'] = df.p_and_l.apply(lambda x: 'red' if x < 0 else 'navy')
+        df.sort_values('p_and_l', ascending=False, inplace=True)
+        print("df before plotting p&l, plotting p_and_l column:\n", df)
 
-        plt.bar(df.Name, df.winnings, color=df.colors)
+        plt.bar(df.Name, df.p_and_l, color=df.colors)
         plt.title("Tonight's P&L")
         plt.tight_layout()
 

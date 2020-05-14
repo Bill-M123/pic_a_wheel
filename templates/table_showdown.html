@@ -370,20 +370,28 @@
         <tr>
             <th>Player</th>
             <th style="width:20px"></th>
-            <th>Last Bankroll</th>
-            <th style="width:20px"></th>
             <th>Bankroll</th>
+            <th style="width:20px"></th>
+            <th>Ante/Bets</th>
+            <th style="width:20px"></th>
+            <th>Winnings</th>
         </tr>
         {% for p in players %}
         <tr>
             <td>{{p.p_nickname}}</td>
             <td style="width:20px"></td>
-            <td>{{p.old_bankroll}}</td>
+            <td>{{p.bankroll2}}</td>
             <td style="width:20px"></td>
-            <td>{{p.bankroll}}</td>
+            <td>{{p.total_bets}}</td>
+            <td style="width:20px"></td>
+            <td>{{p.total_winnings}}</td>
         </tr>
+
         {% endfor %}
         </table>
+        <p>
+            Total player bankroll: {{dealer.total_player_bankroll}}.  Total_funds_check: {{dealer.total_funds_check}}
+        </p>
     </div>
 </div> <!-- the_whole_window -->
 </body>

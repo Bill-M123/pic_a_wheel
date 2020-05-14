@@ -108,9 +108,11 @@ smith = Player(player_dir, name='Walt Smith', nickname='Walt')
 
 possible_players = [alba, bornstein, brian, clyde, degroot, ed, jeff,
                     judogi, tardie, bart, smith]
-starting_funds=500
+
+# starting_funds = dealer.initial_player_funds
 for i,p in enumerate(possible_players):
-    p.bankroll += starting_funds
+    p.bankroll += dealer.initial_player_funds
+    p.starting_funds = dealer.initial_player_funds
     possible_players[i]=p
 
 players = [alba, bornstein, clyde, brian, ed]
@@ -230,17 +232,18 @@ def full_table():
             players[i] = p
 
 
-
         # Evaluate hands for showdown
         declared_high,declared_low = dealer.get_high_low_hands(players)
         high_hand_df, trash_high = dealer.evaluate_all_hands(declared_high)
         trash_low, low_hand_df = dealer.evaluate_all_hands(declared_low)
+
 
         # Check for everyone going the same way:
         try:
             name_check = high_hand_df['Name'][0]
         except:
             name_check='No One'
+
         if name_check == 'No One':
             print("high side found no one.")
             dealer.low_pot += dealer.high_pot
@@ -256,26 +259,64 @@ def full_table():
             dealer.high_pot += dealer.low_pot
             dealer.low_pot = 0
 
-        high_hand_df = dealer.calc_winnings(high_hand_df,dealer.high_pot)
-        low_hand_df = dealer.calc_winnings(low_hand_df,dealer.low_pot)
+        #high_hand_df = dealer.calc_winnings(high_hand_df,dealer.high_pot)
+        #low_hand_df = dealer.calc_winnings(low_hand_df,dealer.low_pot)
 
-        # Make round and nightly scores
-        dealer.make_pandl_df(players, high_hand_df, low_hand_df)
-        print("dealer.pandl_df:\n",dealer.pandl_df,"\n")
 
         if not dealer.done_scoring:
+        ###########
+            print(f"{session['username']}")
+            print("high hand")
+            high_hand_df = dealer.calc_winnings(high_hand_df, dealer.high_pot)
+            print("low hand")
+            low_hand_df = dealer.calc_winnings(low_hand_df, dealer.low_pot)
+            dealer.high_hand_df = high_hand_df
+            dealer.low_hand_df = low_hand_df
+
+            # Make round and nightly scores
+            dealer.make_pandl_df(players, high_hand_df, low_hand_df)
+            print(f"dealer.done_scoring = {dealer.done_scoring} dealer.pandl_df:\n", dealer.pandl_df, "\n")
+            print(f"Calculate bankroll2,total_winnings,total_bets")
             for i,p in enumerate(players):
                 p.old_bankroll=p.bankroll
-                players[i]=p
+
+                ## Calculate post hand bankroll
+                p.total_winnings = sum(p.evening_winnings)
+                p.total_bets = sum(p.evening_bets)
+
+                p.bankroll2 = p.starting_funds + p.total_winnings - p.total_bets
+                print(p.p_nickname,p.bankroll2,p.total_winnings,p.total_bets)
+                players[i] = p
 
             dealer.add_winnings_to_bankroll(players)
+
+            print("\nPost add_winnings:")
+            print(f"Show bankroll2,total_winnings,total_bets")
+            for i, p in enumerate(players):
+                print(p.p_nickname, p.bankroll2, p.total_winnings, p.total_bets)
+
             dealer.make_summary_plots(players)
+            print("\nPost make_summary_plots:")
+            print(f"Show bankroll2,total_winnings,total_bets")
+            for i, p in enumerate(players):
+                print(p.p_nickname, p.bankroll2, p.total_winnings, p.total_bets)
+
             dealer.done_scoring = True
             print("done with plot")
+            print(f"dealer.done_scoring = {dealer.done_scoring} dealer.pandl_df:\n", dealer.pandl_df, "\n")
+
+            dealer.total_player_bankroll = 0
+            for i, p in enumerate(players):
+                dealer.total_player_bankroll += p.bankroll2
+
+            if (dealer.total_player_bankroll % dealer.initial_player_funds == 0):
+                dealer.total_funds_check =True
+            else:
+                dealer.total_funds_check = False
 
         return render_template('table_showdown.html', dealer=dealer,
-                               players=new_players,high_hand_df=high_hand_df,
-                               low_hand_df=low_hand_df)
+                               players=new_players,high_hand_df=dealer.high_hand_df,
+                               low_hand_df=dealer.low_hand_df)
 
     # Betting Complete housekeeping, make round summary
     if dealer.betting_complete:
@@ -595,6 +636,7 @@ def master_control():
             for p in dealer.players_waiting_to_enter:
                 dealer.insert_new_player(players, p)
             dealer.players_waiting_to_enter = []
+            form.seat_new_players.data = False
             return render_template('master_control.html', form=form, name='Bornstein',
                                    players=players, this_game=this_game, dealer=dealer)
         # Remove Player
@@ -792,19 +834,21 @@ def master_control():
                 players[i]=p
                 return redirect(url_for('master_control'))
 
-        if new_deal and ~dealer.deal_complete:
+        if new_deal and not dealer.deal_complete:
             dealer.reset_table(players, this_game)
             shuffled = dealer.deal_cards(players, this_game)
             for i,p in enumerate(players):
                 p.bankroll -= 10 #automatic ante
                 p.in_pot += 10 #automatic ante
+                p.evening_bets.append(10)
+
                 players[i] = p
                 dealer.pot += 10
 
 
             dealer.deal_complete = True
             dealer.first_deal = False
-            form.new_deal.data = False
+            form.new_deal.data = True
             dealer.players_w_two_hands = len(players)
             dealer.calc_hi_low_pots()
 
