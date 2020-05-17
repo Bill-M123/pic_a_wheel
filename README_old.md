@@ -1,18 +1,18 @@
 # Status
 
-Currently Running tenth_deal.py:  This has the following fixes:
+Currently Running ninth_deal.py:  This is the version played last Thursday
 
-Fixes:  
-
-Remove player working correctly.
-
-Scoring on a hand basis working correctly.
-
-Declare list dynamic and displayed for all to see.
+Fixes:  Dealer Rotation Added, login problem fixed
 
 requirments: unchanged
 
-mastercontrols changes.  None.
+mastercontrols changes.  Reordered to reflect what really has to happen
+multiple changes to fifth_deal.py, to active player.html, and dealer.py to allow for cehcking through hand to work, summary page at end of round to be rendered, summary bets to be displayed on player pages.
+
+Note: refresh rate set to every 2 seconds for testing.  a little slow, but worth it.
+Active and inactive player controls switching correctly.
+
+Still a small logic problem in betting.  Calls and bets require checking through hand after betting is done.
 
 
 ## Working pages:
@@ -26,8 +26,6 @@ active player
 inactive player.
 
 declare/declare_wait_state
-
-hand show_down
 
 ## Working Functions:
 
@@ -50,7 +48,7 @@ master_control:  everything but evaluate hands
 
 From the command line, run test program with:
 
-## python tenth_deal.py
+## python fifth_deal.py
 
 
 

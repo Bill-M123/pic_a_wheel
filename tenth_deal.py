@@ -313,7 +313,7 @@ def full_table():
                 dealer.total_funds_check =True
             else:
                 dealer.total_funds_check = False
-
+                
         print("dealer.cumm_pandl_df\n",dealer.cumm_pandl_df)
         rolling_df=dealer.cumm_pandl_df.pivot_table(index='Name',values='p_and_l',aggfunc='sum')
         rolling_df.reset_index(drop=False,inplace=True)
@@ -364,24 +364,27 @@ def full_table():
         if p.p_nickname == session['username']:
             this_guy = p
 
-    # this_guy declare is not done
+
     if dealer.declare_open:
         print(f"Declare open, {this_guy.p_nickname} trying to play.")
         print(f"His declare flag is: {this_guy.declare_complete}")
-
-    if dealer.declare_open and not this_guy.declare_complete:
         this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
         this_player = dealer.make_your_hand_display_cards(this_player)
-        # return render_template('player_base_table_declare.html', dealer=dealer,
-        # players=players, this_player=this_player, form=form)
-        return redirect(url_for("declare"))
 
-    # this_guy declare is done
-    if dealer.declare_open and this_guy.declare_complete:
-        this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
-        this_player = dealer.make_your_hand_display_cards(this_player)
-        return render_template('player_base_table_declare_wait_state.html', dealer=dealer,
-                               players=players, this_player=this_player, form=form)
+        # this_guy declare is not done
+        if not this_guy.declare_complete:
+            return redirect(url_for("declare"))
+
+        # this_guy declare is done
+        if this_guy.declare_complete:
+
+            dealer.players_not_declared=[]
+            for p in players:
+                if not p.declare_complete:
+                    dealer.players_not_declared.append(p.p_nickname)
+
+            return render_template('player_base_table_declare_wait_state.html', dealer=dealer,
+                                   players=players, this_player=this_player, form=form)
 
     # Active player form processing
     if session['username'] == dealer.active_player:
@@ -884,5 +887,5 @@ def master_control():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
-    #app.run(debug=True)
+    #app.run(host='0.0.0.0', debug=True)
+    app.run(debug=True)

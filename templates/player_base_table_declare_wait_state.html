@@ -83,6 +83,10 @@
                 {% endfor %}
 
             </table>
+            <h4>Waiting for:</h4>
+            {% for p in dealer.players_not_declared%}
+            <h1>{{p}}</h1>
+            {% endfor %}
         </div>
 
         <div class="common_card_div">

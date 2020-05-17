@@ -48,6 +48,7 @@ class Player():
         self.total_bets =0
         self.evening_winnings = []
         self.evening_bets = []
+        self.p_and_l = 0
         self.starting_funds = 0
 
     def reset_player_from_master_control(self):

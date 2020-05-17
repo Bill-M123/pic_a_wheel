@@ -32,11 +32,11 @@
             <table class="jumbotron">
 
                 <tr>
-                    <th style="width: 10px"></th>
+                    <td style="width: 10px"></td>
                     <th>Name</th>
-                    <th style="width: 10px"></th>
+                    <td style="width: 10px"></td>
                     <th>Hand 1</th>
-                    <th style="width:10px"></th>
+                    <td style="width:10px"></td>
                     <th>Comm.</th>
                     <th style="width:10px"></th>
                     <th>Hand 2</th>
@@ -375,19 +375,25 @@
             <th>Ante/Bets</th>
             <th style="width:20px"></th>
             <th>Winnings</th>
+            <th style="width:20px"></th>
+            <th>P&L</th>
         </tr>
-        {% for p in players %}
+
+        {% for i in rolling_df.index %}
         <tr>
-            <td>{{p.p_nickname}}</td>
+            <td>{{rolling_df['Name'][i]}}</td>
             <td style="width:20px"></td>
-            <td>{{p.bankroll2}}</td>
+            <td>{{rolling_df['p_and_l'][i]+500 }}</td>
             <td style="width:20px"></td>
-            <td>{{p.total_bets}}</td>
+            <td>?</td>
             <td style="width:20px"></td>
-            <td>{{p.total_winnings}}</td>
+            <td>?</td>
+            <td style="width:20px"></td>
+            <td>{{rolling_df['p_and_l'][i] }}</td>
         </tr>
 
         {% endfor %}
+
         </table>
         <p>
             Total player bankroll: {{dealer.total_player_bankroll}}.  Total_funds_check: {{dealer.total_funds_check}}
