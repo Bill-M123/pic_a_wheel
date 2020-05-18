@@ -33,7 +33,7 @@
         <form method="POST">
             {{form.hidden_tag() }}
                 <table class="center">
-                  <tr><th>Player Controls (indiv reset)</th></tr>
+                  <tr><th>Player/Table Controls (indiv reset)</th></tr>
                   <tr class="mc_player_controls">
                       <td>
                         <label for="player_to_remove">Player to Remove</label>
@@ -57,13 +57,14 @@
                       <td style="width: 10px"></td>
                       <td>{{form.rotate_dealer}}</td>
                   </tr>
-
-                  <th>Hand Controls</th>
-                  <tr class="mc_hand_controls">
+                  <tr class="mc_player_controls">
                       <td>{{form.reset_table.label}}</td>
                       <td style="width: 10px"></td>
                       <td>{{form.reset_table}}</td>
                   </tr>
+
+                  <th>Hand Controls</th>
+
                   <tr class="mc_hand_controls">
                       <td>{{form.new_deal.label}}</td>
                       <td style="width: 10px"></td>

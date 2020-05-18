@@ -23,7 +23,6 @@
             src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 </head>
 
-
 <div>
 
 {% if players == [] %}
@@ -36,11 +35,27 @@
 </div>
 
 {% elif this_player.p_nickname in dealer.waiting_names %}
-<div class="jumbotron center">
-    <h1 class='center'>{{this_player.p_nickname}} welcome to the:</h1>
-    <IMG SRC="static/images/waiting_room.jpg" ALT="Just wait" style="width:50%">
-</div>
+<div class="waiting_screen">
+  {% if not dealer.hand_in_progress %}
 
+    <div class="jumbotron center">
+        <h1 class='center'>{{this_player.p_nickname}} welcome to the:</h1>
+        <IMG SRC="static/images/waiting_room.jpg" ALT="Just wait" class="waiting_image">
+    </div>
+
+  {% else %}
+  <div class="waiting_screen">
+  <div class="jumbotron center">
+      <h1 class='center'>{{this_player.p_nickname}} welcome to the sin bin.</h1>
+      <IMG SRC="static/images/waiting_room_4.jpg" ALT="Just wait" class="waiting_image">
+      <p>You are not currently welcome at this table, likely because you pooched
+        your login, negelcted to clear your cookies before starting, 
+        were late to the game, (or you are trying to cheat.)</p>
+      <h1>Please wait while  we investigate."</h1>
+  </div>
+
+  {% endif %}
+</div><!--Waiting screen-->
 {% else %}
 <div class="the_whole_window">
 

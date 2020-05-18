@@ -67,6 +67,7 @@ class Dealer():
         # House keeping
         self.showdown = False
         self.players_waiting_to_enter = []
+        self.hand_in_progress = False
         self.waiting_names=[]
         self.folded_players_list = []
         self.dead_guys = []
@@ -98,6 +99,7 @@ class Dealer():
         self.deal_complete = False
         self.dealer_position = 0
         self.hand_number += 1
+
 
         # Card Variables
         self.common_cards = []  # Will have separate lists for each flip
@@ -150,6 +152,7 @@ class Dealer():
         self.done_scoring = False
         self.low_hand_df = pd.DataFrame()
         self.high_hand_df = pd.DataFrame()
+        self.hand_in_progress = False
 
         return
 

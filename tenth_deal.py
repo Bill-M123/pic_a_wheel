@@ -757,7 +757,6 @@ def master_control():
             return render_template('master_control.html', form=form, name='Bornstein',
                                    players=players, this_game=this_game, dealer=dealer)
 
-
         declare_open = form.declare_open.data
         if declare_open:
             dealer.declare_open = True
@@ -794,6 +793,7 @@ def master_control():
         evaluate_now = form.evaluate_now.data
         if evaluate_now:
             dealer.showdown = True
+            dealer.hand_in_progress = False
             dealer.active_player = 'No one'
 
         submit_value = form.submit.data
@@ -835,7 +835,6 @@ def master_control():
                 dealer.betting_rounds[i] = True
                 dealer.betting_complete = False
 
-
     if (session['username'] == 'Bornstein') or (session['username'] == 'Clyde'):
         name = session['username']
 
@@ -865,6 +864,7 @@ def master_control():
 
         if new_deal and not dealer.deal_complete:
             dealer.reset_table(players, this_game)
+            dealer.hand_in_progress = True
             shuffled = dealer.deal_cards(players, this_game)
             for i,p in enumerate(players):
                 p.bankroll -= 10 #automatic ante
@@ -873,7 +873,6 @@ def master_control():
 
                 players[i] = p
                 dealer.pot += 10
-
 
             dealer.deal_complete = True
             dealer.first_deal = False
@@ -895,15 +894,11 @@ def master_control():
             dealer.active_player = tmp.p_nickname
             print(f"Active Player: {dealer.active_player}")
 
-
-
-
         return render_template('master_control.html', form=form, name=name,
                                players=players, this_game=this_game, dealer=dealer)
 
     else:
         return f"You are not Bornstein or Clyde, Fuck Off!"
-
 
 if __name__ == '__main__':
     #app.run(host='0.0.0.0', debug=True)

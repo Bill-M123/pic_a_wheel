@@ -4,7 +4,9 @@ Currently Running tenth_deal.py:  This has the following fixes:
 
 Fixes:  
 
-Remove player working correctly.
+Remove player working correctly.  Provided the player hits home page, there is no case where the player can't be brought back in.
+
+Logins:  Three separate cases dealt with: player arrives and is seated in first wave of players, player arrives before hand in progress, player arrives while hand in progress. Separate images and messages are displayed.
 
 Scoring on a hand basis working correctly.
 
@@ -12,11 +14,9 @@ Cummulative scoring working correctly.
 
 Declare list dynamic and displayed for all to see.
 
-A new message/holding page for players in waiting room.
-
 requirments: unchanged
 
-mastercontrols changes.  None.
+mastercontrols changes.  Reset Table moved to Table/Player
 
 
 ## Working pages:
