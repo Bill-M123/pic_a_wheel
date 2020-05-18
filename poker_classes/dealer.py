@@ -67,6 +67,7 @@ class Dealer():
         # House keeping
         self.showdown = False
         self.players_waiting_to_enter = []
+        self.waiting_names=[]
         self.folded_players_list = []
         self.dead_guys = []
         self.players_w_two_hands = 0

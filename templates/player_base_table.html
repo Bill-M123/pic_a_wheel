@@ -27,9 +27,18 @@
 <div>
 
 {% if players == [] %}
+<div class="the_whole_window">
+
 <div class="jumbotron center">
     <h1 class="center">Please Wait.</h1>
     <IMG SRC="static/images/waiting-meme.png" ALT="waiting" style="width:50%">
+</div>
+</div>
+
+{% elif this_player.p_nickname in dealer.waiting_names %}
+<div class="jumbotron center">
+    <h1 class='center'>{{this_player.p_nickname}} welcome to the:</h1>
+    <IMG SRC="static/images/waiting_room.jpg" ALT="Just wait" style="width:50%">
 </div>
 
 {% else %}
@@ -283,7 +292,7 @@
                       <td>{{dealer.low_hands}}</td>
                   </tr>
                 {% endif %}
-                
+
             </table>
 
         </div>

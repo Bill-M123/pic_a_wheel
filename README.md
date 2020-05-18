@@ -8,7 +8,11 @@ Remove player working correctly.
 
 Scoring on a hand basis working correctly.
 
+Cummulative scoring working correctly.
+
 Declare list dynamic and displayed for all to see.
+
+A new message/holding page for players in waiting room.
 
 requirments: unchanged
 

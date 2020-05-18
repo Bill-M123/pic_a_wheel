@@ -175,6 +175,8 @@ def login():
                 for guy in possible_players:
                     if guy.p_nickname == session['username']:
                         dealer.players_waiting_to_enter.append(guy)
+                        dealer.waiting_names=[x.p_nickname for x in dealer.players_waiting_to_enter]
+
                         this_game.players_logged_in.append(guy)
                         print(f"Players logged in: {[p.p_nickname for p in this_game.players_logged_in]}")
                         # return f"Hello {guy.p_nickname}.  Thank-you for logging in.  Please wait patiently."
@@ -313,7 +315,7 @@ def full_table():
                 dealer.total_funds_check =True
             else:
                 dealer.total_funds_check = False
-                
+
         print("dealer.cumm_pandl_df\n",dealer.cumm_pandl_df)
         rolling_df=dealer.cumm_pandl_df.pivot_table(index='Name',values='p_and_l',aggfunc='sum')
         rolling_df.reset_index(drop=False,inplace=True)
@@ -540,12 +542,23 @@ def full_table():
             return render_template('player_base_table.html', dealer=dealer,
                                    players=players, this_player=this_player)
 
+        elif (session['username'] in dealer.waiting_names):
+            for p in this_game.players_logged_in:
+                if p.p_nickname == session['username']:
+                    this_player=p
+                    this_player.expect_long_wait=True
+
+            return render_template('player_base_table.html', dealer=dealer,
+                                   players=players, this_player=this_player)
+
         else:
             sorry_message = f"Sorry.  {session['username']} is not currently welcome at this table, " +\
                           f"likely because you pooched your login, \n"+\
                            f" negelcted to clear your cookies before starting, (or you are trying to cheat.)  \n\n" +\
-                          f"Please wait while we investigate."
+                          f"Please wait while  we investigate."
             return sorry_message
+
+
 
 
 @app.route('/declare', methods=['GET', 'POST'])
@@ -645,7 +658,13 @@ def master_control():
 
             for p in dealer.players_waiting_to_enter:
                 dealer.insert_new_player(players, p)
+                for i,pl in enumerate(players):
+                    if pl.p_nickname == p.p_nickname:
+                        p.expect_long_wait=False
+                        players[i]=p
+
             dealer.players_waiting_to_enter = []
+            dealer.waiting_names = []
             form.seat_new_players.data = False
             return render_template('master_control.html', form=form, name='Bornstein',
                                    players=players, this_game=this_game, dealer=dealer)

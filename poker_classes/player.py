@@ -50,6 +50,7 @@ class Player():
         self.evening_bets = []
         self.p_and_l = 0
         self.starting_funds = 0
+        self.expect_long_wait = False
 
     def reset_player_from_master_control(self):
         self.hands = [[], []]
