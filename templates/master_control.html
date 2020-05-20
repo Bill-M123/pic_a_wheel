@@ -47,6 +47,21 @@
                       <td style="width: 10px"></td>
                       <td>{{form.remove_player}}</td>
                 </tr>
+
+                <tr class="mc_player_controls">
+                    <td>
+                      <label for="player_to_fold">Player to Fold</label>
+                      <select id="player_to_fold" name='player_to_fold' value='No One' default = 'No One'>
+                          <option value="No One">No One</option>
+                          {% for p in dealer.new_betting_order %}
+                        <option value={{p.p_nickname}}>{{p.p_nickname}}</option>
+                          {% endfor %}
+                      </select>
+                    </td>
+                    <td style="width: 10px"></td>
+                    <td>{{form.fold_player}}</td>
+                </tr>
+
                   <tr class="mc_player_controls">
                     <td>{{form.seat_new_players.label}}</td>
                     <td style="width: 10px"></td>

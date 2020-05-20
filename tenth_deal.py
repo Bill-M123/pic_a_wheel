@@ -5,6 +5,7 @@ import datetime as dt
 import os
 import time
 from itertools import combinations
+import gc
 
 import pandas as pd
 from flask import Flask
@@ -49,6 +50,7 @@ class MasterControlForm(FlaskForm):
 
     seat_new_players = BooleanField(label="Seat new Players", default=False)
     remove_player = BooleanField(label="Remove Player", default=False)
+    fold_player = BooleanField(label="Fold Player", default=False)
 
     winnings_l1 = IntegerField(label='Low_1',default=0)
     winnings_l2 = IntegerField(label='Low_2', default=0)
@@ -214,7 +216,6 @@ def full_table():
         print(f"Deleteing cookie from {dead_guy}")
         print(f"Remaining deadguys: {dealer.dead_guys}")
         logout_user()
-        #session.clear()
         return f"{dead_guy} has been removed from the game."
 #################################################################
 
@@ -308,18 +309,26 @@ def full_table():
             print(f"dealer.done_scoring = {dealer.done_scoring} dealer.pandl_df:\n", dealer.pandl_df, "\n")
 
             dealer.total_player_bankroll = 0
-            for i, p in enumerate(players):
-                dealer.total_player_bankroll += p.bankroll2
+            #for i, p in enumerate(players):
+            #    dealer.total_player_bankroll += p.bankroll2
 
-            if (dealer.total_player_bankroll % dealer.initial_player_funds == 0):
-                dealer.total_funds_check =True
-            else:
-                dealer.total_funds_check = False
+            #if (dealer.total_player_bankroll % dealer.initial_player_funds == 0):
+            #    dealer.total_funds_check =True
+            #else:
+            #    dealer.total_funds_check = False
 
         print("dealer.cumm_pandl_df\n",dealer.cumm_pandl_df)
         rolling_df=dealer.cumm_pandl_df.pivot_table(index='Name',values='p_and_l',aggfunc='sum')
         rolling_df.reset_index(drop=False,inplace=True)
         rolling_df=rolling_df.sort_values('p_and_l',ascending=False)
+
+        #### Total_funds_check
+        dealer.total_player_bankroll=rolling_df['p_and_l'].sum()+500*len(players)
+        if (dealer.total_player_bankroll % dealer.initial_player_funds == 0):
+            dealer.total_funds_check =True
+        else:
+            dealer.total_funds_check = False
+        ####
 
         return render_template('table_showdown.html', dealer=dealer,
                                players=new_players,high_hand_df=dealer.high_hand_df,
@@ -335,7 +344,17 @@ def full_table():
                 p.hands_by_round.append(p.num_hands)
                 p.in_pot_by_round.append(p.in_pot_this_round)
                 p.in_pot_this_round = 0
+
+                ## Calculate post round bankroll
+                p.total_winnings = sum(p.evening_winnings)
+                print(f"{p.p_nickname} evening_winnings:{p.evening_winnings} tot:{p.total_winnings}")
+                p.total_bets = sum(p.evening_bets)
+                print(f"{p.p_nickname} evening_bets:{p.evening_bets} tot:{p.total_bets}")
+                p.bankroll2 = p.starting_funds + p.total_winnings - p.total_bets
+                print(p.p_nickname,"roll: ",p.bankroll2,"win: ",p.total_winnings,"bets: ",p.total_bets)
+
                 players[i] = p
+
             dealer.made_round_summary = True
             dealer.make_hand_plot(players)
             return redirect(url_for("full_table"))
@@ -382,7 +401,7 @@ def full_table():
 
             dealer.players_not_declared=[]
             for p in players:
-                if not p.declare_complete:
+                if (not p.declare_complete) and (p.in_hand):
                     dealer.players_not_declared.append(p.p_nickname)
 
             return render_template('player_base_table_declare_wait_state.html', dealer=dealer,
@@ -399,6 +418,7 @@ def full_table():
                 new_players.append(p.reset_player_from_master_control())
             players = new_players
             dealer.reset_table(players, this_game)
+            gc.collect()
 
             hand1_kf = 'keep'
             hand2_kf = 'keep'
@@ -686,6 +706,25 @@ def master_control():
                     print(f"Remaining Players: {[p.p_nickname for p in players]}")
                     return redirect(url_for("master_control"))
 
+        # Fold Player
+        fold_player_flag = form.fold_player.data
+        if fold_player_flag:
+            guy = request.form.get("player_to_fold")
+            print(f"Found player_to_fold_flag:  {guy}")
+            for p in players:
+                if guy == p.p_nickname:
+                    print(f"self.new_betting_order: {dealer.new_betting_order}")
+                    dealer.force_fold_player(guy,players)
+
+                    print(f"Folded {guy} from hand")
+                    print(f"Now the active player is: {dealer.active_player}")
+                    print(f"Betting Order: {[p.p_nickname for p in dealer.new_betting_order]}")
+
+            form.fold_player.data = False
+            name=session['username']
+            return render_template('master_control.html', form=form, name=name,
+                                           players=players, this_game=this_game, dealer=dealer)
+
         distribute_winnings_flag = form.distribute_winnings.data
         if distribute_winnings_flag:
             guy_l1 = request.form.get("winner_l1")
@@ -760,6 +799,12 @@ def master_control():
         declare_open = form.declare_open.data
         if declare_open:
             dealer.declare_open = True
+            dealer.check_which_players_are_folded(players)
+            for fp in dealer.folded_players_list:
+                for i,p in enumerate(players:
+                    if p.p_nickname == fp:
+                        p.declare_complete = True
+                        players[i] = p
 
         declare_closed = form.declare_closed.data
         if declare_closed:
@@ -777,7 +822,7 @@ def master_control():
             dealer.active_player = 'No One'
 
             if dealer.calc_highs_lows:
-                for p in players:
+                for i,p in enumerate(players):
                     for h in p.hands_hi_lo:
                         if h == 'high':
                             dealer.high_hands +=1

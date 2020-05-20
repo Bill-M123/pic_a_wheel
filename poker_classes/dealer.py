@@ -802,6 +802,29 @@ l1'''
 
         return new_player_list
 
+    def force_fold_player(self,p_name,players):
+        '''Accept a player name, set both hands and hands_pr to folded,
+        set common and common_pr to ['folded']
+        set new betting new_order
+        set new active player.'''
+        for i,p in enumerate(players):
+            if p.p_nickname == p_name:
+                p.hands[0]='folded'
+                p.hands[1]='folded'
+                p.hands_pr[0]='folded'
+                p.hands_pr[1]='folded'
+                p.common_cards = ['folded']
+                p.common_cards_pr = ['folded']
+                p.in_hand = False
+                players[i]=p
+                self.new_betting_order = [x for x in self.new_betting_order if x.p_nickname != p_name]
+                print("New Betting Order in dealer.force_fold_player:")
+                print(f"{self.new_betting_order}")
+        tmp=self.new_betting_order[0]
+        self.active_player = tmp.p_nickname
+        return
+
+
     def make_hand_plot(self, players):
         '''Make betting round summary plot - Who is committed'''
         tmp = []

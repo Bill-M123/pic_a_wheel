@@ -4,6 +4,10 @@ Currently Running tenth_deal.py:  This has the following fixes:
 
 Fixes:  
 
+Fold player added and working correctly.
+
+Declare list dynamic and displayed for all to see.  Folded players do not have to declare.
+
 Remove player working correctly.  Provided the player hits home page, there is no case where the player can't be brought back in.
 
 Logins:  Three separate cases dealt with: player arrives and is seated in first wave of players, player arrives before hand in progress, player arrives while hand in progress. Separate images and messages are displayed.
@@ -11,8 +15,6 @@ Logins:  Three separate cases dealt with: player arrives and is seated in first 
 Scoring on a hand basis working correctly.
 
 Cummulative scoring working correctly.
-
-Declare list dynamic and displayed for all to see.
 
 requirments: unchanged
 

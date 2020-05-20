@@ -82,7 +82,7 @@
 
                     <td class="hand_play_box_r_show">
                     {% if p.p_nickname not in dealer.dead_guys %}
-
+                      {% if (p.common_cards_pr != 'folded')  %}
                         {% if p["common_cards_pr"][1] in ["\u2665","\u2666"] %}
                             <span class="your_cards_card_r_rnk">{{p["common_cards_pr"][0]}}</span>
                             <span class="your_cards_card_r_st">{{p["common_cards_pr"][1]}}</span>
@@ -90,6 +90,7 @@
                             <span class="your_cards_card_b_rnk">{{p["common_cards_pr"][0]}}</span>
                             <span class="your_cards_card_b_st">{{p["common_cards_pr"][1]}}</span>
                         {% endif %}
+                      {% endif %}
                     {% endif %}
                     </td>td
 
