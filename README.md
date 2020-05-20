@@ -1,6 +1,12 @@
 # Status
 
-Currently Running tenth_deal.py:  This has the following fixes:
+Proposed program for 5/21
+
+Lots of cosmetic changes.  If testing, pay attention to each page.  For example, coi shows active screen post declare done, scoring and cummulative bets and antes working on showdown page, card values converted to account for picture cards, etc.
+
+Additionally, showdow page should automatically revert to full_table on reset.
+
+Currently Running tenth_deal.py:  This has the following additional fixes:
 
 Fixes:  
 

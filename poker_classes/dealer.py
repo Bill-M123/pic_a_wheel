@@ -35,6 +35,9 @@ class Dealer():
         self.display_suits_dict = {'S': '\u2660', 'C': '\u2663', 'H': '\u2665', 'D': '\u2666', }
         self.display_rank_dict = {1: 'A', 11: 'J', 12: 'Q', 13: 'K', 2: 2, 3: 3, 4: 4, 5: 5, 6: 6,
                                   7: 7, 8: 8, 9: 9, 10: 10}
+        self.showdown_rank_dict = {'01': 'A', '11': 'J', '12': 'Q', '13': 'K', '02': '2',
+                                   '03': '3', '04': '4', '05': '5', '06': '6',
+                                  '07': '7', '08': '8', '09': '9', '10': '10','14':'A'}
 
         # Controls Added for betting rounds
         self.betting_round_number = 0
@@ -84,7 +87,9 @@ class Dealer():
         self.pandl_df = pd.DataFrame()
         self.done_scoring = False
         self.low_hand_df = pd.DataFrame()
+        self.low_hand_df_dis = pd.DataFrame()
         self.high_hand_df = pd.DataFrame()
+        self.high_hand_df_dis = pd.DataFrame()
         self.cumm_pandl_df = pd.DataFrame()
 
         return
@@ -151,7 +156,9 @@ class Dealer():
         self.pandl_df = pd.DataFrame()
         self.done_scoring = False
         self.low_hand_df = pd.DataFrame()
+        self.low_hand_df_dis = pd.DataFrame()
         self.high_hand_df = pd.DataFrame()
+        self.high_hand_df_dis = pd.DataFrame()
         self.hand_in_progress = False
 
         return
@@ -905,6 +912,25 @@ l1'''
 
         self.pandl_df = pd.DataFrame(columns=["Name", "Stake", "in_hnd", "winnings", "p_and_l"], data=pl)
         return
+
+    def adjust_hi_lo_show_down_displays(self):
+        '''Make copy of self.high_hand_df and self.low_hand_df, adjust for display'''
+        self.high_hand_df_dis=self.high_hand_df.copy()
+        self.low_hand_df_dis=self.low_hand_df.copy()
+
+        def make_adjust(x):
+            tmp=x.split('-')
+            tmp=[self.showdown_rank_dict[x] for x in tmp]
+            return '-'.join(tmp)
+
+        self.high_hand_df_dis['Card_Values'] =\
+            self.high_hand_df_dis['Card_Values'].apply(make_adjust)
+        self.low_hand_df_dis['Card_Values'] =\
+            self.low_hand_df_dis['Card_Values'].apply(make_adjust)
+
+        return
+
+
 
     def add_winnings_to_bankroll(self, players):
         for i, p in enumerate(players):

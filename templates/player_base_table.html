@@ -49,7 +49,7 @@
       <h1 class='center'>{{this_player.p_nickname}} welcome to the sin bin.</h1>
       <IMG SRC="static/images/waiting_room_4.jpg" ALT="Just wait" class="waiting_image">
       <p>You are not currently welcome at this table, likely because you pooched
-        your login, negelcted to clear your cookies before starting, 
+        your login, negelcted to clear your cookies before starting,
         were late to the game, (or you are trying to cheat.)</p>
       <h1>Please wait while  we investigate."</h1>
   </div>
@@ -330,7 +330,13 @@
                             {% else %}
                             <span class="your_cards_card_b_rnk">{{this_player["hands_pr"][0][0][0]}}</span>
                             <span class="your_cards_card_b_st">{{this_player["hands_pr"][0][0][1]}}</span>
-                            {% endif %},
+                            {% endif %}
+
+                            {% if this_player.hands_hi_lo[0]=="high" %}
+                            <span style="color: #777777; font-size:40px">&#9679;</span>
+                            {% elif this_player.hands[1]!="folded" %}
+                            {% endif %}
+
                             {% if this_player["hands_pr"][0][1][1] in ["\u2665","\u2666"] %}
                             <span class="your_cards_card_r_rnk">{{this_player["hands_pr"][0][1][0]}}</span>
                             <span class="your_cards_card_r_st">{{this_player["hands_pr"][0][1][1]}}</span>
@@ -368,7 +374,12 @@
                             {% else %}
                             <span class="your_cards_card_b_rnk">{{this_player["hands_pr"][1][0][0]}}</span>
                             <span class="your_cards_card_b_st">{{this_player["hands_pr"][1][0][1]}}</span>
-                            {% endif %},
+                            {% endif %}
+
+                            {% if this_player.hands_hi_lo[1]=="high" %}
+                            <span style="color: #777777; font-size:40px">&#9679;</span>
+                            {% elif this_player.hands[1]!="folded" %}
+                            {% endif %}
 
                             {% if this_player["hands_pr"][1][1][1] in ["\u2665","\u2666"] %}
                             <span class="your_cards_card_r_rnk">{{this_player["hands_pr"][1][1][0]}}</span>

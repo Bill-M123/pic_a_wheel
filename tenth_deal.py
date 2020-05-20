@@ -318,21 +318,27 @@ def full_table():
             #    dealer.total_funds_check = False
 
         print("dealer.cumm_pandl_df\n",dealer.cumm_pandl_df)
-        rolling_df=dealer.cumm_pandl_df.pivot_table(index='Name',values='p_and_l',aggfunc='sum')
-        rolling_df.reset_index(drop=False,inplace=True)
-        rolling_df=rolling_df.sort_values('p_and_l',ascending=False)
+        #rolling_df=dealer.cumm_pandl_df.pivot_table(index='Name',values='p_and_l',aggfunc='sum')
+        # rolling_df.reset_index(drop=False,inplace=True)
+        rolling_df = dealer.cumm_pandl_df.pivot_table(index='Name', values=["in_hnd", "winnings", "p_and_l"],
+                                           aggfunc='sum').reset_index(drop=False)
+        rolling_df = rolling_df.sort_values('p_and_l', ascending=False)
+        rolling_df.rename(columns={"in_hnd": "Ante/Bet", "winnings": "Winnings", "p_and_l": "Profit"},inplace=True)
+        rolling_df = rolling_df[["Name", "Ante/Bet", "Winnings", "Profit"]]
 
         #### Total_funds_check
-        dealer.total_player_bankroll=rolling_df['p_and_l'].sum()+500*len(players)
+        dealer.total_player_bankroll=rolling_df['Profit'].sum()+500*len(players)
         if (dealer.total_player_bankroll % dealer.initial_player_funds == 0):
             dealer.total_funds_check =True
         else:
             dealer.total_funds_check = False
         ####
 
+        dealer.adjust_hi_lo_show_down_displays()
+        dealer.active_player = "No one"
         return render_template('table_showdown.html', dealer=dealer,
-                               players=new_players,high_hand_df=dealer.high_hand_df,
-                               low_hand_df=dealer.low_hand_df,rolling_df=rolling_df)
+                               players=new_players,high_hand_df=dealer.high_hand_df_dis,
+                               low_hand_df=dealer.low_hand_df_dis,rolling_df=rolling_df)
 
     # Betting Complete housekeeping, make round summary
     if dealer.betting_complete:
@@ -801,7 +807,7 @@ def master_control():
             dealer.declare_open = True
             dealer.check_which_players_are_folded(players)
             for fp in dealer.folded_players_list:
-                for i,p in enumerate(players:
+                for i,p in enumerate(players):
                     if p.p_nickname == fp:
                         p.declare_complete = True
                         players[i] = p
