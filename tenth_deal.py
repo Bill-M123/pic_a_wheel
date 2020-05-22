@@ -269,62 +269,64 @@ def full_table():
         if not dealer.done_scoring:
         ###########
             print(f"{session['username']}")
-            print("high hand")
+
             high_hand_df = dealer.calc_winnings(high_hand_df, dealer.high_pot)
-            print("low hand")
+            print(f"hand: {dealer.hand_number} round: {dealer.betting_round_number} high hand")
+            print(high_hand_df)
+
             low_hand_df = dealer.calc_winnings(low_hand_df, dealer.low_pot)
+            print(f"hand: {dealer.hand_number} round: {dealer.betting_round_number} low hand")
+            print(low_hand_df)
+
             dealer.high_hand_df = high_hand_df
             dealer.low_hand_df = low_hand_df
 
             # Make round and nightly scores
             dealer.make_pandl_df(players, high_hand_df, low_hand_df)
             print(f"dealer.done_scoring = {dealer.done_scoring} dealer.pandl_df:\n", dealer.pandl_df, "\n")
-            print(f"Calculate bankroll2,total_winnings,total_bets")
-            for i,p in enumerate(players):
-                p.old_bankroll=p.bankroll
+           # print(f"Calculate bankroll2,total_winnings,total_bets")
+            #for i,p in enumerate(players):
+             #   p.old_bankroll=p.bankroll
 
                 ## Calculate post hand bankroll
-                p.total_winnings = sum(p.evening_winnings)
-                p.total_bets = sum(p.evening_bets)
+             #   p.total_winnings = sum(p.evening_winnings)
+             #   p.total_bets = sum(p.evening_bets)
 
-                p.bankroll2 = p.starting_funds + p.total_winnings - p.total_bets
-                print(p.p_nickname,p.bankroll2,p.total_winnings,p.total_bets)
-                players[i] = p
+             #   p.bankroll2 = p.starting_funds + p.total_winnings - p.total_bets
+             #   print(p.p_nickname,p.bankroll2,p.total_winnings,p.total_bets)
+             #   players[i] = p
 
-            dealer.add_winnings_to_bankroll(players)
+            # Test removing this line, done in make_p_and_l
+            #dealer.add_winnings_to_bankroll(players)
 
-            print("\nPost add_winnings:")
-            print(f"Show bankroll2,total_winnings,total_bets")
-            for i, p in enumerate(players):
-                print(p.p_nickname, p.bankroll2, p.total_winnings, p.total_bets)
+            #print("\nPost add_winnings:")
+            #print(f"Show bankroll2,total_winnings,total_bets")
+            #for i, p in enumerate(players):
+             #   print(p.p_nickname, p.bankroll2, p.total_winnings, p.total_bets)
 
             dealer.make_summary_plots(players)
             print("\nPost make_summary_plots:")
-            print(f"Show bankroll2,total_winnings,total_bets")
-            for i, p in enumerate(players):
-                print(p.p_nickname, p.bankroll2, p.total_winnings, p.total_bets)
 
             dealer.done_scoring = True
             print("done with plot")
             print(f"dealer.done_scoring = {dealer.done_scoring} dealer.pandl_df:\n", dealer.pandl_df, "\n")
 
             dealer.total_player_bankroll = 0
-            #for i, p in enumerate(players):
-            #    dealer.total_player_bankroll += p.bankroll2
-
-            #if (dealer.total_player_bankroll % dealer.initial_player_funds == 0):
-            #    dealer.total_funds_check =True
-            #else:
-            #    dealer.total_funds_check = False
 
         print("dealer.cumm_pandl_df\n",dealer.cumm_pandl_df)
-        #rolling_df=dealer.cumm_pandl_df.pivot_table(index='Name',values='p_and_l',aggfunc='sum')
-        # rolling_df.reset_index(drop=False,inplace=True)
-        rolling_df = dealer.cumm_pandl_df.pivot_table(index='Name', values=["in_hnd", "winnings", "p_and_l"],
-                                           aggfunc='sum').reset_index(drop=False)
+
+        #rolling_df = dealer.cumm_pandl_df.pivot_table(index='Name', values=["in_hnd", "winnings", "p_and_l"],
+        #                                   aggfunc='sum').reset_index(drop=False)
+
+        rolling_df=dealer.player_funds_df[['Name','In_Pot','Total_Bets','Total_Winnings','p_and_l']]
+        #rolling_df.set_index('Name',drop=True,inplace=True)
+
+
         rolling_df = rolling_df.sort_values('p_and_l', ascending=False)
-        rolling_df.rename(columns={"in_hnd": "Ante/Bet", "winnings": "Winnings", "p_and_l": "Profit"},inplace=True)
-        rolling_df = rolling_df[["Name", "Ante/Bet", "Winnings", "Profit"]]
+        #rolling_df.rename(columns={"in_hnd": "Ante/Bet", "winnings": "Winnings", "p_and_l": "Profit"},inplace=True)
+        rolling_df.rename(columns={"Total_Bets": "Ante/Bet", "Total_Winnings": "Winnings", "p_and_l": "Profit"}, inplace=True)
+        print('rolling_df\n', rolling_df)
+        rolling_df = rolling_df[["Name","Ante/Bet", "Winnings", "Profit"]]
 
         #### Total_funds_check
         dealer.total_player_bankroll=rolling_df['Profit'].sum()+500*len(players)
@@ -336,6 +338,8 @@ def full_table():
 
         dealer.adjust_hi_lo_show_down_displays()
         dealer.active_player = "No one"
+
+        dealer.calculate_bankrolls(players)
         return render_template('table_showdown.html', dealer=dealer,
                                players=new_players,high_hand_df=dealer.high_hand_df_dis,
                                low_hand_df=dealer.low_hand_df_dis,rolling_df=rolling_df)
@@ -374,6 +378,8 @@ def full_table():
         this_player = dealer.make_your_hand_display_cards(this_player)
         dealer.check_which_players_are_folded(players)
         dealer.flips_complete=len([x for x in dealer.common_cards_flipped if x == True])
+
+        dealer.calculate_bankrolls(players)
         return render_template('round_summary.html', dealer=dealer,
                                players=players, this_player=this_player, form=form)
 
@@ -384,6 +390,9 @@ def full_table():
         this_player = dealer.make_your_hand_display_cards(this_player)
         dealer.check_which_players_are_folded(players)
         dealer.flips_complete = len([x for x in dealer.common_cards_flipped if x == True])
+
+        print("post declare: dealer.player_funds_df")
+        dealer.calculate_bankrolls(players)
         return render_template('round_summary.html', dealer=dealer,
                                players=players, this_player=this_player, form=form)
 

@@ -37,7 +37,8 @@ class Dealer():
                                   7: 7, 8: 8, 9: 9, 10: 10}
         self.showdown_rank_dict = {'01': 'A', '11': 'J', '12': 'Q', '13': 'K', '02': '2',
                                    '03': '3', '04': '4', '05': '5', '06': '6',
-                                  '07': '7', '08': '8', '09': '9', '10': '10','14':'A'}
+                                  '07': '7', '08': '8', '09': '9', '10': '10','14':'A',
+                                   'You should have stayed':'You should have stayed'}
 
         # Controls Added for betting rounds
         self.betting_round_number = 0
@@ -85,6 +86,7 @@ class Dealer():
         self.round_chart_location = ''
         self.pandl_chart_location = ''
         self.pandl_df = pd.DataFrame()
+        self.pandl_df_made = False
         self.done_scoring = False
         self.low_hand_df = pd.DataFrame()
         self.low_hand_df_dis = pd.DataFrame()
@@ -154,6 +156,7 @@ class Dealer():
         self.round_chart_location = ''
         self.pandl_chart_location = ''
         self.pandl_df = pd.DataFrame()
+        self.pandl_df_made = False
         self.done_scoring = False
         self.low_hand_df = pd.DataFrame()
         self.low_hand_df_dis = pd.DataFrame()
@@ -524,7 +527,7 @@ l1'''
             winning_card_values = tmp_df['Card_Values'][0]
         except:
             fail_df = pd.DataFrame(columns=['Name', 'Rank', 'Hand', 'Card_Values', 'sh_pot', 'Winnings'],
-                                   data=[['No One', 100, 'None', 'All Joker', 0, 0]])
+                                   data=[['No One', 100, 'None', 'You should have stayed', 0, 0]])
             print("Returning failing_df")
             return fail_df
 
@@ -883,24 +886,34 @@ l1'''
         '''Accept list of player objects, adjust bankrolls for winnings,
         convert df to userful df for score summary'''
 
+        #added to prevent multiple calculations of round winnings
+        if self.pandl_df_made:
+            return
+
         pl = []
         for i, p in enumerate(players):
             winnings_h = 0
             winnings_l = 0
+            print(f"{p.p_nickname} hnd:{self.hand_number}")
 
             try:
+                print(high_hand_df.loc[high_hand_df.Name == p.p_nickname, :])
+                print('winnings_h',high_hand_df.loc[high_hand_df.Name == p.p_nickname, "Winnings"].values[0])
                 winnings_h = high_hand_df.loc[high_hand_df.Name == p.p_nickname, "Winnings"].values[0]
             except:
                 print(f"{p.p_nickname} failed high_hand_df.  winnings_h remains 0\n", high_hand_df)
                 winnings_h = 0
 
             try:
+                print(low_hand_df.loc[low_hand_df.Name == p.p_nickname, :])
+                print('winnings_l', low_hand_df.loc[low_hand_df.Name == p.p_nickname, "Winnings"].values[0])
                 winnings_l = low_hand_df.loc[low_hand_df.Name == p.p_nickname, "Winnings"].values[0]
             except:
-                print(f"{p.p_nickname} failed low_hand_df.  winnings_l remains 0\n", high_hand_df)
+                print(f"{p.p_nickname} failed low_hand_df.  winnings_l remains 0\n", low_hand_df)
                 winnings_l = 0
 
             winnings_t = winnings_h + winnings_l
+            print(f"{p.p_nickname} hnd:{self.hand_number} {winnings_t}")
 
             # Assign winnings:
             p.evening_winnings.append(winnings_t)
@@ -910,7 +923,9 @@ l1'''
             pl.append([p.p_nickname, p.bankroll, p.in_pot, winnings_t, p.p_and_l])
             players[i] = p
 
-        self.pandl_df = pd.DataFrame(columns=["Name", "Stake", "in_hnd", "winnings", "p_and_l"], data=pl)
+        self.pandl_df = pd.DataFrame(columns=["Name", "Stake", "in_hnd", "winnings", "p_and_l"],
+                                     data=pl)
+        self.pandl_df_made = True
         return
 
     def adjust_hi_lo_show_down_displays(self):
@@ -932,18 +947,18 @@ l1'''
 
 
 
-    def add_winnings_to_bankroll(self, players):
-        for i, p in enumerate(players):
-            try:
-                winnings = self.pandl_df.loc[self.pandl_df['Name'] == p.p_nickname, 'winnings'].values[0].sum()
-                print(f"{p.p_nickname} winnings: {winnings}")
-            except:
-                print(f"{p.p_nickname} Failed to add winnings: {p.p_nickname}")
-                winnings = 0
-
-            p.bankroll += winnings
-            players[i] = p
-        return
+#    def add_winnings_to_bankroll(self, players):
+#        for i, p in enumerate(players):
+#            try:
+#                winnings = self.pandl_df.loc[self.pandl_df['Name'] == p.p_nickname, 'winnings'].values[0].sum()
+#                print(f"{p.p_nickname} winnings: {winnings}")
+#            except:
+#                print(f"{p.p_nickname} Failed to add winnings: {p.p_nickname}")
+#                winnings = 0
+#
+#            p.bankroll += winnings
+#            players[i] = p
+#        return
 
     def make_summary_plots(self, players):
         '''Accept list of player objects, combine with dealer object (pandl_df)
@@ -954,7 +969,7 @@ l1'''
 
             df = self.pandl_df.copy()
 
-            self.cumm_pandl_df = self.cumm_pandl_df.append(df)
+            self.cumm_pandl_df.append(df)
             print("PandL columns:\n", self.cumm_pandl_df.columns)
             print("PandL:\n", self.cumm_pandl_df)
 
@@ -983,8 +998,12 @@ l1'''
             # df['winnings'] = df.Stake - 500
             ######
 
-            df = self.cumm_pandl_df.copy()
-            df = df.pivot_table(index='Name', values="p_and_l", aggfunc='sum').reset_index(drop=False)
+            # Test removal 5_21
+            #df = self.cumm_pandl_df.copy()
+            #df = df.pivot_table(index='Name', values="p_and_l", aggfunc='sum').reset_index(drop=False)
+
+            self.calculate_bankrolls(players)
+            df = self.player_funds_df.copy()
 
             df['colors'] = df.p_and_l.apply(lambda x: 'red' if x < 0 else 'navy')
             df.sort_values('p_and_l', ascending=False, inplace=True)
@@ -1001,3 +1020,25 @@ l1'''
             plt.savefig(pwd + self.pandl_chart_location)
             plt.close('all')
         return
+
+    def calculate_bankrolls(self,players):
+        '''Calculate bankrolls from evening bets and winnings'''
+
+        tmp_list=[]
+        for i,p in enumerate(players):
+            p.total_winnings = sum(p.evening_winnings)
+            p.total_bets = sum(p.evening_bets)
+            p.p_and_l = p.total_winnings - p.total_bets
+            p.bankroll = self.initial_player_funds + p.total_winnings - p.total_bets
+            players[i] = p
+            tmp_list.append([self.hand_number,self.betting_round_number,p.p_nickname,p.bankroll,
+                             p.in_pot,p.total_bets,p.total_winnings,p.p_and_l])
+
+        self.player_funds_df=pd.DataFrame(columns=['Hand','Betting_Round','Name','Bankroll','In_Pot','Total_Bets',
+                        'Total_Winnings','p_and_l'],data=tmp_list)
+        self.player_funds_df.sort_values('p_and_l',ascending=False,inplace=True)
+
+        pd.set_option('display.max_columns', None)
+        print('Dealer calculated player funds:\n',self.player_funds_df)
+        return
+

@@ -1,10 +1,16 @@
 # Status
 
-Proposed program for 5/21
+Proposed program for 5/26+
 
-Lots of cosmetic changes.  If testing, pay attention to each page.  For example, coi shows active screen post declare done, scoring and cummulative bets and antes working on showdown page, card values converted to account for picture cards, etc.
+Everything working, provided you allow refreshes to page.  There are a few race conditions where the browser can go faster than the server in terms of ht eplots not being available.  This cause some cosmetic issues, but the actual score graph and the score table are correct after showdown.  Also, the interim tables during hand should be correct.
 
-Additionally, showdow page should automatically revert to full_table on reset.
+One note: The final table is technically correct, but a little difficult to interpret relative to the last hand.  It probably needs a column of three to summarize last hand effects on overall bankroll.
+
+From before, and now can be excercised.
+
+Some cosmetic changes.  If testing, pay attention to each page.  For example, coin shows active screen post declare done, scoring and cummulative bets and antes working on showdown page, card values converted to account for picture cards, etc.
+
+Additionally, showdown page should automatically revert to full_table on reset.
 
 Currently Running tenth_deal.py:  This has the following additional fixes:
 
