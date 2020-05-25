@@ -41,7 +41,6 @@ class Player():
         self.waiting = False # Flag for logged in but waiting
         self.declare_start = False
         self.declare_complete = False
-        self.check_player_existence()
         self.old_bankroll = 500
         self.bankroll2 = 0
         self.total_winnings = 0
@@ -51,6 +50,8 @@ class Player():
         self.p_and_l = 0
         self.starting_funds = 0
         self.expect_long_wait = False
+
+        self.check_player_existence()
 
     def reset_player_from_master_control(self):
         self.hands = [[], []]
@@ -281,6 +282,7 @@ class Player():
         data['password'] = self.password
         data['bankroll'] = self.bankroll
         data['deposits'] = self.deposits
+
         json_data = json.dumps(data)
 
         with open(self.player_dir + player_file, 'w', encoding='utf-8') as f:

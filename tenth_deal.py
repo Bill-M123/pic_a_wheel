@@ -650,23 +650,23 @@ def declare():
 
 
 
-@app.route('/new_deal')
-def new_deal():
-    display_dict = {}
-    shuffled = dealer.deal_cards(players, this_game)
+#@app.route('/new_deal')
+#def new_deal():
+#    display_dict = {}
+#    shuffled = dealer.deal_cards(players, this_game)
 
-    for i, p in enumerate(players):
-        display_dict = dealer.add_to_display_dict(display_dict, i, p, cards)
+#    for i, p in enumerate(players):
+#        display_dict = dealer.add_to_display_dict(display_dict, i, p, cards)
 
-    high_hand_df, low_hand_df = dealer.evaluate_all_hands(players)
-    print('Best High Hands:\n', high_hand_df.head(3))
-    print('Best Low Hands:\n', low_hand_df.head(3))
+#    high_hand_df, low_hand_df = dealer.evaluate_all_hands(players)
+#    print('Best High Hands:\n', high_hand_df.head(3))
+#    print('Best Low Hands:\n', low_hand_df.head(3))
 
-    common_dict = dealer.make_common_display_dict(dealer.common_cards, cards)
-    print('Common_Dict: ', common_dict)
+#    common_dict = dealer.make_common_display_dict(dealer.common_cards, cards)
+#    print('Common_Dict: ', common_dict)
 
-    return render_template('base_table.html', players=display_dict,
-                           common=common_dict)
+#    return render_template('base_table.html', players=display_dict,
+#                           common=common_dict)
 
 
 @app.route('/master_control', methods=['GET', 'POST'])

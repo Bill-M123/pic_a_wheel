@@ -235,9 +235,11 @@ l1'''
         self.pot += ante
         return
 
-    def shuffle_deck(self, deck):
+    def shuffle_deck(self, deck,aseed=False):
         '''Shuffles card in deck, returns decl'''
         random.seed(dt.datetime.now().microsecond)
+        if aseed:
+            random.seed(aseed)
         random.shuffle(deck)
         return deck
 
@@ -246,10 +248,10 @@ l1'''
         card = deck.pop(0)
         return card, deck
 
-    def deal_cards(self, players, game):
+    def deal_cards(self, players, game, aseed=False):
 
         new_deck = self.new_deck.copy()
-        shuffled = self.shuffle_deck(new_deck)
+        shuffled = self.shuffle_deck(new_deck,aseed=aseed)
 
         # deal
         for p in players:
@@ -1041,4 +1043,3 @@ l1'''
         pd.set_option('display.max_columns', None)
         print('Dealer calculated player funds:\n',self.player_funds_df)
         return
-
