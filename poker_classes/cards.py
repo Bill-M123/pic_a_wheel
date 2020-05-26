@@ -8,7 +8,7 @@ class Cards():
         return a tuple that can be used to output simple unicode card.
         One note: this output is for HTML'''
 
-        suits_dict = {'S': '&#9824', 'C': '&#9827', 'H': '&#9829', 'D': '&#9830', }
+        suits_dict = {'S': '&#9824', 'C': '&#9827', 'H': '&#9825', 'D': '&#9830', }
         return (x_tup[0], suits_dict[x_tup[1]])
 
     def get_simple_u_card_p(self, x_tup):

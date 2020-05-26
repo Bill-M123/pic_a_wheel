@@ -6,6 +6,11 @@ from itertools import combinations
 
 import pandas as pd
 import matplotlib.pyplot as plt
+
+import base64
+from io import BytesIO
+from matplotlib.figure import Figure
+
 import numpy as np
 import os
 import copy
@@ -884,6 +889,57 @@ l1'''
 
         return
 
+    def make_hand_plot_no_pyplot(self, players):
+        '''Make betting round summary plot - Who is committed'''
+        tmp = []
+        for g, guy in enumerate(players):
+            for h, hand in enumerate(guy.in_pot_by_round):
+                tmp.append([guy.p_nickname, h, hand, guy.hands_by_round[h]])
+        guys_df = pd.DataFrame(columns=['Name', 'rnd', 'rnd_pot', 'num_hnds'],
+                               data=tmp)
+        print("guys_df\n", guys_df)
+        guys_df['rnd_ttl'] = guys_df['rnd_pot']
+        guys_df['cum_bet'] = guys_df.groupby("Name")["rnd_ttl"].cumsum().fillna(0)
+        tls = guys_df.pivot_table(index='Name', values='rnd_ttl', \
+                                  aggfunc='sum').reset_index(drop=False).rename(columns={'rnd_ttl': 'ttl'})
+        guys_df = pd.merge(guys_df, tls, on='Name')
+        guys_df.sort_values(["ttl", "rnd"], ascending=[False, True], inplace=True)
+
+        colors_dict = {0: 'red', 1: 'yellow', 2: 'darkgreen'}
+
+        fig = Figure(figsize=(5, 3), dpi=100)
+        ax1 = fig.add_subplot(1,1,1)
+
+        for r in sorted(list(guys_df.rnd.unique())):
+            tmp = guys_df.loc[guys_df.rnd == r, :]
+
+            if r == 0:
+                bottoms = tmp.rnd
+            else:
+                tmp2 = guys_df.loc[guys_df.rnd == r - 1, :]
+                bottoms = tmp2.cum_bet
+            xs = list(tmp.Name)
+            colors = [colors_dict[x] for x in tmp.num_hnds.values]
+            ax1.bar(range(len(xs)), tmp.rnd_ttl, bottom=bottoms, color=colors, edgecolor='gray')
+
+        legend_x_base = len(xs) + 1
+        x_txt = 0.5
+        legend_y_base = guys_df.ttl.max()
+        y_rect = 5
+
+        ax1.set_title("How committed are they? (g=2h,y=1h,r=Folded)")
+
+        ax1.set_xticks(np.arange(len(xs)))
+        ax1.set_xticklabels(xs,rotation=15)
+        fig.tight_layout()
+        pwd = os.getcwd()
+        print(f'pwd: {pwd}')
+        self.round_chart_location = '/static/images/betting_rounds_sum_table_hand' + \
+                                    str(self.hand_number) + '_round_' + str(self.betting_round_number) + '.png'
+        fig.savefig(pwd + self.round_chart_location)
+
+        return
+
     def make_pandl_df(self, players, high_hand_df, low_hand_df):
         '''Accept list of player objects, adjust bankrolls for winnings,
         convert df to userful df for score summary'''
@@ -1021,6 +1077,65 @@ l1'''
                                         str(self.hand_number) + '_round_' + str(self.betting_round_number) + '.png'
             plt.savefig(pwd + self.pandl_chart_location)
             plt.close('all')
+
+        return
+
+    def make_summary_plots_no_pyplot(self, players):
+        '''Accept list of player objects, combine with dealer object (pandl_df)
+        generate round and nightly score plots -without using pyplot'''
+
+        if not self.done_scoring:
+        ###################################
+
+            df = self.pandl_df.copy()
+
+            self.cumm_pandl_df.append(df)
+            print("PandL columns:\n", self.cumm_pandl_df.columns)
+            print("PandL:\n", self.cumm_pandl_df)
+
+            df['colors'] = df.winnings.apply(lambda x: 'red' if x < 0 else 'navy')
+            df.sort_values(['winnings', 'in_hnd'], ascending=[False, False], inplace=True)
+
+            shft_wid = 0.25
+            bar_width = 0.5
+            inv_width = 0.75
+            xs = np.arange(len(df.Name))
+
+            fig = Figure(figsize=(10, 3), dpi=100)
+
+            ax1 = fig.add_subplot(1, 2, 1)
+            ax1.bar(xs, df.winnings, width=inv_width, color='navy', label="Winnings")
+            ax1.bar(xs, df.in_hnd, width=bar_width, color='red', label="Bets")
+
+            ax1.set_title('Last Hand Hall of Fame (Shame?)')
+            ax1.set_xticks(xs)
+            ax1.set_xticklabels(df.Name.values,rotation=15)
+            ax1.legend(loc="best")
+
+            ##################################
+            ax2 = fig.add_subplot(1, 2, 2)
+
+            self.calculate_bankrolls(players)
+            df = self.player_funds_df.copy()
+
+            df['colors'] = df.p_and_l.apply(lambda x: 'red' if x < 0 else 'navy')
+            df.sort_values('p_and_l', ascending=False, inplace=True)
+            print("df before plotting p&l, plotting p_and_l column:\n", df)
+
+            ax2.bar(df.Name, df.p_and_l, color=df.colors)
+            ax2.set_title("Tonight's P&L")
+            xs = np.arange(len(df.Name))
+            ax2.set_xticks(xs)
+            ax2.set_xticklabels(df.Name.values,rotation=15)
+            fig.tight_layout()
+
+            pwd = os.getcwd()
+            print(f'pwd: {pwd}')
+            self.pandl_chart_location = '/static/images/pandl_post_hand_' + \
+                                        str(self.hand_number) + '_round_' + str(self.betting_round_number) + '.png'
+            fig.savefig(pwd + self.pandl_chart_location)
+            #plt.close('all')
+
         return
 
     def calculate_bankrolls(self,players):

@@ -1,5 +1,7 @@
 # Status
 
+Removed all pyplot to fix multithreading issue.
+
 Proposed program for 5/26+
 
 Everything working, provided you allow refreshes to page.  There are a few race conditions where the browser can go faster than the server in terms of ht eplots not being available.  This cause some cosmetic issues, but the actual score graph and the score table are correct after showdown.  Also, the interim tables during hand should be correct.
