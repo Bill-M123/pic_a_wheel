@@ -61,6 +61,7 @@ class Dealer():
         # Money variables
         self.initial_player_funds = 500
         self.total_funds_check = False
+        self.ante_taken = False
 
         self.total_player_bankroll = 0
         self.bet_per_side = 0
@@ -98,6 +99,7 @@ class Dealer():
         self.high_hand_df = pd.DataFrame()
         self.high_hand_df_dis = pd.DataFrame()
         self.cumm_pandl_df = pd.DataFrame()
+        self.rolling_df = pd.DataFrame()
 
         return
 
@@ -136,6 +138,7 @@ class Dealer():
         self.active_player = 'No One'
 
         # Money variables
+        self.ante_taken = False
         self.bet_per_side = 0
         self.pot = 0
         self.high_pot = 0
@@ -168,6 +171,7 @@ class Dealer():
         self.high_hand_df = pd.DataFrame()
         self.high_hand_df_dis = pd.DataFrame()
         self.hand_in_progress = False
+        self.rolling_df = pd.DataFrame()
 
         return
 

@@ -396,10 +396,41 @@
         {% endfor %}
 
         </table>
+
+        <h2>The Table 2</h2>
+        <table>
+        <tr>
+            <th>Player</th>
+            <th style="width:20px"></th>
+            <th>Bankroll</th>
+            <th style="width:20px"></th>
+            <th>Ante/Bets</th>
+            <th style="width:20px"></th>
+            <th>Winnings</th>
+            <th style="width:20px"></th>
+            <th>P&L</th>
+        </tr>
+
+        {% for p in players %}
+        <tr>
+            <td>{{p.p_nickname}}</td>
+            <td style="width:20px"></td>
+            <td>{{p.bankroll}}</td>
+            <td style="width:20px"></td>
+            <td>{{p.total_bets}}</td>
+            <td style="width:20px"></td>
+            <td>{{p.total_winnings}}</td>
+            <td style="width:20px"></td>
+            <td>{{p.p_and_l}}</td>
+        </tr>
+
+        {% endfor %}
+
+        </table>
         <p>
             Total player bankroll: {{dealer.total_player_bankroll}}.  Total_funds_check: {{dealer.total_funds_check}}
         </p>
-    </div>
+    </div> <!-- Scoreplots-->
 </div> <!-- the_whole_window -->
 </body>
 </html>
