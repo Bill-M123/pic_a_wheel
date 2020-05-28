@@ -858,5 +858,5 @@ def master_control():
         return f"You are not Bornstein or Clyde, Fuck Off!"
 
 if __name__ == '__main__':
-    #app.run(host='0.0.0.0', debug=True)
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
+    #app.run(debug=True)
