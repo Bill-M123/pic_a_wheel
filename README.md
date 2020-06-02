@@ -1,6 +1,19 @@
 # Status
 
+Proposed program for 6/2 +
+
+Fixed late entry and ejection.  Tested on debug mode with 3 players.  Needs confirmation.
+
+Fixed forced fold to require only folding active player which eases some conditional checking.
+
+Still a need to refresh some players post evaluation.  Not sure why.
+
+
 Removed all pyplot to fix multithreading issue.
+
+Must use twelveth_deal.py
+
+
 
 Proposed program for 5/26+
 

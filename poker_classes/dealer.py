@@ -830,6 +830,10 @@ l1'''
         set common and common_pr to ['folded']
         set new betting new_order
         set new active player.'''
+        if p_name != self.active_player:
+            print(f"Can not fold {p_name} since he is not active.")
+            return
+
         for i,p in enumerate(players):
             if p.p_nickname == p_name:
                 p.hands[0]='folded'
@@ -840,11 +844,28 @@ l1'''
                 p.common_cards_pr = ['folded']
                 p.in_hand = False
                 players[i]=p
+
+                # Check that folding player did not make last raise, and if yes, adjust last bet to next player
+                if self.last_raise == p.p_nickname:
+                    if p.p_nickname == self.new_betting_order[-1]:
+                        self.last_raise = self.new_betting_order[0]
+                    else:
+                        self.last_raise = self.new_betting_order[self.new_betting_order.index(p.p_nickname)+1]
+                    print(f"Changed last_bet to {self.last_raise}")
+
                 self.new_betting_order = [x for x in self.new_betting_order if x.p_nickname != p_name]
                 print("New Betting Order in dealer.force_fold_player:")
                 print(f"{self.new_betting_order}")
         tmp=self.new_betting_order[0]
         self.active_player = tmp.p_nickname
+
+        # Check for last bet and adjust:
+        if self.last_raise == p_name:
+            for p in self.new_betting_order:
+                max_in_pot = max([x.this_round_per_side for x in self.new_betting_order])
+                max_bets=[x.p_nickname for x in self.new_betting_order if x.this_round_per_side == max_in_pot ]
+                self.last_raise = max_bets[0]
+
         return
 
 
@@ -1168,6 +1189,8 @@ l1'''
     def evaluate_hands_calc_winnings(self,players):
         '''Replace logic in flask app to evaluate hands and assign winnings'''
 
+        self.active_player = "No one"
+
         declared_high,declared_low = self.get_high_low_hands(players)
         high_hand_df, trash_high = self.evaluate_all_hands(declared_high)
         trash_low, low_hand_df = self.evaluate_all_hands(declared_low)
@@ -1235,6 +1258,6 @@ l1'''
 
         self.done_scoring = True
         self.hand_in_progress = False
-        self.active_player = 'No one'
+
         self.showdown = True
         return

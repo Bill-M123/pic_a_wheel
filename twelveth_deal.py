@@ -177,7 +177,9 @@ def login():
 
                 for guy in possible_players:
                     if guy.p_nickname == session['username']:
+                        guy.reset_player_from_master_control() # Fix for jinja code
                         dealer.players_waiting_to_enter.append(guy)
+
                         dealer.waiting_names=[x.p_nickname for x in dealer.players_waiting_to_enter]
 
                         this_game.players_logged_in.append(guy)
@@ -268,7 +270,11 @@ def full_table():
     # Betting complete before declare
     if dealer.betting_complete and not dealer.declare_open and not dealer.declare_done:
 
-        this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+        if session['username'] in dealer.waiting_names: # Waiting Bandaid
+            this_player = dealer.make_player_cards_no_options(dealer.players_waiting_to_enter, session['username'], cards)
+        else:
+            this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+
         this_player = dealer.make_your_hand_display_cards(this_player)
         dealer.check_which_players_are_folded(players)
         dealer.flips_complete=len([x for x in dealer.common_cards_flipped if x == True])
@@ -280,7 +286,15 @@ def full_table():
     # Betting complete after declare
     if dealer.betting_complete and dealer.declare_done:
 
-        this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+        # Set active player to "No One" forcing auto refresh
+        dealer.active_player = "No One"
+
+        if session['username'] in dealer.waiting_names:  # Waiting Bandaid
+            this_player = dealer.make_player_cards_no_options(dealer.players_waiting_to_enter, session['username'],
+                                                              cards)
+        else:
+            this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+
         this_player = dealer.make_your_hand_display_cards(this_player)
         dealer.check_which_players_are_folded(players)
         dealer.flips_complete = len([x for x in dealer.common_cards_flipped if x == True])
@@ -290,15 +304,26 @@ def full_table():
         return render_template('round_summary.html', dealer=dealer,
                                players=players, this_player=this_player, form=form)
 
-    for p in players:
-        if p.p_nickname == session['username']:
-            this_guy = p
+    #Jinja bandaid
+    if session['username'] in dealer.waiting_names:
+        for p in dealer.players_waiting_to_enter:
+            if p.p_nickname == session['username']:
+                this_guy = p
+    else:
+        for p in players:
+            if p.p_nickname == session['username']:
+                this_guy = p
 
 
     if dealer.declare_open:
         print(f"Declare open, {this_guy.p_nickname} trying to play.")
         print(f"His declare flag is: {this_guy.declare_complete}")
-        this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+        if session['username'] in dealer.waiting_names:  # Waiting Bandaid
+            this_player = dealer.make_player_cards_no_options(dealer.players_waiting_to_enter, session['username'],
+                                                              cards)
+        else:
+            this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+
         this_player = dealer.make_your_hand_display_cards(this_player)
 
         # this_guy declare is not done
@@ -497,9 +522,19 @@ def declare():
     form = DeclareForm()
 
     # set this_guy to player requesting declare info
-    for p in players:
-        if p.p_nickname == session['username']:
-            this_guy = p
+
+    if (session['username'] in dealer.waiting_names):
+        for p in dealer.players_waiting_to_enter:
+            if p.p_nickname == session['username']:
+                this_guy = p
+                this_guy.expect_long_wait = True
+                return render_template('player_base_table.html', dealer=dealer,
+                                       players=players, this_player=this_guy)
+
+    else:
+        for p in players:
+            if p.p_nickname == session['username']:
+                this_guy = p
 
     if form.validate_on_submit:
 
@@ -513,7 +548,12 @@ def declare():
                 if p.p_nickname == session['username']:
                     players[i] = this_guy
 
-            this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+            if session['username'] in dealer.waiting_names:  # Waiting Bandaid
+                this_player = dealer.make_player_cards_no_options(dealer.players_waiting_to_enter, session['username'],
+                                                                  cards)
+            else:
+                this_player = dealer.make_player_cards_no_options(players, session['username'], cards)
+
             this_player = dealer.make_your_hand_display_cards(this_player)
             return render_template('player_base_table_declare.html', dealer=dealer,
                                    players=players, this_player=this_player)
@@ -543,26 +583,6 @@ def declare():
         return redirect(url_for("full_table"))
 
 
-
-#@app.route('/new_deal')
-#def new_deal():
-#    display_dict = {}
-#    shuffled = dealer.deal_cards(players, this_game)
-
-#    for i, p in enumerate(players):
-#        display_dict = dealer.add_to_display_dict(display_dict, i, p, cards)
-
-#    high_hand_df, low_hand_df = dealer.evaluate_all_hands(players)
-#    print('Best High Hands:\n', high_hand_df.head(3))
-#    print('Best Low Hands:\n', low_hand_df.head(3))
-
-#    common_dict = dealer.make_common_display_dict(dealer.common_cards, cards)
-#    print('Common_Dict: ', common_dict)
-
-#    return render_template('base_table.html', players=display_dict,
-#                           common=common_dict)
-
-
 @app.route('/master_control', methods=['GET', 'POST'])
 def master_control():
     global players
@@ -585,11 +605,16 @@ def master_control():
         # New Player
         seat_new_players = form.seat_new_players.data
         if seat_new_players:
-
+            print(f"{len(players)}Players {[x.p_nickname for x in players]}")
             for p in dealer.players_waiting_to_enter:
+                p.reset_player_from_master_control() #Trial to fix entering problem.
+                print(f"Working on {p.p_nickname}")
                 dealer.insert_new_player(players, p)
+                print(f"{len(players)}Players {[x.p_nickname for x in players]}")
                 for i,pl in enumerate(players):
+                    print(f"Updating player (pl): {pl.p_nickname}")
                     if pl.p_nickname == p.p_nickname:
+                        print(f"Found p.p_nickname {p.p_nickname}")
                         p.expect_long_wait=False
                         players[i]=p
 
@@ -858,5 +883,5 @@ def master_control():
         return f"You are not Bornstein or Clyde, Fuck Off!"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
-    #app.run(debug=True)
+    #app.run(host='0.0.0.0', debug=True)
+    app.run(debug=True)
