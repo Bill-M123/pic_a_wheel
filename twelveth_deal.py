@@ -605,6 +605,18 @@ def master_control():
         # New Player
         seat_new_players = form.seat_new_players.data
         if seat_new_players:
+
+            # Reset table and existing players
+            new_players = []
+            session['declare_complete'] = False
+            session['declare_start'] = False
+            dealer.reset_table(players, this_game)
+            dealer.perform_reset = True
+
+            for i, p in enumerate(players):
+                players[i] = p.reset_player_from_master_control()
+
+            # Seat players legacy
             print(f"{len(players)}Players {[x.p_nickname for x in players]}")
             for p in dealer.players_waiting_to_enter:
                 p.reset_player_from_master_control() #Trial to fix entering problem.
