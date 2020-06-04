@@ -1,6 +1,7 @@
 import json
 import random as random
 import datetime as dt
+from pytz import timezone
 from collections import Counter
 from itertools import combinations
 
@@ -24,6 +25,7 @@ class Dealer():
 
     def __init__(self):
         # General Table variables
+        self.game_number = 0
         self.perform_reset = False
         self.new_deck = [(rank, suit) for rank in range(1, 14) for suit in ['S', 'H', 'C', 'D']]
         self.first_deal = True
@@ -1275,4 +1277,73 @@ l1'''
         self.hand_in_progress = False
 
         self.showdown = True
+        return
+
+    def get_local_time(self,target_tz='US/Eastern'):
+        # define eastern timezone
+        my_tz = timezone(target_tz)
+        current_time=dt.datetime.now(my_tz)
+        return f"{current_time.date()}",f"{current_time.time()}"
+
+    def save_summary_data(self,summary_dir):
+        '''Save a temmporary copy of the hand summary.  Append it to the evening_bets
+        summary'''
+
+        tmp_df=self.rolling_df.copy()
+        tmp_columns=tmp_df.columns
+
+        tmp_df['hand']=self.hand_number
+
+        da_date,da_time=self.get_local_time()
+        tmp_df['date']=da_date
+        tmp_df['time']=da_time
+        new_cols=['date','time','hand']+[x for x in tmp_df.columns if x not in ['date','time','hand']]
+        tmp_df=tmp_df[new_cols]
+        print(tmp_df)
+
+        tmp_df.to_csv(summary_dir+f"sum_{da_date}_gm_{self.game_number}_hand_{self.hand_number}.csv")
+        return
+
+    # Game list manually initialized 6/5/2020
+    def initialize_game_times(self):
+        target_tz='US/Eastern'
+        my_tz = timezone(target_tz)
+        current_time=dt.datetime.now(my_tz)
+        tmp_df=pd.DataFrame(columns=['Start','Game'],data=[[current_time,0]])
+        tmp_df.to_csv('C:\\Users\\bill_\\github\\pic_a_wheel\\performance_summaries\\game_starts.csv')
+        print(tmp_df)
+        return tmp_df
+
+
+    def set_game_number(self,summary_dir):
+        target_tz='US/Eastern'
+        my_tz = timezone(target_tz)
+        current_time=dt.datetime.now(my_tz)
+        parse_dates=['Start']
+        games_df=pd.read_csv(summary_dir+'game_starts.csv',
+                             parse_dates=parse_dates,index_col=0)
+        max_game_date=games_df['Start'].max()
+        print('max_game_date',max_game_date)
+
+        date_now=dt.datetime.now(my_tz)
+        print(date_now.date(),max_game_date.date())
+
+        if date_now.date() == max_game_date.date():
+            print("Found today's date in games list.")
+            last_game=games_df.loc[games_df.Start==max_game_date,'Game'].max()
+            this_game=last_game+1
+            new_row={'Start':date_now,'Game':this_game}
+            games_df=games_df.append(new_row, ignore_index=True)
+            games_df.to_csv(summary_dir+'game_starts.csv')
+            print(games_df)
+
+        else:
+            print("Didn't find today's date in games list.")
+            this_game=1
+            new_row={'Start':date_now,'Game':this_game}
+            games_df=games_df.append(new_row, ignore_index=True)
+            games_df.to_csv('C:\\Users\\bill_\\github\\pic_a_wheel\\performance_summaries\\game_starts.csv')
+            print(games_df)
+
+        self.game_number = this_game
         return

@@ -85,12 +85,14 @@ class DeclareForm(FlaskForm):
 working_dir = os.getcwd()
 app_dir = working_dir + '/poker_classes/'
 player_dir = working_dir + '/existing_players/'
+summary_dir =working_dir + '/performance_summaries/'
 
 cards = Cards()
 this_game = Game()
 this_game.set_pic_a_wheel()
 
 dealer = Dealer()
+
 
 login_manager = LoginManager()  # Sets up player views
 
@@ -146,6 +148,14 @@ app.debug = True
 
 login_manager = login_manager.init_app(app)
 
+
+
+@app.before_first_request
+def initialize():
+    print("Called only once, when the first request comes in")
+    #moved inside ap
+    dealer.set_game_number(summary_dir)
+    print(f"Set Game number to {dealer.game_number}")
 
 @app.route('/')
 def index():
@@ -786,6 +796,7 @@ def master_control():
         evaluate_now = form.evaluate_now.data
         if evaluate_now and not dealer.done_scoring:
             dealer.evaluate_hands_calc_winnings(players)
+            dealer.save_summary_data(summary_dir)
 
         submit_value = form.submit.data
 
