@@ -1342,7 +1342,7 @@ l1'''
             this_game=1
             new_row={'Start':date_now,'Game':this_game}
             games_df=games_df.append(new_row, ignore_index=True)
-            games_df.to_csv('C:\\Users\\bill_\\github\\pic_a_wheel\\performance_summaries\\game_starts.csv')
+            games_df.to_csv(summary_dir+'game_starts.csv')
             print(games_df)
 
         self.game_number = this_game
