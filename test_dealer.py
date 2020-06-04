@@ -119,6 +119,7 @@ def test_get_possible_hands(dealer):
     assert dealer.get_possible_hands(this_hand, com_cards, omaha=False)[-1] == combos
 
 def test_rank_single_hand(dealer):
+    #64
     this_hand=[(1,'S'),(2,'D'),(3,'H'),(4,'C'),(6,'S')]
     best_high,best_low=dealer.rank_single_hand(this_hand)
     check_best = (9, 'High card', [14, 6, 4, 3, 2], [(1, 'S'), (2, 'D'), (3, 'H'), (4, 'C'), (6, 'S')])
@@ -126,11 +127,22 @@ def test_rank_single_hand(dealer):
     check_best= (1, 'High card', [6, 4, 3, 2, 1], [(1, 'S'), (2, 'D'), (3, 'H'), (4, 'C'), (6, 'S')])
     assert best_low == check_best
 
+    #64/Flush
     this_hand=[(1,'S'),(2,'S'),(3,'S'),(4,'S'),(6,'S')]
     best_high,best_low=dealer.rank_single_hand(this_hand)
     check_best = (4, 'Flush', [14, 6, 4, 3, 2], [(1, 'S'), (2, 'S'), (3, 'S'), (4, 'S'), (6, 'S')])
     assert best_high == check_best
     check_best = (6, 'Flush', [6, 4, 3, 2, 1], [(1, 'S'), (2, 'S'), (3, 'S'), (4, 'S'), (6, 'S')])
+    assert best_low == check_best
+
+    #Straight flush
+    this_hand=[(2,'H'),(3,'H'),(4,'H'),(5,'H'),(1,'H')]
+    best_high,best_low=dealer.rank_single_hand(this_hand)
+    check_best = (1, 'Straight Flush', [5, 4, 3, 2, 1], [(2, 'H'), (3, 'H'), (4, 'H'), (5, 'H'), (1, 'H')])
+    print(best_high)
+    print(check_best)
+    assert best_high == check_best
+    check_best = (6, 'Flush', [14, 5, 4, 3, 2], [(2, 'H'), (3, 'H'), (4, 'H'), (5, 'H'), (1, 'H')])
     assert best_low == check_best
 
 def test_rank_all_hands(players,game,dealer):

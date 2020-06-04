@@ -248,7 +248,7 @@ l1'''
 
     def shuffle_deck(self, deck,aseed=False):
         '''Shuffles card in deck, returns decl'''
-        random.seed(dt.datetime.now().microsecond)
+        #random.seed(dt.datetime.now().microsecond)
         if aseed:
             random.seed(aseed)
         random.shuffle(deck)
@@ -335,7 +335,7 @@ l1'''
                     possibles += [list(h) + list(com)]
         return possibles
 
-    def rank_single_hand(self, hand):
+    def rank_single_hand(self,hand):
         '''accept list of 5 cards, return hand rank
         If Ace, run calculations twice, returns a list of best hand(s).'''
 
@@ -368,6 +368,7 @@ l1'''
             a_l_list = rank_list
             hand_options = [a_h_list, a_l_list]
 
+        print(f"hand_options: {hand_options}")
         high_hands = []
         low_hands = []
 
@@ -448,7 +449,8 @@ l1'''
                     low_hands.append((1, 'High card', sorted(tmp, reverse=True), hand))
 
             elif flush_flag:
-                if (max(rank_list) - min(rank_list) == 4) & (len(set(rank_list)) == 5) & \
+
+                if (max(tmp) - min(tmp) == 4) & (len(set(tmp)) == 5) & \
                         (hand_decision == False):
                     high_hands.append((1, f"Straight Flush", sorted(tmp, reverse=True), hand))
                     low_hands.append((9, f"Straight Flush", sorted(tmp), hand))
@@ -458,7 +460,20 @@ l1'''
             else:
                 high_hands.append('Unknown: ' + str(hand))
                 low_hands.append('Unknown: ' + str(hand))
-        return max(high_hands), min(low_hands)
+        #return max(high_hands), min(low_hands)
+        # New high eval
+        def adjust_for_sorting(high_low_hand):
+            '''Bandaid for sorting problem requires two uses of high_ranks dict'''
+            high_ranks={1:9,2:8,3:7,4:6,5:5,6:4,7:3,8:2,9:1}
+            new_hands=[]
+            for x in high_low_hand:
+                new_hands.append((high_ranks[x[0]],x[1],x[2],x[3]))
+            best_hand = sorted(new_hands, key=lambda x: (x[0], x[2]))[-1]
+            print("da_best_hand",best_hand)
+            best_hand=(((high_ranks[best_hand[0]],best_hand[1],best_hand[2],best_hand[3])))
+            return best_hand
+        best_high=adjust_for_sorting(high_hands)
+        return best_high, min(low_hands)#adjust_for_sorting(low_hands)#
 
     def evaluate_all_hands(self, players):
         '''Evaluate winning hands from remaining players'''
