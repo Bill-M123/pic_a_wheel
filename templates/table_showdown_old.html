@@ -137,30 +137,110 @@
                     <th style="text-align:center">Flip 2</th>
                     <th style="text-align:center">Flip 3</th>
                 </tr>
-
-                {% for row in range(dealer.common_rows)%}
                 <tr class="common_card_back_r">
-                  {% for col in range(dealer.common_cols)%}
-
-                    {% if dealer.common_cards_flipped[col] %}
-                    {% if dealer.common_cards_pr[col][row][1] in ["\u2665","\u2666"] %}
+                    {% if dealer.common_cards_flipped[0] %}
+                    {% if dealer.common_cards_pr[0][0][1] in ["\u2665","\u2666"] %}
                     <td>
-                        <span class="your_cards_card_r_rnk">{{dealer.common_cards_pr[col][row][0]}}</span>
-                        <span class="your_cards_card_r_st">{{dealer.common_cards_pr[col][row][1]}}</span>
+                        <span class="your_cards_card_r_rnk">{{dealer.common_cards_pr[0][0][0]}}</span>
+                        <span class="your_cards_card_r_st">{{dealer.common_cards_pr[0][0][1]}}</span>
                     </td>
                     {% else %}
-                    <td>
-                      <span class="your_cards_card_b_rnk">{{dealer.common_cards_pr[col][row][0]}}</span>
-                      <span class="your_cards_card_b_st">{{dealer.common_cards_pr[col][row][1]}}</span>
-                    </td>
+                    <td><span class="your_cards_card_b_rnk">{{dealer.common_cards_pr[0][0][0]}}</span><span
+                            class="your_cards_card_b_st">{{dealer.common_cards_pr[0][0][1]}}</span></td>
                     {% endif %}
 
                     {% else%}
                     <td class="common_card_back_r">&#127136;</td>
                     {% endif %}
-                  {% endfor %} <!--End td loop -->
+                    {% if dealer.common_cards_flipped[1] %}
+                    {% if dealer.common_cards_pr[1][0][1] in ["\u2665","\u2666"] %}
+                    <td><span class="your_cards_card_r_rnk">{{dealer.common_cards_pr[1][0][0]}}</span><span
+                            class="your_cards_card_r_st">{{dealer.common_cards_pr[1][0][1]}}</span></td>
+                    {% else %}
+                    <td><span class="your_cards_card_b_rnk">{{dealer.common_cards_pr[1][0][0]}}</span><span
+                            class="your_cards_card_b_st">{{dealer.common_cards_pr[1][0][1]}}</span></td>
+                    {% endif %}
+
+                    {% else%}
+                    <td class="common_card_back_r">&#127136;</td>
+                    {% endif %}
+                    {% if dealer.common_cards_flipped[2] %}
+                    {% if dealer.common_cards_pr[2][0][1] in ["\u2665","\u2666"] %}
+                    <td><span class="your_cards_card_r_rnk">{{dealer.common_cards_pr[2][0][0]}}</span><span
+                            class="your_cards_card_r_st">{{dealer.common_cards_pr[2][0][1]}}</span></td>
+                    {% else %}
+                    <td><span class="your_cards_card_b_rnk">{{dealer.common_cards_pr[2][0][0]}}</span><span
+                            class="your_cards_card_b_st">{{dealer.common_cards_pr[2][0][1]}}</span></td>
+                    {% endif %}
+
+                    {% else%}
+                    <td class="common_card_back_r">&#127136;</td>
+                    {% endif %}
                 </tr>
-                {% endfor %} <!-- end row loop -->
+                <tr class="common_card_back_r">
+                    {% if dealer.common_cards_flipped[0] %}
+                    {% if dealer.common_cards_pr[0][1][1] in ["\u2665","\u2666"] %}
+                    <td><span class="your_cards_card_r_rnk">{{dealer.common_cards_pr[0][1][0]}}</span><span
+                            class="your_cards_card_r_st">{{dealer.common_cards_pr[0][1][1]}}</span></td>
+                    {% else %}
+                    <td><span class="your_cards_card_b_rnk">{{dealer.common_cards_pr[0][1][0]}}</span><span
+                            class="your_cards_card_b_st">{{dealer.common_cards_pr[0][1][1]}}</span></td>
+                    {% endif %}
+
+                    {% else%}
+                    <td class="common_card_back_r">&#127136;</td>
+                    {% endif %}
+                    {% if dealer.common_cards_flipped[1] %}
+                    {% if dealer.common_cards_pr[1][1][1] in ["\u2665","\u2666"] %}
+                    <td><span class="your_cards_card_r_rnk">{{dealer.common_cards_pr[1][1][0]}}</span><span
+                            class="your_cards_card_r_st">{{dealer.common_cards_pr[1][1][1]}}</span></td>
+                    {% else %}
+                    <td><span class="your_cards_card_b_rnk">{{dealer.common_cards_pr[1][1][0]}}</span><span
+                            class="your_cards_card_b_st">{{dealer.common_cards_pr[1][1][1]}}</span></td>
+                    {% endif %}
+
+                    {% else%}
+                    <td class="common_card_back_r">&#127136;</td>
+                    {% endif %}
+                    {% if dealer.common_cards_flipped[2] %}
+                    {% if dealer.common_cards_pr[2][1][1] in ["\u2665","\u2666"] %}
+                    <td><span class="your_cards_card_r_rnk">{{dealer.common_cards_pr[2][1][0]}}</span><span
+                            class="your_cards_card_r_st">{{dealer.common_cards_pr[2][1][1]}}</span></td>
+                    {% else %}
+                    <td><span class="your_cards_card_b_rnk">{{dealer.common_cards_pr[2][1][0]}}</span><span
+                            class="your_cards_card_b_st">{{dealer.common_cards_pr[2][1][1]}}</span></td>
+                    {% endif %}
+
+                    {% else%}
+                    <td class="common_card_back_r">&#127136;</td>
+                    {% endif %}
+                </tr>
+                <tr class="common_card_back_r">
+                    {% if dealer.common_cards_flipped[0] %}
+                    {% if dealer.common_cards_pr[0][2][1] in ["\u2665","\u2666"] %}
+                    <td><span class="your_cards_card_r_rnk">{{dealer.common_cards_pr[0][2][0]}}</span><span
+                            class="your_cards_card_r_st">{{dealer.common_cards_pr[0][2][1]}}</span></td>
+                    {% else %}
+                    <td><span class="your_cards_card_b_rnk">{{dealer.common_cards_pr[0][2][0]}}</span><span
+                            class="your_cards_card_b_st">{{dealer.common_cards_pr[0][2][1]}}</span></td>
+                    {% endif %}
+
+                    {% else%}
+                    <td class="common_card_back_r">&#127136;</td>
+                    {% endif %}
+                    {% if dealer.common_cards_flipped[1] %}
+                    {% if dealer.common_cards_pr[1][2][1] in ["\u2665","\u2666"] %}
+                    <td><span class="your_cards_card_r_rnk">{{dealer.common_cards_pr[1][2][0]}}</span><span
+                            class="your_cards_card_r_st">{{dealer.common_cards_pr[1][2][1]}}</span></td>
+                    {% else %}
+                    <td><span class="your_cards_card_b_rnk">{{dealer.common_cards_pr[1][2][0]}}</span><span
+                            class="your_cards_card_b_st">{{dealer.common_cards_pr[1][2][1]}}</span></td>
+                    {% endif %}
+
+                    {% else%}
+                    <td class="common_card_back_r">&#127136;</td>
+                    {% endif %}
+                </tr>
             </table>
         </div>
 

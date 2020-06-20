@@ -89,7 +89,9 @@ summary_dir =working_dir + '/performance_summaries/'
 
 cards = Cards()
 this_game = Game()
-this_game.set_pic_a_wheel()
+#this_game.set_pic_a_wheel()
+this_game.set_tic_tac_toe()
+
 
 dealer = Dealer()
 
@@ -120,12 +122,13 @@ for i,p in enumerate(possible_players):
     p.starting_funds = dealer.initial_player_funds
     possible_players[i]=p
 
-players = [alba, bornstein, clyde, brian, ed]
-players = [alba, bornstein, clyde]
-players = [bornstein]
-players = [alba, bornstein]
-players = [clyde, tardie, judogi, brian, ed, bornstein, jeff]
-players = [jeff, brian, bornstein]
+### Old testing, no longer needed####
+#players = [alba, bornstein, clyde, brian, ed]
+#players = [alba, bornstein, clyde]
+#players = [bornstein]
+#players = [alba, bornstein]
+#players = [clyde, tardie, judogi, brian, ed, bornstein, jeff]
+#players = [jeff, brian, bornstein]
 
 players = []
 
@@ -799,7 +802,7 @@ def master_control():
         #################################################
         evaluate_now = form.evaluate_now.data
         if evaluate_now and not dealer.done_scoring:
-            dealer.evaluate_hands_calc_winnings(players)
+            dealer.evaluate_hands_calc_winnings(players, this_game)
             dealer.save_summary_data(summary_dir)
 
         submit_value = form.submit.data
@@ -910,6 +913,6 @@ def master_control():
         return f"You are not Bornstein or Clyde, Fuck Off!"
 
 if __name__ == '__main__':
-    #app.run(host='0.0.0.0', debug=True)
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)
+    #app.run(host='0.0.0.0')
     #app.run(debug=True)

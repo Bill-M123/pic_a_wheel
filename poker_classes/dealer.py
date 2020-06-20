@@ -38,6 +38,7 @@ class Dealer():
         self.common_cards = []  # Will have separate lists for each flip
         self.common_cards_pr = []
         self.common_cards_flipped = [False, False, False]  # True/False for each flip
+        self.common_rows = 0
         self.cards = Cards()
         self.display_suits_dict = {'S': '\u2660', 'C': '\u2663', 'H': '\u2665', 'D': '\u2666', }
         self.display_rank_dict = {1: 'A', 11: 'J', 12: 'Q', 13: 'K', 2: 2, 3: 3, 4: 4, 5: 5, 6: 6,
@@ -266,6 +267,8 @@ l1'''
 
         new_deck = self.new_deck.copy()
         shuffled = self.shuffle_deck(new_deck,aseed=aseed)
+        self.common_rows = game.common_rows #Every time you deal, set the row count
+        self.common_cols = game.common_cols
 
         # deal
         for p in players:
@@ -478,7 +481,7 @@ l1'''
         best_high=adjust_for_sorting(high_hands)
         return best_high, min(low_hands)#adjust_for_sorting(low_hands)#
 
-    def evaluate_all_hands(self, players):
+    def evaluate_all_hands(self, players, game):
         '''Evaluate winning hands from remaining players'''
         high_hand_list = []
         low_hand_list = []
@@ -494,8 +497,31 @@ l1'''
 
                 if hand != 'folded':
                     tmp_hand = hand + p.common_cards
-                    flat_list = [item for sublist in self.common_cards for item in sublist]
-                    combos = self.get_possible_hands(tmp_hand, flat_list)
+                    #flat_list = [item for sublist in self.common_cards for item in sublist]
+
+                    # Changes for tic_tac_toe.  Initially, leave pw as is and trap for not pw
+
+                    if game.game == 'pick_a_wheel':
+                        flat_list = [item for sublist in self.common_cards for item in sublist]
+                        combos = self.get_possible_hands(tmp_hand, flat_list)
+
+                    else:
+                        combos=[]
+
+                        for cmb in game.valid_combos:
+
+                            t_line=[]
+                            for c in cmb:
+                                print(f"cmb: {cmb}, c[1]: {c[1]} c[0]: {c[0]} comm: {self.common_cards[c[1]][c[0]]}")
+                                t_line.append(self.common_cards[c[1]][c[0]])
+
+                            combos += self.get_possible_hands(tmp_hand, t_line)
+
+
+                        ##############################
+
+
+
                     for c in combos:
                         tmp_high, tmp_low = self.rank_single_hand((c))
 
@@ -1204,14 +1230,14 @@ l1'''
         print('Dealer calculated player funds:\n',self.player_funds_df)
         return
 
-    def evaluate_hands_calc_winnings(self,players):
+    def evaluate_hands_calc_winnings(self,players, game):
         '''Replace logic in flask app to evaluate hands and assign winnings'''
 
         self.active_player = "No one"
 
         declared_high,declared_low = self.get_high_low_hands(players)
-        high_hand_df, trash_high = self.evaluate_all_hands(declared_high)
-        trash_low, low_hand_df = self.evaluate_all_hands(declared_low)
+        high_hand_df, trash_high = self.evaluate_all_hands(declared_high, game)
+        trash_low, low_hand_df = self.evaluate_all_hands(declared_low, game)
 
         # Check for everyone going the same way:
         try:

@@ -1,5 +1,16 @@
 # Status
 
+6/21
+Alba changed to Bronislav
+
+Walt changed to Smitty
+
+3x3 3phase added python three_phase.py
+
+3x3 tic_tac_toe added python tic_tac_toe.py
+
+
+
 Proposed program for 6/2 +
 
 Fixed late entry and ejection.  Tested on debug mode with 3 players.  Needs confirmation.
