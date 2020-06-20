@@ -213,7 +213,8 @@ class Dealer():
         if where_orig_dealer == 0:
             last_order.append(new_player)
         else:
-            last_order.insert(where_orig_dealer, 9)
+            #last_order.insert(where_orig_dealer, 9)
+            last_order.insert(where_orig_dealer, new_player)
         return
 
     '''l1=[1,2,3,4,5,6,7,8]
