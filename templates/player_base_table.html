@@ -127,7 +127,11 @@
                 <tr class="common_card_back_r">
                   {% for col in range(dealer.common_cols)%}
 
-                    {% if dealer.common_cards_flipped[col] %}
+                    {% if dealer.common_cards[col][row] == 'blank_card'%}
+                    <td>&nbsp;</td>
+
+                    {% elif dealer.common_cards_flipped[col] %}
+
                     {% if dealer.common_cards_pr[col][row][1] in ["\u2665","\u2666"] %}
                     <td>
                         <span class="your_cards_card_r_rnk">{{dealer.common_cards_pr[col][row][0]}}</span>
@@ -141,7 +145,7 @@
                     {% endif %}
 
                     {% else%}
-                    <td class="common_card_back_r">&#127136;</td>
+                  <td class="common_card_back_r">&#127136;</td>
                     {% endif %}
                   {% endfor %} <!--End td loop -->
                 </tr>

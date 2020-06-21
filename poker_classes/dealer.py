@@ -299,6 +299,11 @@ l1'''
                 card, shuffled = self.deal_card(shuffled)
                 self.common_cards[i].append(card)
 
+            if flip < game.common_rows:
+                blanks=game.common_rows-f
+                for k in range(blanks):
+                    self.common_cards[i].append('blank_card')
+
         self.common_cards_flipped = []
         for flip in self.common_cards:
             self.common_cards_flipped.append(False)
@@ -501,21 +506,21 @@ l1'''
 
                     # Changes for tic_tac_toe.  Initially, leave pw as is and trap for not pw
 
-                    if game.game == 'pick_a_wheel':
-                        flat_list = [item for sublist in self.common_cards for item in sublist]
-                        combos = self.get_possible_hands(tmp_hand, flat_list)
+                    #if game.game == 'pic_a_wheel':
+                    #    flat_list = [item for sublist in self.common_cards for item in sublist]
+                    #    combos = self.get_possible_hands(tmp_hand, flat_list)
 
-                    else:
-                        combos=[]
+                    #else:
+                    combos=[]
 
-                        for cmb in game.valid_combos:
+                    for cmb in game.valid_combos:
 
-                            t_line=[]
-                            for c in cmb:
-                                print(f"cmb: {cmb}, c[1]: {c[1]} c[0]: {c[0]} comm: {self.common_cards[c[1]][c[0]]}")
-                                t_line.append(self.common_cards[c[1]][c[0]])
+                        t_line=[]
+                        for c in cmb:
+                            print(f"cmb: {cmb}, c[1]: {c[1]} c[0]: {c[0]} comm: {self.common_cards[c[1]][c[0]]}")
+                            t_line.append(self.common_cards[c[1]][c[0]])
 
-                            combos += self.get_possible_hands(tmp_hand, t_line)
+                        combos += self.get_possible_hands(tmp_hand, t_line)
 
 
                         ##############################
