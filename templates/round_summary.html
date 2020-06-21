@@ -49,7 +49,7 @@
           <td style="width:10px"></td>
           <td>{{p.bankroll}}</td>
           <td style="width:10px"></td>
-          <td>{% if p.p_nickname in dealer.dead_guys %}
+          <td>{% if p.p_nickname in dealer.folded_players_list %}
                 Folded.
               {% else %}
                 Still Alive

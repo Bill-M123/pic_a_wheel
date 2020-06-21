@@ -7,7 +7,9 @@ class Game():
         self.max_raises = 3
         self.high_low = "high-low"
         self.delta = False
+        self.omaha = False
         self.ante = 50
+        self.game = 'Unknown'
         return
 
     def set_pic_a_wheel(self):

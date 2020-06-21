@@ -78,6 +78,7 @@ class Dealer():
         self.players_not_declared = []
 
         # House keeping
+        self.game_name = 'Unknown'
         self.showdown = False
         self.players_waiting_to_enter = []
         self.hand_in_progress = False
@@ -154,6 +155,7 @@ class Dealer():
         self.players_not_declared = []
 
         # House keeping
+        self.game_name = 'Unknown'
         self.showdown = False
         self.dead_guys = []
         self.folded_players_list = []
@@ -267,6 +269,7 @@ l1'''
 
         new_deck = self.new_deck.copy()
         shuffled = self.shuffle_deck(new_deck,aseed=aseed)
+        self.game_name = game.game
         self.common_rows = game.common_rows #Every time you deal, set the row count
         self.common_cols = game.common_cols
 
