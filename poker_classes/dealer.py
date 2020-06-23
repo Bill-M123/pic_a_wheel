@@ -33,6 +33,7 @@ class Dealer():
         self.dealer_position = 0
         self.hand_number = 0
         self.original_dealer = 'Not defined yet'
+        self.dealer_name = 'No One'
 
         # Card Variables
         self.common_cards = []  # Will have separate lists for each flip
@@ -105,6 +106,7 @@ class Dealer():
         self.cumm_pandl_df = pd.DataFrame()
         self.rolling_df = pd.DataFrame()
         self.summaries_made = False
+        self.flip_map = []
 
         return
 
@@ -124,6 +126,7 @@ class Dealer():
         self.common_cards = []  # Will have separate lists for each flip
         self.common_cards_pr = []
         self.common_cards_flipped = [False, False, False]  # True/False for each flip
+        self.common_rows = 0
         self.cards = Cards()
         self.display_suits_dict = {'S': '\u2660', 'C': '\u2663', 'H': '\u2665', 'D': '\u2666', }
         self.display_rank_dict = {1: 'A', 11: 'J', 12: 'Q', 13: 'K', 2: 2, 3: 3, 4: 4, 5: 5, 6: 6,
@@ -179,6 +182,7 @@ class Dealer():
         self.hand_in_progress = False
         self.rolling_df = pd.DataFrame()
         self.summaries_made = False
+        self.flip_map = []
 
         return
 
@@ -201,6 +205,7 @@ class Dealer():
     def rotate_deal(self, last_order):
         dealer = last_order.pop(0)
         last_order.append(dealer)
+        self.dealer_name=dealer.p_nickname
         return last_order
 
     def insert_new_player(self, last_order, new_player):
@@ -270,6 +275,7 @@ l1'''
         new_deck = self.new_deck.copy()
         shuffled = self.shuffle_deck(new_deck,aseed=aseed)
         self.game_name = game.game
+        print(f"dealing cards, game is: {game.game}")
         self.common_rows = game.common_rows #Every time you deal, set the row count
         self.common_cols = game.common_cols
 

@@ -51,6 +51,7 @@ class MasterControlForm(FlaskForm):
 
     seat_new_players = BooleanField(label="Seat new Players", default=False)
     remove_player = BooleanField(label="Remove Player", default=False)
+    da_game_choice = BooleanField(label="Game Choice", default=False)
     fold_player = BooleanField(label="Fold Player", default=False)
 
     winnings_l1 = IntegerField(label='Low_1',default=0)
@@ -79,6 +80,9 @@ class DeclareForm(FlaskForm):
     hand2_hl = SelectField(label="Hand 2 H/L", default='undeclared')
     submit = SubmitField("Take Action")
 
+class GameChoiceForm(FlaskForm):
+    game_choice = SelectField(label="game_choice", default='pic_a_wheel')
+    submit = SubmitField("Make Choice")
 
 #########################
 
@@ -601,7 +605,7 @@ def declare():
 
 @app.route('/master_control', methods=['GET', 'POST'])
 def master_control():
-    global players
+    global players, this_game
     form = MasterControlForm()
 
     if form.validate_on_submit:
@@ -649,8 +653,45 @@ def master_control():
             dealer.players_waiting_to_enter = []
             dealer.waiting_names = []
             form.seat_new_players.data = False
+            dealer.dealer_name=players[-1].p_nickname
             return render_template('master_control.html', form=form, name='Bornstein',
                                    players=players, this_game=this_game, dealer=dealer)
+
+        #choose games
+        game_choice_flag = form.da_game_choice.data
+        if game_choice_flag:
+
+
+            game_choice = request.form.get('game_choice')
+
+            for i in range(20):
+                print(f"game_choice: {game_choice}")
+
+            if game_choice == 'pic_a_wheel':
+                this_game.set_pic_a_wheel()
+            elif game_choice == 'slot_machine':
+                this_game.set_slot_machine()
+            elif game_choice == 'three_phase':
+                this_game.set_three_phase()
+            elif game_choice == 'tic_tac_toe':
+                this_game.set_tic_tac_toe()
+            elif game_choice == 'tic_tac_toe_w_plex':
+                this_game.set_tic_tac_toe_w_plex()
+            else:
+                this_game.set_pic_a_wheel()
+
+            form.da_game_choice.data = False
+
+            name=session['username']
+            dealer.reset_table(players,this_game)
+            for i, p in enumerate(players):
+                players[i] = p.reset_player_from_master_control()
+                print((p.p_nickname, p.hands, p.common_cards))
+
+            return render_template('master_control.html', form=form, name=name,
+                    players=players, this_game=this_game, dealer=dealer)
+
+
         # Remove Player
         remove_player_flag = form.remove_player.data
         if remove_player_flag:
@@ -918,7 +959,44 @@ def master_control():
     else:
         return f"You are not Bornstein or Clyde, Fuck Off!"
 
+@app.route('/game_choice', methods=['GET', 'POST'])
+def game_choice():
+    global this_game, dealer
+
+    form = GameChoiceForm()
+
+
+    if form.validate_on_submit:
+        if (session['username'] in ['Bornstein','Clyde',dealer.dealer_name]):
+            for i in range(20):
+                print(f"Found user name {session['username']}")
+                print(request.form.get('game_choice'))
+
+            game_choice = request.form.get('game_choice')
+
+            for i in range(20):
+                print(f"game_choice: {game_choice}")
+
+            if game_choice == 'pic_a_wheel':
+                this_game.set_pic_a_wheel()
+            elif game_choice == 'slot_machine':
+                this_game.set_slot_machine()
+            elif game_choice == 'three_phase':
+                this_game.set_three_phase()
+            elif game_choice == 'tic_tac_toe':
+                this_game.set_tic_tac_toe()
+            elif game_choice == 'tic_tac_toe_w_plex':
+                this_game.set_tic_tac_toe_w_plex()
+            else:
+                this_game.set_pic_a_wheel()
+
+        else:
+            return f"You are not Bornstein or Clyde, or {dealer.dealer_name}.  Please try again later."
+
+    return render_template('game_choice.html', form=form)
+
+
 if __name__ == '__main__':
-    #app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', debug=True)
     #app.run(host='0.0.0.0')
-    app.run(debug=True)
+    #app.run(debug=True)

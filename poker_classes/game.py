@@ -96,8 +96,8 @@ class Game():
         return
 
     def set_tic_tac_toe_w_plex(self):
-        self.game = 'tic_tac_toe'
-        self.common_cards = [3, 4, 3]
+        self.game = 'tic_tac_toe_w_plex'
+        self.common_cards = [3, 3, 4]
         self.hands = [[], []]
         self.hands_count = [2, 2]
         self.p_common = 1
@@ -105,10 +105,10 @@ class Game():
         self.common_rows=max(self.common_cards) #set the max number of common cards per column
         self.common_cols=len(self.common_cards) #set the max number of common columns for jinja use
 
-        self.valid_combos=[[[0,0],[0,1],[0,2],[3,1]],[[1,0],[1,1],[1,2],[3,1]],
-                            [[2,0],[2,1],[2,2],[3,1]],[[0,0],[1,0],[2,0],[3,1]],
-                            [[0,1],[1,1],[2,1],[3,1]],[[0,2],[1,2],[2,2],[3,1]],
-                            [[0,0],[1,1],[2,2],[3,1]],[[0,2],[1,1],[2,0],[3,1]]]
+        self.valid_combos=[[[0,0],[0,1],[0,2],[3,2]],[[1,0],[1,1],[1,2],[3,2]],
+                            [[2,0],[2,1],[2,2],[3,2]],[[0,0],[1,0],[2,0],[3,2]],
+                            [[0,1],[1,1],[2,1],[3,2]],[[0,2],[1,2],[2,2],[3,2]],
+                            [[0,0],[1,1],[2,2],[3,2]],[[0,2],[1,1],[2,0],[3,2]]]
 
         self.flip_list=[[[0,0],[0,1],[1,0]],[[2,2],[1,2],[2,1]],[[0,2],[1,1],[0,2]]]
 

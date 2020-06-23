@@ -126,28 +126,30 @@
                 {% for row in range(dealer.common_rows)%}
                 <tr class="common_card_back_r">
                   {% for col in range(dealer.common_cols)%}
+                  <!--Row: {{row}} Col: {{col}} in: {{[row,col] in dealer.flip_map}}-->
 
                     {% if dealer.common_cards[col][row] == 'blank_card'%}
                     <td>&nbsp;</td>
 
                     {% elif dealer.common_cards_flipped[col] %}
 
-                    {% if dealer.common_cards_pr[col][row][1] in ["\u2665","\u2666"] %}
-                    <td>
-                        <span class="your_cards_card_r_rnk">{{dealer.common_cards_pr[col][row][0]}}</span>
-                        <span class="your_cards_card_r_st">{{dealer.common_cards_pr[col][row][1]}}</span>
-                    </td>
-                    {% else %}
-                    <td>
-                      <span class="your_cards_card_b_rnk">{{dealer.common_cards_pr[col][row][0]}}</span>
-                      <span class="your_cards_card_b_st">{{dealer.common_cards_pr[col][row][1]}}</span>
-                    </td>
-                    {% endif %}
+                      {% if dealer.common_cards_pr[col][row][1] in ["\u2665","\u2666"] %}
+                        <td>
+                            <span class="your_cards_card_r_rnk">{{dealer.common_cards_pr[col][row][0]}}</span>
+                            <span class="your_cards_card_r_st">{{dealer.common_cards_pr[col][row][1]}}</span>
+                        </td>
+                      {% else %}
+                        <td>
+                          <span class="your_cards_card_b_rnk">{{dealer.common_cards_pr[col][row][0]}}</span>
+                          <span class="your_cards_card_b_st">{{dealer.common_cards_pr[col][row][1]}}</span>
+                        </td>
+                      {% endif %}
 
-                    {% else%}
-                  <td class="common_card_back_r">&#127136;</td>
-                    {% endif %}
-                  {% endfor %} <!--End td loop -->
+                  {% else%}
+                    <td class="common_card_back_r">&#127136;</td>
+                  {% endif %}
+                {% endfor %} <!--End td loop -->
+
                 </tr>
                 {% endfor %} <!-- end row loop -->
             </table>
@@ -163,7 +165,7 @@
                 </tr>
                 <tr>
                     <td>Dealer</td>
-                    <td>{{players[-1].p_nickname}}</td>
+                    <td>{{dealer.dealer_name}}</td>
                     <td style="width:50px"></td>
                 </tr>
                 <tr>
@@ -192,7 +194,7 @@
                     <td>{{dealer.active_player}}</td>
                     <td></td>
                 </tr>
-              
+
                 <tr>
                     <td>Bet/Raises remaining:</td>
                     <td>{{4-dealer.num_raises}}</td>

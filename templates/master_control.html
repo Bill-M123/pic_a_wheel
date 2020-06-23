@@ -34,6 +34,23 @@
             {{form.hidden_tag() }}
                 <table class="center">
                   <tr><th>Player/Table Controls (indiv reset)</th></tr>
+
+                  <tr class="mc_player_controls">
+                      <td>
+                        <label for="game_choice">Game Choice</label>
+                        <select id="game_choice" name='game_choice' value='pic_a_wheel' default = 'pic_a_wheel'>
+                          <option value='pic_a_wheel'>pic_a_wheel</option>
+                          <option value='slot_machine'>slot_machine</option>
+                          <option value='three_phase'>three_phase</option>
+                          <option value='tic_tac_toe'>tic_tac_toe</option>
+                          <option value='tic_tac_toe_w_plex'>tic_tac_toe_w_plex</option>
+                        </select>
+                      </td>
+                      <td style="width: 10px"></td>
+                      <td>{{form.da_game_choice}}</td>
+                      <td>{{this_game.game}}</td>
+                </tr>
+
                   <tr class="mc_player_controls">
                       <td>
                         <label for="player_to_remove">Player to Remove</label>
