@@ -104,17 +104,17 @@ login_manager = LoginManager()  # Sets up player views
 ############################################
 # Player Initialization
 ############################################
-alba = Player(player_dir, name='John Alba', nickname='Bronislav')
-bornstein = Player(player_dir, name='Bill Murphy', nickname='Bornstein')
-clyde = Player(player_dir, name='Bob Vincent', nickname='Clyde')
-brian = Player(player_dir, name='Brian Mercer', nickname='Mercer')
-ed = Player(player_dir, name='Ed Mulhern', nickname='Mr.Pink')
-tardie = Player(player_dir, name='Michael Tardie', nickname='Tardie')
-judogi = Player(player_dir, name='Bob Powers', nickname='Judogi')
-jeff = Player(player_dir, name='Jeff Andersen', nickname='Jeff')
-degroot = Player(player_dir, name='Henry DeGroot', nickname='Grout')
-bart = Player(player_dir, name='Steve Bart', nickname='Bartman')
-smith = Player(player_dir, name='Walt Smith', nickname='Smitty')
+alba = Player(player_dir, name='John', nickname='Bronislav')
+bornstein = Player(player_dir, name='Bill', nickname='Bornstein')
+clyde = Player(player_dir, name='Bob V', nickname='Clyde')
+brian = Player(player_dir, name='Brian', nickname='Brian')
+ed = Player(player_dir, name='Ed', nickname='Mr.Pink')
+tardie = Player(player_dir, name='Mike', nickname='Tardie')
+judogi = Player(player_dir, name='Bob P', nickname='Judogi')
+jeff = Player(player_dir, name='Jeff', nickname='Jeff')
+degroot = Player(player_dir, name='Henry', nickname='Grout')
+bart = Player(player_dir, name='Steve', nickname='Bartman')
+smith = Player(player_dir, name='Walt', nickname='Smitty')
 
 possible_players = [alba, bornstein, brian, clyde, degroot, ed, jeff,
                     judogi, tardie, bart, smith]
