@@ -115,9 +115,12 @@ jeff = Player(player_dir, name='Jeff', nickname='Jeff')
 degroot = Player(player_dir, name='Henry', nickname='Grout')
 bart = Player(player_dir, name='Steve', nickname='Bartman')
 smith = Player(player_dir, name='Walt', nickname='Smitty')
+dinkya = Player(player_dir, name='Dean', nickname='Dinkya')
+scumbo = Player(player_dir, name='TW', nickname='Scumbo')
+beauv = Player(player_dir, name='Beauv', nickname='Beauv')
 
 possible_players = [alba, bornstein, brian, clyde, degroot, ed, jeff,
-                    judogi, tardie, bart, smith]
+                    judogi, tardie, bart, smith,dinkya]
 
 # starting_funds = dealer.initial_player_funds
 for i,p in enumerate(possible_players):
@@ -125,23 +128,9 @@ for i,p in enumerate(possible_players):
     p.starting_funds = dealer.initial_player_funds
     possible_players[i]=p
 
-### Old testing, no longer needed####
-#players = [alba, bornstein, clyde, brian, ed]
-#players = [alba, bornstein, clyde]
-#players = [bornstein]
-#players = [alba, bornstein]
-#players = [clyde, tardie, judogi, brian, ed, bornstein, jeff]
-#players = [jeff, brian, bornstein]
-
 players = []
 
 player_dict = {}
-# Removing Funds until login corrected
-# for i, p in enumerate(players):
-#    p.add_funds(500)  # add funds
-#    p.player_position = i  # set table position
-
-
 
 
 #########################

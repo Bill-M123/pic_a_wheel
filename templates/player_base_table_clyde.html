@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+    <head>
+        <meta charset="utf-8">
+        {% if dealer.declare_open == False  and dealer.active_player != session['username']%}
+        <meta content="2" http-equiv="refresh"/>
+        {% endif %}
+
+        <title></title>
+
+        <link href="static/table.css" rel="stylesheet">
+
+        <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" rel="stylesheet">
+        <script crossorigin="anonymous"
+                integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+                src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+        <script crossorigin="anonymous"
+                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+                src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+        <script crossorigin="anonymous"
+                integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+                src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div> <!-- MAGILLA -->
+            {% if players == [] %}
+                <div class="the_whole_window">
+                    <div class="jumbotron center">
+                        <h1 class="center">Please Wait.</h1>
+                        <IMG SRC="static/images/waiting-meme.png" ALT="waiting" style="width:50%">
+                    </div>
+                </div>
+
+            {% elif this_player.p_nickname in dealer.waiting_names %}
+
+            <div class="waiting_screen">
+                {% if not dealer.hand_in_progress %}
+                    <div class="jumbotron center">
+                        <h1 class='center'>{{this_player.p_nickname}} welcome to the:</h1>
+                        <IMG SRC="static/images/waiting_room.jpg" ALT="Just wait" class="waiting_image">
+                    </div>
+
+                {% else %}
+                    <div class="waiting_screen">
+                        <div class="jumbotron center">
+                            <h1 class='center'>{{this_player.p_nickname}} welcome to the sin bin.</h1>
+                            <IMG SRC="static/images/waiting_room_4.jpg" ALT="Just wait" class="waiting_image">
+                            <p>You are not currently welcome at this table, likely because you pooched
+                                your login, negelcted to clear your cookies before starting,
+                                were late to the game, (or you are trying to cheat.)</p>
+                            <h1>Please wait while  we investigate."</h1> -->
+
+                        </div>
+                    </div>
+                {% endif %}
+            </div> <!--Waiting screen -->
+
+            {% else %} <!-- all not waiting -->
+
+                <div class="the_whole_window">
+                    <div class="common_table_view">
+                        <div class="player_div">
+                            <table class="jumbotron">
+                                <tr>
+                                    <td style="width: 10px"> </td>
+                                    <th>Name</th>
+                                    <th style="width: 10px"></th>
+                                    <th>Hand 1</th>
+                                    <th style="width:10px"></th>
+                                    <th>Comm.</th>
+                                    <th style="width:10px"></th>
+                                    <th>Hand 2</th>
+                                    <th style="width:10px"></th>
+                                    <th>/Side</th>
+                                    <th style="width:10px"></th>
+                                    <th>Bet</th>
+                                </tr>
+
+                                <!-- {% for p in players%} -->
+
+                                <tr>
+                                    <td style="width: 10px"></td>
+                                    <td class="player_name_box">{{p.p_nickname}}</td>
+                                    <td style="width: 10px"></td>
+                                    <td class="hand_play_box_r">
+                                        {% if (p.hands_hi_lo[0]=="high") and (p.hands[0]!="folded") %}
+                                            &#127136 <span style="color: #777777">&#9679</span> &#127136;
+                                        {% elif p.hands[0]!="folded" %}
+                                            &#127136 &#127136;
+                                        {% endif %}
+                                    </td>
+                                    <td style="width:10px"></td>
+                                    <td class="hand_play_box_r">
+                                        {% if p.common_cards[0]!="folded" %}
+                                            &#127136;
+                                        {% endif %}
+                                    </td>
+                                    <td style="width:10px"></td>
+                                    <td class="hand_play_box_r">
+                                        {% if (p.hands_hi_lo[1]=="high") and (p.hands[1]!="folded") %}
+                                            &#127136 <span style="color: #777777">&#9679</span> &#127136;
+                                        {% elif p.hands[1]!="folded" %}
+                                            &#127136 &#127136;
+                                        {% endif %}
+                                    </td>
+                                    <td style="width:10px"></td>
+                                    <td class="hand_play_box_b">{{p.this_round_per_side}}</td>
+                                    <td style="width:10px"></td>
+                                    <td class="hand_play_box_b">{% if p.p_nickname == dealer.active_player%}X{%endif%}</td>
+
+                                </tr>
+                                <!-- {% endfor %} p in players -->
+                            </table> <!-- jumbotron -->
+                        </div> <!-- player div -->
+
+                        <div class="common_card_div">
+                            <table class="common_card_table">
+                                <tr>
+                                    <th style="text-align:center">Flip 1</th>
+                                    <th style="text-align:center">Flip 2</th>
+                                    <th style="text-align:center">Flip 3</th>
+                                </tr>
+
+                                {% for row in range(dealer.common_rows)%}
+
+                                    <tr class="common_card_back_r">
+                                        {% for col in range(dealer.common_cols)%}
+                                        <!--Row: {{row}} Col: {{col}} in: {{[row,col] in dealer.flip_map}}-->
+
+                                            {% if dealer.common_cards[col][row] == 'blank_card'%} <td>&nbsp;</td>
+
+                                            {% elif dealer.common_cards_flipped[col] %}
+                                                {% if dealer.common_cards_pr[col][row][1] in ["\u2665","\u2666"] %}
+                                                    <td>
+                                                        <span class="your_cards_card_r_rnk">{{dealer.common_cards_pr[col][row][0]}}</span>
+                                                        <span class="your_cards_card_r_st">{{dealer.common_cards_pr[col][row][1]}}</span>
+                                                    </td>
+                                                {% else %}
+                                                    <td>
+                                                      <span class="your_cards_card_b_rnk">{{dealer.common_cards_pr[col][row][0]}}</span>
+                                                      <span class="your_cards_card_b_st">{{dealer.common_cards_pr[col][row][1]}}</span>
+                                                    </td>
+                                                {% endif %}
+                                            {% else%}
+                                                <td class="common_card_back_r">&#127136;</td>
+                                            {% endif %}
+                                        {% endfor %} <!--End td loop -->
+
+                                    </tr>
+                                {% endfor %} <!-- end row loop -->
+                            </table> <!-- common card table -->
+                        </div> <!-- common card div -->
+
+                        <div class="summary_table">
+                            <table>
+                                <th><b>Table Status</b></th>
+                                <tr>
+                                    <td>Game</td>
+                                    <td><b>{{dealer.game_name}}</b></td>
+                                    <td style="width:50px"></td>
+                                </tr>
+                                <tr>
+                                    <td>Dealer</td>
+                                    <td>{{dealer.dealer_name}}</td>
+                                    <td style="width:50px"></td>
+                                </tr>
+                                <tr>
+                                    <td>In Pot:</td>
+                                    <td>{{dealer.pot}}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Pot hi/low:</td>
+                                    <td>{{dealer.high_pot}}/{{dealer.low_pot}}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Opened:</td>
+                                    <td>{{dealer.who_opened}}</td>
+                                    <td></td>
+                                </tr>
+
+                                <tr>
+                                    <td>Last Bet/Raise:</td>
+                                    <td>{{dealer.last_raise}}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Bet to:</td>
+                                    <td>{{dealer.active_player}}</td>
+                                    <td></td>
+                                </tr>
+
+                                <tr>
+                                    <td>Bet/Raises remaining:</td>
+                                    <td>{{4-dealer.num_raises}}</td>
+                                    <td></td>
+                                </tr>
+                                <tr style="height: 10px">
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th><b>Hand Status</b></th>
+                                </tr>
+                                <tr>
+                                    <td>Players w/ Two Hands</td>
+                                    <td>{{dealer.players_w_two_hands}}</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Players w/ One Hand</td>
+                                    <td>{{dealer.players_w_one_hand}}</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <tr>
+                                    <td>Players Folded</td>
+                                    <td>{{dealer.players_folded}}</td>
+                                </tr>
+                                {% if dealer.declare_done %}
+                                    <tr>
+                                        <tr>
+                                        <td>High hands</td>
+                                        <td>{{dealer.high_hands}}</td>
+                                    </tr>
+                                    <tr>
+                                        <tr>
+                                        <td>Low hands</td>
+                                        <td>{{dealer.low_hands}}</td>
+                                    </tr>
+                                {% endif %}
+                            </table> <!-- summary table -->
+                        </div> <!-- summary table -->
+                    </div> <!-- common table view div -->
+
+                    <div class="container your_cards">
+                        <p><b>{{this_player.p_nickname}} your cards are:</b></p>
+                        <form class="form-inline" method="POST"> <!-- your table form -->
+                            <div><!-- your cards -->
+                                <table><!-- your table -->
+                                    <tr>
+
+                                        <td class="your_cards_hand">
+                                            {% if (this_player["hands"][0] !="folded") and (dealer.first_deal != True) %}
+                                                {% if this_player["hands_pr"][0][0][1] in ["\u2665","\u2666"] %}
+                                                    <span class="your_cards_card_r_rnk">{{this_player["hands_pr"][0][0][0]}}</span>
+                                                    <span class="your_cards_card_r_st">{{this_player["hands_pr"][0][0][1]}}</span>
+                                                {% else %}
+                                                    <span class="your_cards_card_b_rnk">{{this_player["hands_pr"][0][0][0]}}</span>
+                                                    <span class="your_cards_card_b_st">{{this_player["hands_pr"][0][0][1]}}</span>
+                                                {% endif %}
+
+                                                {% if this_player.hands_hi_lo[0]=="high" %}
+                                                    <span style="color: #777777; font-size:40px">&#9679;</span>
+                                                {% elif this_player.hands[1]!="folded" %}
+                                                {% endif %}
+
+                                                {% if this_player["hands_pr"][0][1][1] in ["\u2665","\u2666"] %}
+                                                    <span class="your_cards_card_r_rnk">{{this_player["hands_pr"][0][1][0]}}</span>
+                                                    <span class="your_cards_card_r_st">{{this_player["hands_pr"][0][1][1]}}</span>
+                                                {% else %}
+                                                    <span class="your_cards_card_b_rnk">{{this_player["hands_pr"][0][1][0]}}</span>
+                                                    <span class="your_cards_card_b_st">{{this_player["hands_pr"][0][1][1]}}</span>
+                                                {% endif %}
+
+                                            {% endif %}
+                                        </td>
+
+                                        <td style="width:10px"></td>
+
+                                        <td class="your_cards_hand">
+                                            {% if (this_player["common_cards"][0]!="folded") and (dealer.first_deal != True) %}
+                                                {% if this_player["common_cards_pr"][0][1] in ["\u2665","\u2666"] %}
+                                                    <span class="your_cards_card_r_rnk">{{this_player["common_cards_pr"][0][0]}}</span>
+                                                    <span class="your_cards_card_r_st">{{this_player["common_cards_pr"][0][1]}}</span>
+                                                {% else %}
+                                                    <span class="your_cards_card_b_rnk">{{this_player["common_cards_pr"][0][0]}}</span>
+                                                    <span class="your_cards_card_b_st">{{this_player["common_cards_pr"][0][1]}}</span>
+                                                {% endif %}
+                                            {% endif %}
+
+                                        </td>
+
+                                        <td style="width:10px"></td>
+
+                                        <td class="your_cards_hand">
+                                            {% if this_player["hands"][1] !="folded" and (dealer.first_deal != True) %}
+                                                {% if this_player["hands_pr"][1][0][1] in ["\u2665","\u2666"] %}
+                                                    <span class="your_cards_card_r_rnk">{{this_player["hands_pr"][1][0][0]}}</span>
+                                                    <span class="your_cards_card_r_st">{{this_player["hands_pr"][1][0][1]}}</span>
+                                                {% else %}
+                                                    <span class="your_cards_card_b_rnk">{{this_player["hands_pr"][1][0][0]}}</span>
+                                                    <span class="your_cards_card_b_st">{{this_player["hands_pr"][1][0][1]}}</span>
+                                                {% endif %}
+
+                                                {% if this_player.hands_hi_lo[1]=="high" %}
+                                                    <span style="color: #777777; font-size:40px">&#9679;</span>
+                                                {% elif this_player.hands[1]!="folded" %}
+                                                {% endif %}
+
+                                                {% if this_player["hands_pr"][1][1][1] in ["\u2665","\u2666"] %}
+                                                    <span class="your_cards_card_r_rnk">{{this_player["hands_pr"][1][1][0]}}</span>
+                                                    <span class="your_cards_card_r_st">{{this_player["hands_pr"][1][1][1]}}</span>
+                                                {% else %}
+                                                    <span class="your_cards_card_b_rnk">{{this_player["hands_pr"][1][1][0]}}</span>
+                                                    <span class="your_cards_card_b_st">{{this_player["hands_pr"][1][1][1]}}</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td> </td>
+                                        <td> </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                          {% block hand_1_controls %}
+                                          {% endblock %}
+
+                                        </td>
+
+                                        <td> </td>
+                                        <td>Common</td>
+                                        <td> </td>
+                                        <td>
+                                          {% block hand_2_controls %}
+                                          {% endblock %}
+                                        </td>
+                                        <td> </td>
+
+                                        <td>
+                                          {% block bet_actions %}
+                                          {% endblock %}
+                                        </td>
+
+                                        <td>
+                                          {% block submit_block %}
+                                          {% endblock %}
+                                        </td>
+                                    </tr>
+                                </table> <!-- your table -->
+                            </div><!-- your cards  -->
+                        </form><!-- your table form -->
+                    </div><!-- Your cards div -->
+                </div><!-- the whole window div -->
+
+                {% if dealer.show_winnings %}
+                    <div class="jumbotron">
+                        <h1>Bankrolls</h1>
+                        <table>
+                            <tr><th>Player</th><th>Funds</th></tr>
+                                {% for p in players %}
+                                <tr><td>{{p.p_nickname}}</td><td>{{p.bankroll}}</td></tr>
+                                {% endfor%}
+                        </table>
+                    </div>
+                {% endif %}
+
+            {% endif %} <!-- all not waiting ->
+        </div> <!-- MAGILLA -->
+    </body>
+</html>
